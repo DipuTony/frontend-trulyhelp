@@ -8,6 +8,7 @@ import { register, clearError } from "../../store/slices/authSlice"
 const Signup = () => {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordError, setPasswordError] = useState("")
@@ -23,11 +24,12 @@ const Signup = () => {
 
     // Redirect if already authenticated
     if (isAuthenticated) {
-      if (user?.role === "admin") {
+      if (user?.role === "ADMIN") {
         navigate("/admin")
-      } else if (user?.role === "volunteer") {
+      } else if (user?.role === "VOLUNTEER") {
         navigate("/volunteer")
-      } else if (user?.role === "donor") {
+      } else if (user?.role === "DONOR") {
+        console.log("This is donor")
         navigate("/donor")
       } else {
         navigate("/")
@@ -45,7 +47,7 @@ const Signup = () => {
     }
 
     setPasswordError("")
-    dispatch(register({ name, email, password, role: "donor" }))
+    dispatch(register({ name, email, password, phone }))
   }
 
   return (
@@ -105,6 +107,22 @@ const Signup = () => {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div>
+              <label htmlFor="phone-number" className="sr-only">
+              phone number
+              </label>
+              <input
+                id="phone-number"
+                name="phone"
+                type="phone"
+                autoComplete="phone"
+                required
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
             <div>

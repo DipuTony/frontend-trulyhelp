@@ -5,7 +5,7 @@ import "./index.css"
 import axios from "axios"
 
 // Set up axios defaults
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || "http://localhost:4002/"
+axios.defaults.baseURL = import.meta.env.VITE_API_URL || "https://donation.toolvid.in/"
 axios.defaults.headers.common["Content-Type"] = "application/json"
 
 // Add token to requests if available
