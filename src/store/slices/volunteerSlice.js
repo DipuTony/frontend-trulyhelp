@@ -4,7 +4,7 @@ import axios from "axios"
 // Get all volunteers
 export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/users")
+    const response = await axios.get("/user/view-all")
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)

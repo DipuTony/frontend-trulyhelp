@@ -13,6 +13,8 @@ const Login = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  console.log("loading", loading, "error", error, "isAuthenticated", isAuthenticated, "user", user)
+
   useEffect(() => {
     // Clear any previous errors
     dispatch(clearError())
@@ -56,9 +58,25 @@ const Login = () => {
 
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-            <span className="block sm:inline">{error}</span>
+            <span className="block sm:inline">
+              {typeof error === 'string' ? error : error.message || "Something went wrong"}
+              {
+                error?.emailVerifyStatus === false && (
+                  <button
+                    className="mt-2 inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition"
+                    onClick={() => {
+                      // dispatch(login({ email, password }))
+                    }}
+                  >
+                    Send Verification Email Again.
+                  </button>
+                )
+
+              }
+            </span>
           </div>
         )}
+
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
