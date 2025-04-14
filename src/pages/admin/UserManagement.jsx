@@ -4,10 +4,13 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchVolunteers, addVolunteer, updateVolunteer } from "../../store/slices/volunteerSlice"
 import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline"
+import { useParams } from "react-router-dom"
 
-const VolunteerManagement = () => {
+const UserManagement = () => {
   const dispatch = useDispatch()
   const { volunteers, loading, error } = useSelector((state) => state.volunteers)
+
+  const { role } = useParams();
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -23,8 +26,8 @@ const VolunteerManagement = () => {
   })
 
   useEffect(() => {
-    dispatch(fetchVolunteers())
-  }, [dispatch])
+    dispatch(fetchVolunteers(role?.toUpperCase()))
+  }, [dispatch, role])
 
   const handleOpenModal = (volunteer = null) => {
     if (volunteer) {
@@ -92,9 +95,9 @@ const VolunteerManagement = () => {
     <div>
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Volunteers</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 capitalize">{role}s</h1>
           <p className="mt-2 text-sm text-gray-700">
-            A list of all volunteers including their name, email, phone, and address.
+            A list of all {role}s including their name, email, phone, and address.
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -104,7 +107,7 @@ const VolunteerManagement = () => {
             className="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto"
           >
             <PlusIcon className="h-4 w-4 mr-2" />
-            Add Volunteer
+            Add &nbsp;<span className="capitalize">{role}</span>
           </button>
         </div>
       </div>
@@ -129,7 +132,7 @@ const VolunteerManagement = () => {
                       Role
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                   Created At
+                      Created At
                     </th>
                     <th scope="col" className="relative py-3.5 pl-3 pr-4 sm:pr-6">
                       <span className="sr-only">Edit</span>
@@ -180,8 +183,8 @@ const VolunteerManagement = () => {
               <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
                   <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                      {isEditing ? "Edit Volunteer" : "Add Volunteer"}
+                    <h3 className="text-lg leading-6 font-medium text-gray-900 capitalize">
+                      {isEditing ? `Edit ${role}` : `Add ${role}`}
                     </h3>
                     <div className="mt-2">
                       <form onSubmit={handleSubmit} className="space-y-4">
@@ -271,4 +274,4 @@ const VolunteerManagement = () => {
   )
 }
 
-export default VolunteerManagement
+export default UserManagement

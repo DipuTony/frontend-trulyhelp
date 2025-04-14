@@ -8,8 +8,8 @@ import Signup from "./pages/auth/Signup"
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard"
+import UserManagement from "./pages/admin/UserManagement"
 import DonationList from "./pages/admin/DonationList"
-import VolunteerManagement from "./pages/admin/VolunteerManagement"
 import ExpenseManagement from "./pages/admin/ExpenseManagement"
 import PaymentVerification from "./pages/admin/PaymentVerification"
 import ReportGenerator from "./pages/admin/ReportGenerator"
@@ -58,7 +58,9 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="donations" element={<DonationList />} />
-            <Route path="volunteers" element={<VolunteerManagement />} />
+            <Route path="users/:role?" element={<UserManagement />} />
+            {/* <Route path="users/doners" element={"<list of doners />"} />
+            <Route path="users/admins" element={"<list of Admins />"} /> */}
             <Route path="expenses" element={<ExpenseManagement />} />
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />

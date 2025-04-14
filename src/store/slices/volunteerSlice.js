@@ -2,14 +2,15 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
 // Get all volunteers
-export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", async (_, { rejectWithValue }) => {
+export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", async (role, { rejectWithValue }) => { // Accept role parameter
   try {
-    const response = await axios.get("/user/view-all")
-    return response.data
+    const response = await axios.get(`/user/view-all?role=${role}`); // or `/user/${role}/view-all`
+    return response.data;
   } catch (error) {
-    return rejectWithValue(error.response.data)
+    return rejectWithValue(error.response.data);
   }
-})
+}
+);
 
 // Add new volunteer
 export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (volunteerData, { rejectWithValue }) => {
