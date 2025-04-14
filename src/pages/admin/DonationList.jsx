@@ -125,11 +125,12 @@ const DonationList = () => {
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <span
-                          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.settled ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
                             }`}
                         >
-                          {donation.verified ? "Verified" : "Pending"}
+                          {donation.settled ? "Verified" : "Pending"}
                         </span>
+                        <p className="text-gray-500 text-xs">{donation.status}</p>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                         <span
@@ -141,7 +142,7 @@ const DonationList = () => {
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
-                        {!donation.verified && (
+                        {!donation.settled && (
                           <button
                             onClick={() => handleVerify(donation.id)}
                             className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"

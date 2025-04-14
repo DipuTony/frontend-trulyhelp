@@ -60,7 +60,7 @@ function App() {
             <Route path="donations" element={<DonationList />} />
             <Route path="users/:role?" element={<UserManagement />} />
             <Route path="users/:role?/:userId?" element={"vol;uinter details"} />
-            <Route path="expenses" element={<ExpenseManagement />} />
+            {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />
             <Route path="notifications" element={<NotificationPanel />} />

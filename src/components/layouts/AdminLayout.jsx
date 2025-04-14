@@ -38,7 +38,7 @@ const AdminLayout = () => {
       ]
     },
     { name: "Donations", href: "/admin/donations", icon: "chart-pie" },
-    { name: "Expenses", href: "/admin/expenses", icon: "chart-pie" },
+    // { name: "Expenses", href: "/admin/expenses", icon: "chart-pie" },
     { name: "Payment Verification", href: "/admin/payment-verification", icon: "check-circle" },
     { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
     { name: "Notifications", href: "/admin/notifications", icon: "bell" },
