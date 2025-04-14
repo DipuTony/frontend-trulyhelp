@@ -4,8 +4,8 @@ import axios from "axios"
 // Get all donations
 export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/donations")
-    return response.data
+    const response = await axios.get("/donations/view-all")
+    return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
   }

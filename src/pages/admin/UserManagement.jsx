@@ -95,9 +95,9 @@ const UserManagement = () => {
     <div>
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900 capitalize">{role}s</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 capitalize">{role ? role+"s" :"All Users"}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            A list of all {role}s including their name, email, phone, and address.
+            A list of all {role ? role+"s" :"All Users"} including their name, email, phone, and address.
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
