@@ -64,7 +64,7 @@ const DonorDashboard = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Total Donation</dt>
                     <dd>
-                      <div className="text-lg font-medium text-gray-900">${totalCollected.toFixed(2)}</div>
+                      <div className="text-lg font-medium text-gray-900">₹{totalCollected.toFixed(2)}</div>
                     </dd>
                   </dl>
                 </div>
@@ -82,7 +82,7 @@ const DonorDashboard = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Pending Verification</dt>
                     <dd>
-                      <div className="text-lg font-medium text-gray-900">${pendingAmount.toFixed(2)}</div>
+                      <div className="text-lg font-medium text-gray-900">₹{pendingAmount.toFixed(2)}</div>
                     </dd>
                   </dl>
                 </div>
@@ -100,7 +100,7 @@ const DonorDashboard = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Verified Donations</dt>
                     <dd>
-                      <div className="text-lg font-medium text-gray-900">${verifiedAmount.toFixed(2)}</div>
+                      <div className="text-lg font-medium text-gray-900">₹{verifiedAmount.toFixed(2)}</div>
                     </dd>
                   </dl>
                 </div>
@@ -223,7 +223,7 @@ const DonorDashboard = () => {
                           <div className="text-sm text-gray-500">{donation.donorEmail}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">${donation.amount?.toFixed(2)}</div>
+                          <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">{new Date(donation.date).toLocaleDateString()}</div>

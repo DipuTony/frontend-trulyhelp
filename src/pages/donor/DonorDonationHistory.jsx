@@ -88,7 +88,7 @@ const DonorDonationHistory = () => {
                   <dl>
                     <dt className="text-sm font-medium text-gray-500 truncate">Total Donated</dt>
                     <dd>
-                      <div className="text-lg font-medium text-gray-900">${totalDonated.toFixed(2)}</div>
+                      <div className="text-lg font-medium text-gray-900">₹{totalDonated.toFixed(2)}</div>
                     </dd>
                   </dl>
                 </div>
@@ -188,7 +188,7 @@ const DonorDonationHistory = () => {
                             <div className="text-sm text-gray-900">{new Date(donation.date).toLocaleDateString()}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">${donation.amount?.toFixed(2)}</div>
+                            <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">{donation.paymentMethod || "Online"}</div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
+import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
 const PaymentVerification = () => {
   const dispatch = useDispatch()
@@ -81,8 +82,8 @@ const PaymentVerification = () => {
                           <p className="text-sm text-gray-500 truncate">{donation.donorEmail}</p>
                         </div>
                         <div>
-                          <p className="text-sm font-semibold text-gray-900">${donation.amount?.toFixed(2)}</p>
-                          <p className="text-xs text-gray-500">{new Date(donation.date).toLocaleDateString()}</p>
+                          <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
+                          <p className="text-xs text-gray-500">{formatDateShort(donation.date)}</p>
                         </div>
                       </div>
                     </li>
@@ -109,12 +110,12 @@ const PaymentVerification = () => {
                   </div>
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Amount</dt>
-                    <dd className="mt-1 text-sm text-gray-900">${selectedDonation.amount?.toFixed(2)}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">₹{selectedDonation.amount?.toFixed(2)}</dd>
                   </div>
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Date</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {new Date(selectedDonation.date).toLocaleDateString()}
+                      {formatDateShort(selectedDonation.date)}
                     </dd>
                   </div>
                   <div className="sm:col-span-2">

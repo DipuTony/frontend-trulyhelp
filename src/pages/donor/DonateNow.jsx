@@ -149,7 +149,7 @@ const DonateNow = () => {
                     </label>
                     <div className="mt-1 relative rounded-md shadow-sm">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500 sm:text-sm">$</span>
+                        <span className="text-gray-500 sm:text-sm">₹</span>
                       </div>
                       <input
                         type="number"
@@ -283,7 +283,7 @@ const DonateNow = () => {
                   {donationData.paymentMethod === "paypal" && (
                     <div className="col-span-6">
                       <p className="text-sm text-gray-500">
-                        You will be redirected to PayPal to complete your donation of ${donationData.amount}.
+                        You will be redirected to PayPal to complete your donation of ₹{donationData.amount}.
                       </p>
                     </div>
                   )}
@@ -291,7 +291,7 @@ const DonateNow = () => {
                   {donationData.paymentMethod === "bank_transfer" && (
                     <div className="col-span-6">
                       <p className="text-sm text-gray-500">
-                        Please use the following details to make your bank transfer of ${donationData.amount}:
+                        Please use the following details to make your bank transfer of ₹{donationData.amount}:
                       </p>
                       <div className="mt-2 bg-gray-50 p-4 rounded-md">
                         <p className="text-sm">
@@ -318,7 +318,7 @@ const DonateNow = () => {
                       <h4 className="text-sm font-medium text-gray-900">Donation Summary</h4>
                       <div className="mt-2 flex justify-between">
                         <p className="text-sm text-gray-500">Amount:</p>
-                        <p className="text-sm font-medium text-gray-900">${donationData.amount}</p>
+                        <p className="text-sm font-medium text-gray-900">₹{donationData.amount}</p>
                       </div>
                       {donationData.isRecurring && (
                         <div className="mt-1 flex justify-between">

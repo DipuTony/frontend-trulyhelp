@@ -361,7 +361,7 @@ const GuestDonateNow = () => {
                               : "bg-white text-gray-700 hover:bg-gray-50"
                           } border border-gray-300 rounded-md py-3 px-4 flex items-center justify-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500`}
                         >
-                          ${amount}
+                          ₹{amount}
                         </button>
                       ))}
                     </div>
@@ -371,7 +371,7 @@ const GuestDonateNow = () => {
                       </label>
                       <div className="mt-1 relative rounded-md shadow-sm">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">$</span>
+                          <span className="text-gray-500 sm:text-sm">₹</span>
                         </div>
                         <input
                           type="number"
@@ -616,7 +616,7 @@ const GuestDonateNow = () => {
                         <div className="ml-3">
                           <h3 className="text-sm font-medium text-blue-800">PayPal Information</h3>
                           <div className="mt-2 text-sm text-blue-700">
-                            <p>You will be redirected to PayPal to complete your donation of ${donationData.amount}.</p>
+                            <p>You will be redirected to PayPal to complete your donation of ₹{donationData.amount}.</p>
                           </div>
                         </div>
                       </div>
@@ -633,7 +633,7 @@ const GuestDonateNow = () => {
                           <h3 className="text-sm font-medium text-blue-800">Bank Transfer Information</h3>
                           <div className="mt-2 text-sm text-blue-700">
                             <p>
-                              Please use the following details to make your bank transfer of ${donationData.amount}:
+                              Please use the following details to make your bank transfer of ₹{donationData.amount}:
                             </p>
                             <div className="mt-2 bg-white p-3 rounded-md">
                               <p className="text-sm">
@@ -671,7 +671,7 @@ const GuestDonateNow = () => {
                       </div>
                       <div className="flex justify-between">
                         <dt className="text-sm text-gray-500">Amount:</dt>
-                        <dd className="text-sm font-medium text-gray-900">${donationData.amount}</dd>
+                        <dd className="text-sm font-medium text-gray-900">₹{donationData.amount}</dd>
                       </div>
                       <div className="flex justify-between">
                         <dt className="text-sm text-gray-500">Category:</dt>
@@ -788,7 +788,7 @@ const GuestDonateNow = () => {
                 </div>
                 <h2 className="mt-6 text-2xl font-extrabold text-gray-900">Thank You for Your Donation!</h2>
                 <p className="mt-2 text-lg text-gray-600">
-                  Your donation of ${donationData.amount} has been successfully processed.
+                  Your donation of ₹{donationData.amount} has been successfully processed.
                 </p>
                 <p className="mt-1 text-gray-600">A confirmation email has been sent to {donorData.email}.</p>
                 <div className="mt-8 bg-gray-50 p-4 rounded-md text-left">
@@ -804,7 +804,7 @@ const GuestDonateNow = () => {
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm text-gray-500">Amount:</dt>
-                      <dd className="text-sm font-medium text-gray-900">${donationData.amount}</dd>
+                      <dd className="text-sm font-medium text-gray-900">₹{donationData.amount}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt className="text-sm text-gray-500">Payment Method:</dt>

@@ -39,7 +39,7 @@ const AdminDashboard = () => {
   const stats = [
     {
       name: "Total Donations",
-      value: `$${totalDonations.toFixed(2)}`,
+      value: `₹${totalDonations.toFixed(2)}`,
       icon: "dollar-sign",
       color: "bg-green-500",
     },
@@ -51,13 +51,13 @@ const AdminDashboard = () => {
     },
     { 
       name: "Expenses", 
-      value: `$${totalExpenses.toFixed(2)}`, 
+      value: `₹${totalExpenses.toFixed(2)}`, 
       icon: "file-invoice", 
       color: "bg-red-500" 
     },
     { 
       name: "Net Balance", 
-      value: `$${netBalance.toFixed(2)}`, 
+      value: `₹${netBalance.toFixed(2)}`, 
       icon: "balance-scale", 
       color: "bg-purple-500" 
     },
@@ -155,7 +155,7 @@ const AdminDashboard = () => {
                     <div className="text-sm text-gray-500">{donation.donorEmail || '-'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    ${Number(donation.amount || 0).toFixed(2)}
+                  ₹{Number(donation.amount || 0).toFixed(2)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {donation.createdAt ? new Date(donation.createdAt).toLocaleDateString() : '-'}

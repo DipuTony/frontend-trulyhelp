@@ -1,68 +1,34 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
+import { fetchDonations } from "../../store/slices/donationSlice"
 
 const VolunteerDonationHistory = () => {
-  const { user } = useSelector((state) => state.auth)
   const [filter, setFilter] = useState("all")
-  const [donations, setDonations] = useState([])
 
-  // Dummy Data for testing
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+  const { donations, loading } = useSelector((state) => state.donations)
+
   useEffect(() => {
-    const dummyDonations = [
-      {
-        id: 1,
-        donorName: "Alice Johnson",
-        donorEmail: "alice@example.com",
-        amount: 500,
-        date: "2025-04-08T10:00:00Z",
-        paymentMethod: "CASH",
-        verified: true,
-        collectedBy: user?.id,
-      },
-      {
-        id: 2,
-        donorName: "Bob Smith",
-        donorEmail: "bob@example.com",
-        amount: 250,
-        date: "2025-04-09T14:30:00Z",
-        paymentMethod: "ONLINE",
-        verified: false,
-        collectedBy: user?.id,
-      },
-      {
-        id: 3,
-        donorName: "Clara Adams",
-        donorEmail: "clara@example.com",
-        amount: 1200,
-        date: "2025-04-07T08:15:00Z",
-        paymentMethod: "UPI",
-        verified: true,
-        collectedBy: user?.id,
-      },
-      {
-        id: 4,
-        donorName: "David King",
-        donorEmail: "david@example.com",
-        amount: 320,
-        date: "2025-04-06T19:45:00Z",
-        paymentMethod: "CHEQUE",
-        verified: false,
-        collectedBy: 999, // Other volunteer (for filter test)
-      },
-    ]
+    dispatch(fetchDonations())
+  }, [dispatch])
 
-    setDonations(dummyDonations)
-  }, [user])
-
-  const myDonations = donations.filter((d) => d.collectedBy === user?.id)
   const filteredDonations =
     filter === "all"
-      ? myDonations
+      ? donations
       : filter === "verified"
-      ? myDonations.filter((d) => d.verified)
-      : myDonations.filter((d) => !d.verified)
+        ? donations.filter((d) => d.verified)
+        : donations.filter((d) => !d.verified)
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -80,15 +46,14 @@ const VolunteerDonationHistory = () => {
           <button
             key={key}
             onClick={() => setFilter(key)}
-            className={`px-3 py-2 rounded-md text-sm font-medium ${
-              filter === key
-                ? key === "verified"
-                  ? "bg-green-100 text-green-800"
-                  : key === "pending"
+            className={`px-3 py-2 rounded-md text-sm font-medium ${filter === key
+              ? key === "verified"
+                ? "bg-green-100 text-green-800"
+                : key === "pending"
                   ? "bg-yellow-100 text-yellow-800"
                   : "bg-indigo-100 text-indigo-800"
-                : "text-gray-700 hover:bg-gray-100"
-            }`}
+              : "text-gray-700 hover:bg-gray-100"
+              }`}
           >
             {key.charAt(0).toUpperCase() + key.slice(1)}
           </button>
@@ -144,9 +109,8 @@ const VolunteerDonationHistory = () => {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span
-                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                              donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                            }`}
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                              }`}
                           >
                             {donation.verified ? "Verified" : "Pending"}
                           </span>

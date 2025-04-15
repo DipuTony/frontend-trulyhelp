@@ -14,7 +14,7 @@ export const fetchDonations = createAsyncThunk("donations/fetchDonations", async
 // Add new donation
 export const addDonation = createAsyncThunk("donations/addDonation", async (donationData, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/donations", donationData)
+    const response = await axios.post("/donations/donate", donationData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
