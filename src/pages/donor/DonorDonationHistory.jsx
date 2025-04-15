@@ -1,60 +1,27 @@
 "use client"
 
 import { useEffect, useState } from "react"
-// import { useSelector, useDispatch } from "react-redux"
-// import { fetchDonations } from "../../store/slices/donationSlice"
+import { useSelector, useDispatch } from "react-redux"
+import { fetchDonerDonations } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
+import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
 const DonorDonationHistory = () => {
-  // const dispatch = useDispatch()
-  // const { user } = useSelector((state) => state.auth)
-  // const { donations, loading, error } = useSelector((state) => state.donations)
+  const dispatch = useDispatch()
+  const { user } = useSelector((state) => state.auth)
+  const { donations, loading, error } = useSelector((state) => state.donations)
 
-  // TEMP dummy user & donation data
-  const user = {
-    name: "Jane Doe",
-    email: "jane@example.com"
-  }
 
-  const donations = [
-    {
-      id: 1,
-      donorEmail: "jane@example.com",
-      donorName: "Jane Doe",
-      amount: 100,
-      date: "2025-04-01T10:00:00Z",
-      paymentMethod: "UPI",
-      verified: true
-    },
-    {
-      id: 2,
-      donorEmail: "jane@example.com",
-      donorName: "Jane Doe",
-      amount: 250,
-      date: "2025-04-05T14:30:00Z",
-      paymentMethod: "Card",
-      verified: false
-    },
-    {
-      id: 3,
-      donorEmail: "jane@example.com",
-      donorName: "Jane Doe",
-      amount: 75,
-      date: "2025-04-07T09:45:00Z",
-      paymentMethod: "Netbanking",
-      verified: true
-    }
-  ]
 
-  // useEffect(() => {
-  //   dispatch(fetchDonations())
-  // }, [dispatch])
+  useEffect(() => {
+    dispatch(fetchDonerDonations())
+  }, [dispatch])
 
-  const myDonations = donations.filter((d) => d.donorEmail === user?.email)
+  // const myDonations = donations.filter((d) => d.donorEmail === user?.email)
 
-  const totalDonated = myDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const verifiedDonations = myDonations.filter((d) => d.verified)
-  const pendingDonations = myDonations.filter((d) => !d.verified)
+  const totalDonated = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
+  const verifiedDonations = donations.filter((d) => d.verified)
+  const pendingDonations = donations.filter((d) => !d.verified)
 
   return (
     <div>
@@ -172,7 +139,7 @@ const DonorDonationHistory = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {myDonations.length === 0 ? (
+                    {donations?.length === 0 ? (
                       <tr>
                         <td colSpan="4" className="px-6 py-4 text-center text-sm text-gray-500">
                           You haven't made any donations yet.{" "}
@@ -182,10 +149,10 @@ const DonorDonationHistory = () => {
                         </td>
                       </tr>
                     ) : (
-                      myDonations.map((donation) => (
+                      donations?.map((donation) => (
                         <tr key={donation.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{new Date(donation.date).toLocaleDateString()}</div>
+                            <div className="text-sm text-gray-900">{formatDateShort(donation.date)}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>

@@ -2,8 +2,9 @@
 
 import { useEffect } from "react"
 import { useSelector, useDispatch } from "react-redux"
-import { fetchDonations } from "../../store/slices/donationSlice"
+import { fetchDonations, fetchDonerDonations } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
+import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
 const DonorDashboard = () => {
   const dispatch = useDispatch()
@@ -11,16 +12,16 @@ const DonorDashboard = () => {
   const { donations, loading } = useSelector((state) => state.donations)
 
   useEffect(() => {
-    dispatch(fetchDonations())
+    dispatch(fetchDonerDonations())
   }, [dispatch])
 
   // Filter donations collected by this volunteer
-  const myDonations = donations.filter((d) => d.collectedBy === user?.id)
-  const pendingDonations = myDonations.filter((d) => !d.verified)
-  const verifiedDonations = myDonations.filter((d) => d.verified)
+  // const myDonations = donations.filter((d) => d.collectedBy === user?.id)
+  const pendingDonations = donations.filter((d) => !d.verified)
+  const verifiedDonations = donations.filter((d) => d.verified)
 
   // Calculate statistics
-  const totalCollected = myDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
+  const totalCollected = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
   const pendingAmount = pendingDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
   const verifiedAmount = verifiedDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
 
@@ -112,71 +113,6 @@ const DonorDashboard = () => {
 
       <div className="mt-8">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Assigned Tasks</h3>
-          <Link to="/volunteer/add-donation" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-            View all tasks
-          </Link>
-        </div>
-        <div className="mt-2 bg-white shadow overflow-hidden sm:rounded-md">
-          <ul className="divide-y divide-gray-200">
-            <li>
-              <div className="px-4 py-4 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-indigo-600 truncate">Collect donations from Event X</p>
-                  <div className="ml-2 flex-shrink-0 flex">
-                    <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      High Priority
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-2 sm:flex sm:justify-between">
-                  <div className="sm:flex">
-                    <p className="flex items-center text-sm text-gray-500">
-                      <i className="fas fa-map-marker-alt flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"></i>
-                      Community Center
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                    <i className="fas fa-calendar flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"></i>
-                    <p>
-                      Due <time dateTime="2023-01-15">January 15, 2023</time>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div className="px-4 py-4 sm:px-6">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-indigo-600 truncate">Follow up with donor John Doe</p>
-                  <div className="ml-2 flex-shrink-0 flex">
-                    <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                      Medium Priority
-                    </p>
-                  </div>
-                </div>
-                <div className="mt-2 sm:flex sm:justify-between">
-                  <div className="sm:flex">
-                    <p className="flex items-center text-sm text-gray-500">
-                      <i className="fas fa-phone flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"></i>
-                      Phone Call
-                    </p>
-                  </div>
-                  <div className="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
-                    <i className="fas fa-calendar flex-shrink-0 mr-1.5 h-5 w-5 text-gray-400"></i>
-                    <p>
-                      Due <time dateTime="2023-01-10">January 10, 2023</time>
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div className="mt-8">
-        <div className="flex items-center justify-between">
           <h3 className="text-lg leading-6 font-medium text-gray-900">Recent Donations</h3>
           <Link to="/volunteer/donation-history" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
             View all
@@ -216,7 +152,7 @@ const DonorDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {myDonations.slice(0, 5).map((donation) => (
+                    {donations?.slice(0, 5).map((donation) => (
                       <tr key={donation.id}>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{donation.donorName}</div>
@@ -226,7 +162,7 @@ const DonorDashboard = () => {
                           <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">{new Date(donation.date).toLocaleDateString()}</div>
+                          <div className="text-sm text-gray-900">{formatDateShort(donation.date)}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span

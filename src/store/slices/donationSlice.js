@@ -1,10 +1,19 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
 
-// Get all donations
+// Get all donations for admin and volunteer
 export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get("/donations/view-all")
+    return response.data.data
+  } catch (error) {
+    return rejectWithValue(error.response.data)
+  }
+})
+// Get all donations of a donor self
+export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get("/donations/doner-donation-history")
     return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations } from "../../store/slices/donationSlice"
+import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
 const VolunteerDonationHistory = () => {
   const [filter, setFilter] = useState("all")
@@ -102,7 +103,7 @@ const VolunteerDonationHistory = () => {
                           ₹{donation.amount.toFixed(2)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {new Date(donation.date).toLocaleDateString()}
+                          {formatDateShort(donation.date)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {donation.paymentMethod}
