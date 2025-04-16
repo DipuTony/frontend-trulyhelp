@@ -75,8 +75,8 @@ const DonateNow = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-2">
         {/* Header Section */}
         <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-2xl shadow-xl p-8 mb-8 text-white">
           <div className="max-w-3xl">
