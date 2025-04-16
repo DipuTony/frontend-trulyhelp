@@ -38,7 +38,6 @@ const AdminLayout = () => {
       ]
     },
     { name: "Donations", href: "/admin/donations", icon: "chart-pie" },
-    // { name: "Expenses", href: "/admin/expenses", icon: "chart-pie" },
     { name: "Payment Verification", href: "/admin/payment-verification", icon: "check-circle" },
     { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
     { name: "Notifications", href: "/admin/notifications", icon: "bell" },
@@ -51,8 +50,24 @@ const AdminLayout = () => {
         setOpenSubMenu(item.name)
       }
     })
-  }, [location.pathname]) // Only run when pathname changes
+  }, [location.pathname])
 
+  // Update the getLinkClasses function
+  const getLinkClasses = (path) => {
+    const baseClasses = "group flex items-center px-2 py-2 font-medium rounded-md transition-all duration-200"
+    const mobileClasses = "text-base"
+    const desktopClasses = "text-sm"
+    
+    return `${baseClasses} ${
+      isActive(path)
+        ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+    } ${sidebarOpen ? mobileClasses : desktopClasses}`
+  }
+
+  const getIconClasses = (path) => {
+    return `${isActive(path) ? "text-indigo-600" : "text-gray-500"}`
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -101,9 +116,17 @@ const AdminLayout = () => {
                       <div>
                         <button
                           onClick={() => toggleSubMenu(item.name)}
-                          className={`group w-full flex items-center px-2 py-2 text-base font-medium rounded-md ${openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                          className={`group w-full flex items-center px-2 py-2 text-base font-medium rounded-md ${
+                            openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
+                              ? 'bg-gray-100 text-gray-900' 
+                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          }`}
                         >
-                          <span className={`mr-4 h-6 w-6 ${openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) ? 'text-gray-500' : 'text-gray-400'}`}>
+                          <span className={`mr-4 h-6 w-6 ${
+                            openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
+                              ? 'text-gray-500' 
+                              : 'text-gray-400'
+                          }`}>
                             <i className={`fas fa-${item.icon}`}></i>
                           </span>
                           {item.name}
@@ -126,10 +149,18 @@ const AdminLayout = () => {
                               <Link
                                 key={subItem.name}
                                 to={subItem.href}
-                                className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive(subItem.href) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                                className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
+                                  isActive(subItem.href) 
+                                    ? 'bg-gray-100 text-gray-900' 
+                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                }`}
                                 onClick={() => setSidebarOpen(false)}
                               >
-                                <span className={`mr-4 h-6 w-6 ${isActive(subItem.href) ? 'text-gray-500' : 'text-gray-400'}`}>
+                                <span className={`mr-4 h-6 w-6 ${
+                                  isActive(subItem.href) 
+                                    ? 'text-gray-500' 
+                                    : 'text-gray-400'
+                                }`}>
                                   <i className={`fas fa-${subItem.icon}`}></i>
                                 </span>
                                 {subItem.name}
@@ -141,10 +172,10 @@ const AdminLayout = () => {
                     ) : (
                       <Link
                         to={item.href}
-                        className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${isActive(item.href) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                        className={getLinkClasses(item.href)}
                         onClick={() => setSidebarOpen(false)}
                       >
-                        <span className={`mr-4 h-6 w-6 ${isActive(item.href) ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <span className={`mr-4 h-6 w-6 ${getIconClasses(item.href)}`}>
                           <i className={`fas fa-${item.icon}`}></i>
                         </span>
                         {item.name}
@@ -159,7 +190,10 @@ const AdminLayout = () => {
               <div className="flex items-center">
                 <div>
                   <div className="text-base font-medium text-gray-700">{user?.name || "Admin User"}</div>
-                  <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-700">
+                  <button 
+                    onClick={handleLogout} 
+                    className="text-sm font-medium text-red-500 hover:text-red-700"
+                  >
                     Logout
                   </button>
                 </div>
@@ -183,9 +217,17 @@ const AdminLayout = () => {
                     <div>
                       <button
                         onClick={() => toggleSubMenu(item.name)}
-                        className={`group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                        className={`group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                          openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
+                            ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
                       >
-                        <span className={`mr-3 h-6 w-6 ${openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) ? 'text-gray-500' : 'text-gray-400'}`}>
+                        <span className={`mr-3 h-6 w-6 ${
+                          openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
+                            ? 'text-indigo-600' 
+                            : 'text-gray-500'
+                        }`}>
                           <i className={`fas fa-${item.icon}`}></i>
                         </span>
                         {item.name}
@@ -208,9 +250,13 @@ const AdminLayout = () => {
                             <Link
                               key={subItem.name}
                               to={subItem.href}
-                              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive(subItem.href) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                                isActive(subItem.href) 
+                                  ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                              }`}
                             >
-                              <span className={`mr-3 h-6 w-6 ${isActive(subItem.href) ? 'text-gray-500' : 'text-gray-400'}`}>
+                              <span className={`mr-3 h-6 w-6 ${getIconClasses(subItem.href)}`}>
                                 <i className={`fas fa-${subItem.icon}`}></i>
                               </span>
                               {subItem.name}
@@ -222,9 +268,9 @@ const AdminLayout = () => {
                   ) : (
                     <Link
                       to={item.href}
-                      className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${isActive(item.href) ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+                      className={getLinkClasses(item.href)}
                     >
-                      <span className={`mr-3 h-6 w-6 ${isActive(item.href) ? 'text-gray-500' : 'text-gray-400'}`}>
+                      <span className={`mr-3 h-6 w-6 ${getIconClasses(item.href)}`}>
                         <i className={`fas fa-${item.icon}`}></i>
                       </span>
                       {item.name}
@@ -238,7 +284,10 @@ const AdminLayout = () => {
             <div className="flex items-center">
               <div>
                 <div className="text-sm font-medium text-gray-700">{user?.name || "Admin User"}</div>
-                <button onClick={handleLogout} className="text-sm font-medium text-red-500 hover:text-red-700">
+                <button 
+                  onClick={handleLogout} 
+                  className="text-sm font-medium text-red-500 hover:text-red-700"
+                >
                   Logout
                 </button>
               </div>

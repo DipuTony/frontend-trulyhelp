@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Outlet, Link, useNavigate } from "react-router-dom"
+import { Outlet, Link, useNavigate, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../../store/slices/authSlice"
 
@@ -10,10 +10,31 @@ const DonorLayout = () => {
   const { user } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = () => {
     dispatch(logout())
     navigate("/login")
+  }
+
+  const isActiveLink = (path) => {
+    return location.pathname === path
+  }
+
+  const getLinkClasses = (path) => {
+    const baseClasses = "group flex items-center px-2 py-2 font-medium rounded-md transition-all duration-200"
+    const mobileClasses = "text-base"
+    const desktopClasses = "text-sm"
+    
+    return `${baseClasses} ${
+      isActiveLink(path)
+        ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+    } ${sidebarOpen ? mobileClasses : desktopClasses}`
+  }
+
+  const getIconClasses = (path) => {
+    return `mr-3 h-6 w-6 ${isActiveLink(path) ? "text-indigo-600" : "text-gray-500"}`
   }
 
   const navigation = [
@@ -67,10 +88,10 @@ const DonorLayout = () => {
                   <Link
                     key={item.name}
                     to={item.href}
-                    className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    className={getLinkClasses(item.href)}
                     onClick={() => setSidebarOpen(false)}
                   >
-                    <span className="mr-4 h-6 w-6 text-gray-500">
+                    <span className={getIconClasses(item.href)}>
                       <i className={`fas fa-${item.icon}`}></i>
                     </span>
                     {item.name}
@@ -105,9 +126,9 @@ const DonorLayout = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="group flex items-center px-2 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  className={getLinkClasses(item.href)}
                 >
-                  <span className="mr-3 h-6 w-6 text-gray-500">
+                  <span className={getIconClasses(item.href)}>
                     <i className={`fas fa-${item.icon}`}></i>
                   </span>
                   {item.name}
