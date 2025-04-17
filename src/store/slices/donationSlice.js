@@ -22,10 +22,14 @@ export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", 
 
 // Update the action type in the createAsyncThunk call
 export const onlineGuestDonationEazyBuzz = createAsyncThunk(
-  "donations/guestDonationEazyBuzz", // Changed from "donations/addDonation"
+  "donations/guestDonationEazyBuzz",
   async (donationData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/donations/guest-donation-online", donationData)
+      const response = await axios.post("/donations/guest-donation-online", {
+        ...donationData,
+        // successUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/success`,
+        // failureUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/failed`
+      })
       if (response.data.success && response.data.paymentUrl) {
         window.location.href = response.data.paymentUrl
       }
