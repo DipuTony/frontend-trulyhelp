@@ -20,6 +20,22 @@ export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", 
   }
 })
 
+// Update the action type in the createAsyncThunk call
+export const onlineGuestDonationEazyBuzz = createAsyncThunk(
+  "donations/guestDonationEazyBuzz", // Changed from "donations/addDonation"
+  async (donationData, { rejectWithValue }) => {
+    try {
+      const response = await axios.post("/donations/guest-donation-online", donationData)
+      if (response.data.success && response.data.paymentUrl) {
+        window.location.href = response.data.paymentUrl
+      }
+      return response.data
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
 // Add new donation
 export const addDonation = createAsyncThunk("donations/addDonation", async (donationData, { rejectWithValue }) => {
   try {
@@ -55,6 +71,8 @@ const initialState = {
   report: null,
   loading: false,
   error: null,
+  paymentUrl: null,
+  transactionId: null,
 }
 
 const donationSlice = createSlice({
@@ -124,6 +142,22 @@ const donationSlice = createSlice({
       .addCase(generateReport.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload || "Failed to generate report"
+      })
+      // Add cases for online guest donation
+      .addCase(onlineGuestDonationEazyBuzz.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(onlineGuestDonationEazyBuzz.fulfilled, (state, action) => {
+        state.loading = false
+        if (action.payload) {
+          state.paymentUrl = action.payload.paymentUrl
+          state.transactionId = action.payload.transactionId
+        }
+      })
+      .addCase(onlineGuestDonationEazyBuzz.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload?.message || "Failed to process donation"
       })
   },
 })

@@ -37,6 +37,8 @@ import GuestLayout from "./components/layouts/GuestLayout"
 
 // Auth Guard Component
 import ProtectedRoute from "./components/auth/ProtectedRoute"
+import PaymentFailed from "./pages/guest/PaymentFailed"
+import PaymentSuccess from "./pages/guest/PaymentSuccess"
 
 function App() {
   return (
@@ -98,6 +100,8 @@ function App() {
           {/* Guest Routes */}
           <Route path="/" element={<GuestLayout />}>
             <Route index element={<GuestDonationNow />} />
+            <Route path="success" element={<PaymentSuccess />} />
+            <Route path="failed" element={<PaymentFailed />} />
           </Route>
 
           {/* Redirect to login if no route matches */}
