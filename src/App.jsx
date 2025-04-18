@@ -100,8 +100,8 @@ function App() {
           {/* Guest Routes */}
           <Route path="/" element={<GuestLayout />}>
             <Route index element={<GuestDonationNow />} />
-            <Route path="success" element={<PaymentSuccess />} />
-            <Route path="failed" element={<PaymentFailed />} />
+            <Route path="payment/success" element={<PaymentSuccess />} />
+            <Route path="payment/failed" element={<PaymentFailed />} />
           </Route>
 
           {/* Redirect to login if no route matches */}

@@ -8,15 +8,14 @@ const PaymentSuccess = () => {
   
   // Extract key payment details
   const paymentDetails = {
-    amount: searchParams.get('amount'),
-    txnid: searchParams.get('txnid'),
+    Name: searchParams.get('name'),
+    transactionId: searchParams.get('transactionId'),
     email: searchParams.get('email'),
+    donationId: searchParams.get('donationId'),
     phone: searchParams.get('phone'),
-    firstname: searchParams.get('firstname'),
-    status: searchParams.get('status'),
-    easepayid: searchParams.get('easepayid'),
-    bank_name: searchParams.get('bank_name'),
-    payment_source: searchParams.get('payment_source'),
+    PAN: searchParams.get('donorPan'),
+    amount: searchParams.get('amount'),
+    address: searchParams.get('address'),
   }
 
   return (
