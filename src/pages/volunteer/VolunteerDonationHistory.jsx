@@ -94,24 +94,26 @@ const VolunteerDonationHistory = () => {
                     </tr>
                   ) : (
                     filteredDonations.map((donation) => (
-                      <tr key={donation.id}>
+                      <tr key={donation.id || Math.random()}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                          <div className="font-medium text-gray-900">{donation.donorName}</div>
-                          <div className="text-gray-500">{donation.donorEmail}</div>
+                          <div className="font-medium text-gray-900">{donation.donorName || 'N/A'}</div>
+                          <div className="text-gray-500">{donation.donorPhone || 'No phone'}</div>
+                          <div className="text-gray-500">{donation.donorEmail || 'No email'}</div>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                          ₹{donation.amount.toFixed(2)}
+                          ₹{donation.amount ? donation.amount.toFixed(2) : '0.00'}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {formatDateShort(donation.date)}
+                          {donation.createdAt ? formatDateShort(donation.createdAt) : 'N/A'}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {donation.paymentMethod}
+                          {donation.method || 'N/A'}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                           <span
-                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                              }`}
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                              donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                            }`}
                           >
                             {donation.verified ? "Verified" : "Pending"}
                           </span>

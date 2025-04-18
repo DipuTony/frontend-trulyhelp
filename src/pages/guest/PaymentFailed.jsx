@@ -9,10 +9,16 @@ const PaymentFailed = () => {
   // Extract key payment details
   const paymentDetails = {
     amount: searchParams.get('amount'),
-    txnid: searchParams.get('txnid'),
-    error_Message: searchParams.get('error_Message'),
-    email: searchParams.get('email'),
+    donationId: searchParams.get('donationId'),
+    transactionId: searchParams.get('transactionId'),
+    error: searchParams.get('error'),
+    errorReason: searchParams.get('errorReason'),
     status: searchParams.get('status'),
+    email: searchParams.get('email'),
+    name: searchParams.get('name'),
+    phone: searchParams.get('phone'),
+    paymentMethod: searchParams.get('paymentMethod'),
+    paymentSource: searchParams.get('paymentSource'),
   }
 
   return (
@@ -27,7 +33,7 @@ const PaymentFailed = () => {
               We couldn't process your donation of ₹{paymentDetails.amount}
             </p>
             <p className="mt-2 text-red-600">
-              {paymentDetails.error_Message || 'An error occurred during the payment process'}
+              {paymentDetails.errorReason || paymentDetails.error || 'An error occurred during the payment process'}
             </p>
           </div>
 
@@ -36,20 +42,40 @@ const PaymentFailed = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-4">Transaction Details</h3>
             <div className="space-y-4">
               <div className="flex justify-between">
+                <span className="text-gray-600">Donation ID</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.donationId}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-600">Transaction ID</span>
-                <span className="text-gray-900 font-medium">{paymentDetails.txnid}</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.transactionId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Amount</span>
                 <span className="text-gray-900 font-medium">₹{paymentDetails.amount}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-gray-600">Name</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.name}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-600">Email</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.email}</span>
               </div>
               <div className="flex justify-between">
+                <span className="text-gray-600">Phone</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.phone}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Payment Method</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.paymentMethod}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Payment Source</span>
+                <span className="text-gray-900 font-medium">{paymentDetails.paymentSource}</span>
+              </div>
+              <div className="flex justify-between">
                 <span className="text-gray-600">Status</span>
-                <span className="text-red-600 font-medium">{paymentDetails.status}</span>
+                <span className="text-red-600 font-medium uppercase">{paymentDetails.status}</span>
               </div>
             </div>
           </div>
