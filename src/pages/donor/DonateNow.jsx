@@ -6,6 +6,14 @@ import { addDonation } from "../../store/slices/donationSlice"
 import { useNavigate } from "react-router-dom"
 
 const DonateNow = () => {
+  // Add helper function at the top of the component
+  const getErrorMessage = (error) => {
+    if (typeof error === 'string') return error;
+    if (error?.message) return error.message;
+    if (error?.error) return error.error;
+    return 'An error occurred while processing your donation';
+  };
+
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { user } = useSelector((state) => state.auth)
@@ -116,7 +124,7 @@ const DonateNow = () => {
                   <i className="fas fa-exclamation-circle text-red-400"></i>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                  <p className="text-sm text-red-700">{getErrorMessage(error)}</p>
                 </div>
               </div>
             </div>

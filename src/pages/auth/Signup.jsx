@@ -39,21 +39,34 @@ const Signup = () => {
     }))
   }
 
-  const handleSubmit = (e) => {
+  // Add error handling helper
+  const getErrorMessage = (error) => {
+    if (typeof error === 'string') return error;
+    if (error?.message) return error.message;
+    if (error?.errors) return Object.values(error.errors)[0];
+    return 'An error occurred during registration';
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (formData.password !== formData.confirmPassword) {
       setPasswordError("Passwords do not match")
       return
     }
     setPasswordError("")
-    dispatch(register({ 
-      name: formData.name, 
-      email: formData.email, 
-      password: formData.password, 
-      phone: formData.phone 
-    }))
+    try {
+      await dispatch(register({ 
+        name: formData.name, 
+        email: formData.email, 
+        password: formData.password, 
+        phone: formData.phone 
+      })).unwrap()
+    } catch (err) {
+      console.error('Registration error:', err)
+    }
   }
 
+  // Update error display in the return JSX
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
@@ -76,7 +89,9 @@ const Signup = () => {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error || passwordError}</p>
+                <p className="text-sm text-red-700">
+                  {passwordError || getErrorMessage(error)}
+                </p>
               </div>
             </div>
           </div>
