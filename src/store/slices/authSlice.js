@@ -17,8 +17,8 @@ export const login = createAsyncThunk("auth/login", async (credentials, { reject
 export const register = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
   try {
     const response = await axios.post("/auth/register", userData)
-    localStorage.setItem("token", response.data.token)
-    localStorage.setItem("user", JSON.stringify(response.data.user))
+    // localStorage.setItem("token", response.data.token)
+    // localStorage.setItem("user", JSON.stringify(response.data.user))
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -75,9 +75,10 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false
-        state.user = action.payload.user
-        state.token = action.payload.token
-        state.isAuthenticated = true
+        // Don't set user data or authentication state after registration
+        // state.user = action.payload.user
+        // state.token = action.payload.token
+        // state.isAuthenticated = true
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false
