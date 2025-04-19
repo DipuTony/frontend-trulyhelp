@@ -57,10 +57,10 @@ const AddDonation = ({ usedFor }) => {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (usedFor === "admin" && !selectedVolunteer) {
-      setFormErrors(["Please select a volunteer"])
-      return
-    }
+    // if (usedFor === "admin" && !selectedVolunteer) {
+    //   setFormErrors(["Please select a volunteer"])
+    //   return
+    // }
 
     const newDonation = {
       name: donationData.donorName,
@@ -177,7 +177,7 @@ const AddDonation = ({ usedFor }) => {
           {usedFor === "admin" && (
             <div className="p-8 border-b border-gray-200">
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-gray-900">Select Volunteer</h3>
+                <h3 className="text-lg font-medium text-gray-900">Select Volunteer <span className="text-sm text-gray-500">(optional)</span></h3>
                 <div className="relative">
                   <input
                     type="text"
