@@ -37,11 +37,11 @@ const AdminLayout = () => {
         { name: "Admins", href: "/admin/users/admin", icon: "user-shield" }
       ]
     },
-    { name: "Donations", href: "/admin/donations", icon: "chart-pie" },
+    { name: "View Donations", href: "/admin/donations", icon: "chart-pie" },
+    { name: "Add Donation", href: "/admin/add-donation", icon: "rupee" },
     { name: "Payment Verification", href: "/admin/payment-verification", icon: "check-circle" },
     { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
     { name: "Notifications", href: "/admin/notifications", icon: "bell" },
-    { name: "Profile", href: "/admin/profile", icon: "user" },
   ]
 
   // Automatically open submenu if current route matches any subitem

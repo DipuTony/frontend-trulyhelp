@@ -68,6 +68,7 @@ function App() {
             <Route path="reports" element={<ReportGenerator />} />
             <Route path="notifications" element={<NotificationPanel />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="add-donation" element={<AddDonation />} />
           </Route>
 
           {/* Volunteer Routes */}
