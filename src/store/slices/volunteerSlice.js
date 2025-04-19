@@ -23,9 +23,7 @@ export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (v
 })
 
 // Update volunteer
-export const updateVolunteer = createAsyncThunk(
-  "volunteers/updateVolunteer",
-  async ({ id, volunteerData }, { rejectWithValue }) => {
+export const updateVolunteer = createAsyncThunk("volunteers/updateVolunteer",async ({ id, volunteerData }, { rejectWithValue }) => {
     try {
       const response = await axios.put(`/users/${id}`, volunteerData)
       return response.data
@@ -34,6 +32,19 @@ export const updateVolunteer = createAsyncThunk(
     }
   },
 )
+// search volunteer
+export const searchVolunteers = createAsyncThunk(
+  "volunteers/search",
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`/user/volunteers/search?q=${query}`)
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to search volunteers")
+    }
+  }
+)
+
 
 const initialState = {
   volunteers: [],
@@ -51,6 +62,18 @@ const volunteerSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+    .addCase(searchVolunteers.pending, (state) => {
+      state.loading = true
+      state.error = null
+    })
+    .addCase(searchVolunteers.fulfilled, (state, action) => {
+      state.loading = false
+      state.volunteers = action.payload
+    })
+    .addCase(searchVolunteers.rejected, (state, action) => {
+      state.loading = false
+      state.error = action.payload
+    })
       // Fetch volunteers cases
       .addCase(fetchVolunteers.pending, (state) => {
         state.loading = true

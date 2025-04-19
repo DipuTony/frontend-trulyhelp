@@ -3,11 +3,15 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { addDonation } from "../../store/slices/donationSlice"
+import { searchVolunteers } from "../../store/slices/volunteerSlice"
 
-const AddDonation = () => {
+const AddDonation = ({ usedFor }) => {
   const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
   const { loading, error } = useSelector((state) => state.donations)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedVolunteer, setSelectedVolunteer] = useState(null)
+  const [volunteers, setVolunteers] = useState([])
 
   const [donationData, setDonationData] = useState({
     donorName: "",
@@ -17,19 +21,46 @@ const AddDonation = () => {
     donorPan: "",
     donorAddress: "",
     amount: "",
-    method: "", // Default to CHEQUE as per payload
+    method: "",
     chequeNo: "",
   })
 
   const [success, setSuccess] = useState(false)
+  const [formErrors, setFormErrors] = useState([])
 
   const handleChange = (e) => {
     const { name, value } = e.target
     setDonationData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleVolunteerSearch = async (query) => {
+    setSearchQuery(query)
+    if (query.length >= 3) {
+      try {
+        const response = await dispatch(searchVolunteers(query)).unwrap()
+        setVolunteers(response || [])
+      } catch (err) {
+        console.error("Search error:", err)
+        setVolunteers([])
+      }
+    } else {
+      setVolunteers([])
+    }
+  }
+
+  const handleVolunteerSelect = (volunteer) => {
+    setSelectedVolunteer(volunteer)
+    setVolunteers([])
+    setSearchQuery("")
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (usedFor === "admin" && !selectedVolunteer) {
+      setFormErrors(["Please select a volunteer"])
+      return
+    }
 
     const newDonation = {
       name: donationData.donorName,
@@ -40,18 +71,15 @@ const AddDonation = () => {
       address: donationData.donorAddress,
       amount: Number(donationData.amount),
       method: donationData.method,
-      chequeNo: donationData.method 
-      // === "CHEQUE" ? donationData.chequeNo : undefined,
-      // volunteerUserId: user?.userId, // Using userId instead of id to match your schema
-      // status: "PENDING",
-      // createdAt: new Date().toISOString(),
+      chequeNo: donationData.method === "CHEQUE" ? donationData.chequeNo : undefined,
+      volunteerUserId: usedFor === "admin" ? selectedVolunteer?.userId : user?.userId,
     }
 
     dispatch(addDonation(newDonation))
       .unwrap()
       .then(() => {
         setSuccess(true)
-        // Reset form
+        setFormErrors([])
         setDonationData({
           donorName: "",
           donorEmail: "",
@@ -65,8 +93,18 @@ const AddDonation = () => {
         })
         setTimeout(() => setSuccess(false), 3000)
       })
+      .catch((err) => {
+        if (err.errors) {
+          setFormErrors(err.errors)
+        } else if (err.message) {
+          setFormErrors([err.message])
+        } else if (typeof err === 'string') {
+          setFormErrors([err])
+        } else {
+          setFormErrors(["Failed to submit donation"])
+        }
+      })
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 py-8">
@@ -77,6 +115,7 @@ const AddDonation = () => {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Success Message */}
           {success && (
             <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
               <div className="flex">
@@ -92,6 +131,7 @@ const AddDonation = () => {
             </div>
           )}
 
+          {/* Error Message */}
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
               <div className="flex">
@@ -101,15 +141,100 @@ const AddDonation = () => {
                   </svg>
                 </div>
                 <div className="ml-3">
-                  <p className="text-sm text-red-700">{error}</p>
+                  <p className="text-sm text-red-700">
+                    {typeof error === 'string' ? error : 
+                     error.message || "An error occurred"}
+                  </p>
                 </div>
               </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="divide-y divide-gray-200">
+          {/* Form Validation Errors */}
+          {formErrors.length > 0 && (
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-yellow-800">Validation Error</h3>
+                  <div className="mt-2 text-sm text-yellow-700">
+                    <ul className="list-disc pl-5 space-y-1">
+                      {formErrors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Volunteer Search (Admin Only) */}
+          {usedFor === "admin" && (
+            <div className="p-8 border-b border-gray-200">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium text-gray-900">Select Volunteer</h3>
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleVolunteerSearch(e.target.value)}
+                    placeholder="Search volunteer by name or email..."
+                    className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  />
+                  
+                  {Array.isArray(volunteers) && volunteers.length > 0 ? (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {volunteers.map((volunteer) => (
+                        <div
+                          key={volunteer.userId}
+                          onClick={() => handleVolunteerSelect(volunteer)}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        >
+                          <div className="font-medium text-gray-900">{volunteer.name}</div>
+                          <div className="text-sm text-gray-600">{volunteer.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : searchQuery.length >= 3 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg p-4">
+                      <p className="text-gray-600">No volunteers found</p>
+                    </div>
+                  )}
+                </div>
+              
+                {selectedVolunteer && (
+                  <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="font-medium text-gray-900">{selectedVolunteer.name}</p>
+                        <p className="text-sm text-gray-600">{selectedVolunteer.email}</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedVolunteer(null)
+                          setSearchQuery("")
+                        }}
+                        className="text-sm text-indigo-600 hover:text-indigo-800 font-medium"
+                      >
+                        Change
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Donation Form */}
+          <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-gray-200">
-              {/* Left Column - Donor Information */}
+              {/* Donor Information */}
               <div className="p-8">
                 <div className="flex items-center mb-6">
                   <span className="flex-shrink-0 h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -120,7 +245,6 @@ const AddDonation = () => {
                   <h3 className="ml-3 text-lg font-medium text-gray-900">Donor Information</h3>
                 </div>
 
-                {/* Donor form fields remain the same but with updated styling */}
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Full Name*</label>
@@ -196,7 +320,7 @@ const AddDonation = () => {
                 </div>
               </div>
 
-              {/* Right Column - Donation Details */}
+              {/* Donation Details */}
               <div className="p-8">
                 <div className="flex items-center mb-6">
                   <span className="flex-shrink-0 h-8 w-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -207,7 +331,6 @@ const AddDonation = () => {
                   <h3 className="ml-3 text-lg font-medium text-gray-900">Donation Details</h3>
                 </div>
 
-                {/* Donation form fields remain the same but with updated styling */}
                 <div className="space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Amount*</label>

@@ -68,7 +68,7 @@ function App() {
             <Route path="reports" element={<ReportGenerator />} />
             <Route path="notifications" element={<NotificationPanel />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="add-donation" element={<AddDonation />} />
+            <Route path="add-donation" element={<AddDonation usedFor="admin"/>} />
           </Route>
 
           {/* Volunteer Routes */}
@@ -81,7 +81,7 @@ function App() {
             }
           >
             <Route index element={<VolunteerDashboard />} />
-            <Route path="add-donation" element={<AddDonation />} />
+            <Route path="add-donation" element={<AddDonation usedFor="volunteer"/>} />
             <Route path="donation-history" element={<VolunteerDonationHistory />} />
             <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
             <Route path="profile" element={<Profile />} />
