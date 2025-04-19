@@ -39,6 +39,7 @@ import GuestLayout from "./components/layouts/GuestLayout"
 import ProtectedRoute from "./components/auth/ProtectedRoute"
 import PaymentFailed from "./pages/guest/PaymentFailed"
 import PaymentSuccess from "./pages/guest/PaymentSuccess"
+import Profile from "./pages/donor/Profile"
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />
             <Route path="notifications" element={<NotificationPanel />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Volunteer Routes */}
@@ -81,6 +83,7 @@ function App() {
             <Route path="add-donation" element={<AddDonation />} />
             <Route path="donation-history" element={<VolunteerDonationHistory />} />
             <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Donor Routes */}
@@ -95,6 +98,7 @@ function App() {
             <Route index element={<DonorDashboard />} />
             <Route path="history" element={<DonorDonationHistory />} />
             <Route path="donate" element={<DonateNow />} />
+            <Route path="profile" element={<Profile />} />
           </Route>
 
           {/* Guest Routes */}

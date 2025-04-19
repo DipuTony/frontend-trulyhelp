@@ -41,6 +41,7 @@ const DonorLayout = () => {
     { name: "Dashboard", href: "/donor", icon: "home" },
     { name: "Donation History", href: "/donor/history", icon: "history" },
     { name: "Donate Now", href: "/donor/donate", icon: "hand-holding-heart" },
+    { name: "Profile", href: "/donor/profile", icon: "user" },
   ]
 
   return (

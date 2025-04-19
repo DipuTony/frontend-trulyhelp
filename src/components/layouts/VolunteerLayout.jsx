@@ -22,6 +22,7 @@ const VolunteerLayout = () => {
     { name: "Add Donation", href: "/volunteer/add-donation", icon: "plus-circle" },
     { name: "Donation History", href: "/volunteer/donation-history", icon: "clock" },
     { name: "Upload Settlement", href: "/volunteer/upload-settlement", icon: "file-upload" },
+    { name: "Profile", href: "/volunteer/profile", icon: "user" },
   ]
 
   const isActiveLink = (path) => {

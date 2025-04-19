@@ -17,8 +17,34 @@ export const login = createAsyncThunk("auth/login", async (credentials, { reject
 export const register = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
   try {
     const response = await axios.post("/auth/register", userData)
-    // localStorage.setItem("token", response.data.token)
-    // localStorage.setItem("user", JSON.stringify(response.data.user))
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response.data)
+  }
+})
+
+// Profile thunks
+export const getProfile = createAsyncThunk("auth/profile", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axios.get("/auth/profile")
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response.data)
+  }
+})
+
+export const updateProfile = createAsyncThunk("auth/updateProfile", async (userData, { rejectWithValue }) => {
+  try {
+    const response = await axios.put("/auth/profile", userData)
+    return response.data
+  } catch (error) {
+    return rejectWithValue(error.response.data)
+  }
+})
+
+export const changePassword = createAsyncThunk("auth/changePassword", async (passwords, { rejectWithValue }) => {
+  try {
+    const response = await axios.post("/auth/change-password", passwords)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -75,14 +101,48 @@ const authSlice = createSlice({
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false
-        // Don't set user data or authentication state after registration
-        // state.user = action.payload.user
-        // state.token = action.payload.token
-        // state.isAuthenticated = true
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload || "Registration failed"
+      })
+      // Profile cases
+      .addCase(getProfile.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.loading = false
+        state.user = action.payload.user
+      })
+      .addCase(getProfile.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || "Failed to fetch profile"
+      })
+      // Update Profile cases
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false
+        state.user = action.payload.user
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || "Failed to update profile"
+      })
+      // Change Password cases
+      .addCase(changePassword.pending, (state) => {
+        state.loading = true
+        state.error = null
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.loading = false
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false
+        state.error = action.payload || "Failed to change password"
       })
   },
 })
