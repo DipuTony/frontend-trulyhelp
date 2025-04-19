@@ -1,27 +1,120 @@
-
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { getProfile, updateProfile, changePassword } from "../../store/slices/authSlice"
 import LoaderType1 from "../../components/common/LoaderType1"
+import { useFormik } from "formik"
+import * as Yup from "yup"
 
 function Profile() {
     const dispatch = useDispatch()
     const { user, loading, error } = useSelector((state) => state.auth)
     const [isEditing, setIsEditing] = useState(false)
     const [successMessage, setSuccessMessage] = useState("")
+    const [passwordError, setPasswordError] = useState("")
 
-    const [profileData, setProfileData] = useState({
-        name: "",
-        phone: "",
-        dob: "",
-        pan: "",
-        address: "",
+    // Create refs for form fields
+    const nameRef = useRef(null)
+    const phoneRef = useRef(null)
+    const dobRef = useRef(null)
+    const panRef = useRef(null)
+    const addressRef = useRef(null)
+    const currentPasswordRef = useRef(null)
+    const newPasswordRef = useRef(null)
+    const confirmPasswordRef = useRef(null)
+
+    // Validation schemas
+    const profileSchema = Yup.object({
+        name: Yup.string()
+            .required("Name is required")
+            .min(3, "Name must be at least 3 characters"),
+        phone: Yup.string()
+            .required("Phone number is required")
+            .matches(/^[0-9]{10}$/, "Phone number must be 10 digits"),
+        dob: Yup.date()
+            .required("Date of birth is required")
+            .max(new Date(), "Date of birth cannot be in the future"),
+        pan: Yup.string()
+            .required("PAN number is required")
+            .trim()
+            .uppercase()
+            .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Invalid PAN number format"),
+        address: Yup.string()
+            .required("Address is required")
+            .test(
+              "min-valid-chars",
+              "Address must be at least 6 characters (not just spaces)",
+              (value) => !!value && value.trim().length >= 6
+            )
     })
 
-    const [passwordData, setPasswordData] = useState({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
+    const passwordSchema = Yup.object({
+        currentPassword: Yup.string()
+            .required("Current password is required")
+            .min(6, "Password must be at least 6 characters"),
+        newPassword: Yup.string()
+            .required("New password is required")
+            .min(6, "Password must be at least 6 characters")
+            .notOneOf([Yup.ref('currentPassword')], 'New password must be different from current password'),
+        confirmPassword: Yup.string()
+            .required("Please confirm your password")
+            .oneOf([Yup.ref('newPassword')], 'Passwords must match'),
+    })
+
+    // Profile formik
+    const profileFormik = useFormik({
+        initialValues: {
+            name: "",
+            phone: "",
+            dob: "",
+            pan: "",
+            address: "",
+        },
+        validationSchema: profileSchema,
+        onSubmit: async (values) => {
+            try {
+                await dispatch(updateProfile(values)).unwrap()
+                setSuccessMessage("Profile updated successfully")
+                setIsEditing(false)
+                setTimeout(() => setSuccessMessage(""), 3000)
+            } catch (err) {
+                console.error("Failed to update profile:", err)
+                // Focus first error field
+                const firstError = Object.keys(profileFormik.errors)[0]
+                const refs = { name: nameRef, phone: phoneRef, dob: dobRef, pan: panRef, address: addressRef }
+                refs[firstError]?.current?.focus()
+            }
+        },
+    })
+
+    // Password formik
+    const passwordFormik = useFormik({
+        initialValues: {
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+        },
+        validationSchema: passwordSchema,
+        onSubmit: async (values) => {
+            try {
+                setPasswordError("") // Clear previous error
+                await dispatch(changePassword({
+                    currentPassword: values.currentPassword,
+                    newPassword: values.newPassword,
+                })).unwrap()
+                setSuccessMessage("Password changed successfully")
+                passwordFormik.resetForm()
+                setTimeout(() => setSuccessMessage(""), 3000)
+            } catch (err) {
+                setPasswordError(err.message || "Failed to change password")
+                const firstError = Object.keys(passwordFormik.errors)[0]
+                const refs = {
+                    currentPassword: currentPasswordRef,
+                    newPassword: newPasswordRef,
+                    confirmPassword: confirmPasswordRef
+                }
+                refs[firstError]?.current?.focus()
+            }
+        },
     })
 
     useEffect(() => {
@@ -30,7 +123,7 @@ function Profile() {
 
     useEffect(() => {
         if (user) {
-            setProfileData({
+            profileFormik.setValues({
                 name: user.name || "",
                 phone: user.phone || "",
                 dob: user.dob ? user.dob.split('T')[0] : "",
@@ -40,58 +133,21 @@ function Profile() {
         }
     }, [user])
 
-    const handleProfileChange = (e) => {
-        const { name, value } = e.target
-        setProfileData(prev => ({
-            ...prev,
-            [name]: value
-        }))
+    // Show loading state
+    if (loading) {
+        return <LoaderType1 />
     }
 
-    const handlePasswordChange = (e) => {
-        const { name, value } = e.target
-        setPasswordData(prev => ({
-            ...prev,
-            [name]: value
-        }))
+    // Show error state
+    if (error) {
+        return (
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="bg-red-50 text-red-700 p-4 rounded-md">
+                    {error}
+                </div>
+            </div>
+        )
     }
-
-    const handleProfileSubmit = async (e) => {
-        e.preventDefault()
-        try {
-            await dispatch(updateProfile(profileData)).unwrap()
-            setSuccessMessage("Profile updated successfully")
-            setIsEditing(false)
-            setTimeout(() => setSuccessMessage(""), 3000)
-        } catch (err) {
-            console.error("Failed to update profile:", err)
-        }
-    }
-
-    const handlePasswordSubmit = async (e) => {
-        e.preventDefault()
-        if (passwordData.newPassword !== passwordData.confirmPassword) {
-            return // Add error handling for password mismatch
-        }
-        try {
-            await dispatch(changePassword({
-                currentPassword: passwordData.currentPassword,
-                newPassword: passwordData.newPassword
-            })).unwrap()
-            setSuccessMessage("Password changed successfully")
-            setPasswordData({
-                currentPassword: "",
-                newPassword: "",
-                confirmPassword: "",
-            })
-            setTimeout(() => setSuccessMessage(""), 3000)
-        } catch (err) {
-            console.error("Failed to change password:", err)
-        }
-    }
-    // if (loading) {
-    //     <LoaderType1 />
-    // }
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -148,13 +204,13 @@ function Profile() {
                     )}
 
                     {/* Existing Profile Form */}
-                    <form onSubmit={handleProfileSubmit} className="space-y-6">
+                    <form onSubmit={profileFormik.handleSubmit} className="space-y-6">
                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             {[
-                                { label: "Full Name", name: "name", type: "text" },
-                                { label: "Phone Number", name: "phone", type: "tel" },
-                                { label: "Date of Birth", name: "dob", type: "date" },
-                                { label: "PAN Number", name: "pan", type: "text" },
+                                { label: "Full Name", name: "name", type: "text", ref: nameRef },
+                                { label: "Phone Number", name: "phone", type: "tel", ref: phoneRef },
+                                { label: "Date of Birth", name: "dob", type: "date", ref: dobRef },
+                                { label: "PAN Number", name: "pan", type: "text", ref: panRef },
                             ].map((field) => (
                                 <div key={field.name}>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -163,13 +219,21 @@ function Profile() {
                                     <input
                                         type={field.type}
                                         name={field.name}
-                                        value={profileData[field.name]}
-                                        onChange={handleProfileChange}
+                                        ref={field.ref}
+                                        value={profileFormik.values[field.name]}
+                                        onChange={profileFormik.handleChange}
+                                        onBlur={profileFormik.handleBlur}
                                         disabled={!isEditing}
-                                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm 
-                    focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                    disabled:bg-gray-50 disabled:text-gray-500"
+                                        className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm 
+                                            ${profileFormik.touched[field.name] && profileFormik.errors[field.name]
+                                                ? 'border-red-500 focus:ring-red-500'
+                                                : 'border-gray-300 focus:ring-indigo-500'} 
+                                            focus:outline-none focus:ring-2 focus:border-transparent
+                                            disabled:bg-gray-50 disabled:text-gray-500`}
                                     />
+                                    {profileFormik.touched[field.name] && profileFormik.errors[field.name] && (
+                                        <p className="mt-1 text-sm text-red-600">{profileFormik.errors[field.name]}</p>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -180,14 +244,22 @@ function Profile() {
                             </label>
                             <textarea
                                 name="address"
+                                ref={addressRef}
                                 rows={3}
-                                value={profileData.address}
-                                onChange={handleProfileChange}
+                                value={profileFormik.values.address}
+                                onChange={profileFormik.handleChange}
+                                onBlur={profileFormik.handleBlur}
                                 disabled={!isEditing}
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm 
-                focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                disabled:bg-gray-50 disabled:text-gray-500"
+                                className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm 
+                                    ${profileFormik.touched.address && profileFormik.errors.address
+                                        ? 'border-red-500 focus:ring-red-500'
+                                        : 'border-gray-300 focus:ring-indigo-500'} 
+                                    focus:outline-none focus:ring-2 focus:border-transparent
+                                    disabled:bg-gray-50 disabled:text-gray-500`}
                             />
+                            {profileFormik.touched.address && profileFormik.errors.address && (
+                                <p className="mt-1 text-sm text-red-600">{profileFormik.errors.address}</p>
+                            )}
                         </div>
 
                         {/* Account Information */}
@@ -230,14 +302,19 @@ function Profile() {
                     </form>
                 </div>
 
-                {/* Existing Change Password Section */}
+                {/* Change Password Section */}
                 <div className="bg-white shadow-lg rounded-2xl p-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
-                    <form onSubmit={handlePasswordSubmit} className="space-y-6">
+                    {passwordError && (
+                        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-md">
+                            {passwordError}
+                        </div>
+                    )}
+                    <form onSubmit={passwordFormik.handleSubmit} className="space-y-6">
                         {[
-                            { label: "Current Password", name: "currentPassword" },
-                            { label: "New Password", name: "newPassword" },
-                            { label: "Confirm New Password", name: "confirmPassword" },
+                            { label: "Current Password", name: "currentPassword", ref: currentPasswordRef },
+                            { label: "New Password", name: "newPassword", ref: newPasswordRef },
+                            { label: "Confirm New Password", name: "confirmPassword", ref: confirmPasswordRef },
                         ].map((field) => (
                             <div key={field.name}>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -246,11 +323,19 @@ function Profile() {
                                 <input
                                     type="password"
                                     name={field.name}
-                                    value={passwordData[field.name]}
-                                    onChange={handlePasswordChange}
-                                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm 
-                  focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                                    ref={field.ref}
+                                    value={passwordFormik.values[field.name]}
+                                    onChange={passwordFormik.handleChange}
+                                    onBlur={passwordFormik.handleBlur}
+                                    className={`mt-1 block w-full px-3 py-2 border rounded-lg shadow-sm 
+                                        ${passwordFormik.touched[field.name] && passwordFormik.errors[field.name]
+                                            ? 'border-red-500 focus:ring-red-500'
+                                            : 'border-gray-300 focus:ring-indigo-500'} 
+                                        focus:outline-none focus:ring-2 focus:border-transparent`}
                                 />
+                                {passwordFormik.touched[field.name] && passwordFormik.errors[field.name] && (
+                                    <p className="mt-1 text-sm text-red-600">{passwordFormik.errors[field.name]}</p>
+                                )}
                             </div>
                         ))}
 
