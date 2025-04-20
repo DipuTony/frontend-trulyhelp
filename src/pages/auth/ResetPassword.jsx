@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import { resetPassword } from "../../store/slices/authSlice"
+import { useFormik } from "formik"
+import * as Yup from "yup"
 
 function ResetPassword() {
-    const [password, setPassword] = useState("")
-    const [confirmPassword, setConfirmPassword] = useState("")
     const [message, setMessage] = useState("")
     const [successMessage, setSuccessMessage] = useState("")
     const { loading, error } = useSelector((state) => state.auth)
@@ -13,31 +13,44 @@ function ResetPassword() {
     const navigate = useNavigate()
     const { token } = useParams()
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setMessage("")
-        setSuccessMessage("")
+    const validationSchema = Yup.object({
+        password: Yup.string()
+            .min(6, 'Password must be at least 6 characters')
+            // .matches(/[0-9]/, 'Password must contain at least one number')
+            // .matches(/[a-z]/, 'Password must contain at least one lowercase letter')
+            // .matches(/[A-Z]/, 'Password must contain at least one uppercase letter')
+            // .matches(/[^\w]/, 'Password must contain at least one symbol')
+            .required('Password is required'),
+        confirmPassword: Yup.string()
+            .oneOf([Yup.ref('password'), null], 'Passwords must match')
+            .required('Confirm password is required'),
+    })
 
-        if (password !== confirmPassword) {
-            setMessage("Passwords do not match")
-            return
-        }
+    const formik = useFormik({
+        initialValues: {
+            password: '',
+            confirmPassword: '',
+        },
+        validationSchema,
+        onSubmit: async (values) => {
+            setMessage("")
+            setSuccessMessage("")
 
-        dispatch(resetPassword({ token, newPassword: password }))
-            .unwrap()
-            .then(() => {
-                setSuccessMessage("Password reset successful! Please login with your new password.")
-                setTimeout(() => {
-                    navigate('/login')
-                }, 3000)
-            })
-            .catch((err) => {
-                console.error("Error resetting password:", err)
-                // Extract message from the error response
-                const errorMessage = err.response?.data?.message || err.message || err || "Failed to reset password. Please try again."
-                setMessage(errorMessage)
-            })
-    }
+            dispatch(resetPassword({ token, newPassword: values.password }))
+                .unwrap()
+                .then(() => {
+                    setSuccessMessage("Password reset successful! Please login with your new password.")
+                    setTimeout(() => {
+                        navigate('/login')
+                    }, 3000)
+                })
+                .catch((err) => {
+                    console.error("Error resetting password:", err)
+                    const errorMessage = err.response?.data?.message || err.message || err || "Failed to reset password. Please try again."
+                    setMessage(errorMessage)
+                })
+        },
+    })
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -55,28 +68,13 @@ function ResetPassword() {
                     </div>
                 )}
 
-                {error && (
+                {(error || message) && (
                     <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <div className="flex">
-                            <div className="flex-shrink-0">
-                                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-                            <div className="ml-3">
-                                <p className="text-sm text-red-700">{error}</p>
-                            </div>
-                        </div>
+                        <p className="text-sm text-red-700">{error || message}</p>
                     </div>
                 )}
 
-                {message && (
-                    <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                        <p className="text-sm text-red-700">{message}</p>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={formik.handleSubmit} className="space-y-6">
                     <div>
                         <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             New Password
@@ -85,31 +83,41 @@ function ResetPassword() {
                             id="password"
                             name="password"
                             type="password"
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            {...formik.getFieldProps('password')}
+                            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
+                                formik.touched.password && formik.errors.password 
+                                    ? 'border-red-300' 
+                                    : 'border-gray-300'
+                            }`}
                         />
+                        {formik.touched.password && formik.errors.password && (
+                            <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
+                        )}
                     </div>
 
                     <div>
-                        <label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                             Confirm New Password
                         </label>
                         <input
-                            id="confirm-password"
-                            name="confirm-password"
+                            id="confirmPassword"
+                            name="confirmPassword"
                             type="password"
-                            required
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            {...formik.getFieldProps('confirmPassword')}
+                            className={`mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 ${
+                                formik.touched.confirmPassword && formik.errors.confirmPassword 
+                                    ? 'border-red-300' 
+                                    : 'border-gray-300'
+                            }`}
                         />
+                        {formik.touched.confirmPassword && formik.errors.confirmPassword && (
+                            <p className="mt-1 text-sm text-red-600">{formik.errors.confirmPassword}</p>
+                        )}
                     </div>
 
                     <button
                         type="submit"
-                        disabled={loading}
+                        disabled={loading || !formik.isValid || !formik.dirty}
                         className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? (

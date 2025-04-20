@@ -1,19 +1,32 @@
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { forgotPassword } from "../../store/slices/authSlice"
 
 function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const { loading, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // TODO: Implement forgot password action in authSlice
+    setMessage("")
+    setSuccessMessage("")
+
     dispatch(forgotPassword({ email }))
-    setMessage("If an account exists with this email, you will receive password reset instructions.")
+      .unwrap()
+      .then(() => {
+        setSuccessMessage("You will receive password reset instructions.")
+        setEmail("")
+      })
+      .catch((err) => {
+        console.error("Error resetting password:", err)
+        const errorMessage = err.response?.data?.message || err.message || err || "Failed to send reset instructions. Please try again."
+        setMessage(errorMessage)
+      })
   }
 
   return (
@@ -29,7 +42,13 @@ function ForgotPassword() {
           </p>
         </div>
 
-        {error && (
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+            <p className="text-sm text-green-700">{successMessage}</p>
+          </div>
+        )}
+
+        {(error || message) && (
           <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -38,17 +57,18 @@ function ForgotPassword() {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-red-700">{error || message}</p>
               </div>
             </div>
           </div>
         )}
 
-        {message && (
+        {/* Remove this duplicate message display */}
+        {/* {message && (
           <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
             <p className="text-sm text-green-700">{message}</p>
           </div>
-        )}
+        )} */}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
