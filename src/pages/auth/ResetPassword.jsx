@@ -32,7 +32,10 @@ function ResetPassword() {
                 }, 3000)
             })
             .catch((err) => {
-                setMessage(err.message || "Failed to reset password. Please try again.")
+                console.error("Error resetting password:", err)
+                // Extract message from the error response
+                const errorMessage = err.response?.data?.message || err.message || err || "Failed to reset password. Please try again."
+                setMessage(errorMessage)
             })
     }
 
