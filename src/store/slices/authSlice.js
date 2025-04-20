@@ -51,6 +51,51 @@ export const changePassword = createAsyncThunk("auth/changePassword", async (pas
   }
 })
 
+// Add this to your existing authSlice
+export const forgotPassword = createAsyncThunk(
+  'auth/forgotPassword',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/api/auth/forgot-password', { email });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+// Add this to your existing authSlice
+export const resetPassword = createAsyncThunk(
+  'auth/resetPassword',
+  async ({ token, newPassword }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post('/auth/reset-password', { 
+        token, 
+        newPassword 
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data.message);
+    }
+  }
+);
+
+// Add these cases to your reducer
+extraReducers: (builder) => {
+  builder
+    .addCase(resetPassword.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    })
+    .addCase(resetPassword.fulfilled, (state) => {
+      state.loading = false;
+    })
+    .addCase(resetPassword.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+}
+
 // Get stored user data
 const storedUser = localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user")) : null
 
@@ -77,6 +122,9 @@ const authSlice = createSlice({
       state.error = null
     },
   },
+
+
+  // Add these cases to your reducer
   extraReducers: (builder) => {
     builder
       // Login cases
@@ -144,6 +192,18 @@ const authSlice = createSlice({
         state.loading = false
         state.error = action.payload || "Failed to change password"
       })
+    builder
+      .addCase(forgotPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 })
 

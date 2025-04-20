@@ -1,48 +1,30 @@
-"use client"
-
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { Link, useNavigate } from "react-router-dom"
-import { login, clearError } from "../../store/slices/authSlice"
+import { Link } from "react-router-dom"
+import { forgotPassword } from "../../store/slices/authSlice"
 
-const Login = () => {
-  const [email, setEmail] = useState("v@gmail.com")
-  const [password, setPassword] = useState("123456")
-  const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth)
-
+function ForgotPassword() {
+  const [email, setEmail] = useState("")
+  const [message, setMessage] = useState("")
+  const { loading, error } = useSelector((state) => state.auth)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
 
-  useEffect(() => {
-    dispatch(clearError())
-    if (isAuthenticated) {
-      const roleRoutes = {
-        ADMIN: "/admin",
-        VOLUNTEER: "/volunteer",
-        DONOR: "/donor",
-      }
-      navigate(roleRoutes[user?.role] || "/")
-    }
-  }, [isAuthenticated, user, navigate, dispatch])
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    dispatch(login({ email, password }))
+    // TODO: Implement forgot password action in authSlice
+    dispatch(forgotPassword({ email }))
+    setMessage("If an account exists with this email, you will receive password reset instructions.")
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>
           <p className="text-gray-600">
-            New here?{" "}
-            <Link to="/signup" className="text-indigo-600 hover:text-indigo-500 font-medium">
-              Create an account
-            </Link>
-            {" "}or{" "}
-            <Link to="/" className="text-indigo-600 hover:text-indigo-500 font-medium">
-              Donate as guest
+            Remember your password?{" "}
+            <Link to="/login" className="text-indigo-600 hover:text-indigo-500 font-medium">
+              Sign in
             </Link>
           </p>
         </div>
@@ -56,16 +38,15 @@ const Login = () => {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">
-                  {typeof error === 'string' ? error : error.message || "Something went wrong"}
-                </p>
-                {error?.emailVerifyStatus === false && (
-                  <button className="mt-2 text-sm text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">
-                    Resend Verification Email
-                  </button>
-                )}
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             </div>
+          </div>
+        )}
+
+        {message && (
+          <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded">
+            <p className="text-sm text-green-700">{message}</p>
           </div>
         )}
 
@@ -86,29 +67,6 @@ const Login = () => {
             />
           </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Password
-            </label>
-            <div className="flex items-center justify-between">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                required
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-          <div>
-            <Link to="/forgot-password" className="font-semibold ml-1 text-base text-indigo-600 hover:text-indigo-500">
-              Forgot password?
-            </Link>
-          </div>
-
           <button
             type="submit"
             disabled={loading}
@@ -120,10 +78,10 @@ const Login = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Signing in...
+                Sending...
               </span>
             ) : (
-              "Sign in"
+              "Send Reset Instructions"
             )}
           </button>
         </form>
@@ -132,4 +90,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default ForgotPassword

@@ -40,6 +40,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute"
 import PaymentFailed from "./pages/guest/PaymentFailed"
 import PaymentSuccess from "./pages/guest/PaymentSuccess"
 import Profile from "./pages/donor/Profile"
+import ForgotPassword from "./pages/auth/ForgotPassword"
+import ResetPassword from "./pages/auth/ResetPassword"
 
 function App() {
   return (
@@ -49,6 +51,8 @@ function App() {
           {/* Auth Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Admin Routes */}
           <Route
@@ -110,7 +114,7 @@ function App() {
           </Route>
 
           {/* Redirect to login if no route matches */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
         </Routes>
       </Router>
     </Provider>
