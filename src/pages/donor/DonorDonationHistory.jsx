@@ -44,8 +44,9 @@ const DonorDonationHistory = () => {
         throw new Error('Failed to download receipt');
       }
   
-      const filePath = response.data.data.filePath;
-      const fileName = response.data.data.fileName;
+      const filePath = response?.data?.filePath;
+      const fileName = response?.data?.fileName || "Download.pdf";
+      console.log("filePath",filePath)
   
       // Try to force download
       const anchor = document.createElement('a');
