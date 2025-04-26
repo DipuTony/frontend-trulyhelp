@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
+import axiosInstance from "../../utils/axiosInterceptor";
 
 // Get all volunteers
 export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", async (role, { rejectWithValue }) => { // Accept role parameter
   try {
-    const response = await axios.get(`/user/view-all?role=${role}`); // or `/user/${role}/view-all`
+    const response = await axiosInstance.get(`/user/view-all?role=${role}`); // or `/user/${role}/view-all`
     return response.data;
   } catch (error) {
     return rejectWithValue(error.response.data);
@@ -15,7 +16,7 @@ export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", as
 // Add new volunteer
 export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (volunteerData, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/users", volunteerData)
+    const response = await axiosInstance.post("/users", volunteerData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -25,7 +26,7 @@ export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (v
 // Update volunteer
 export const updateVolunteer = createAsyncThunk("volunteers/updateVolunteer",async ({ id, volunteerData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(`/users/${id}`, volunteerData)
+      const response = await axiosInstance.put(`/users/${id}`, volunteerData)
       return response.data
     } catch (error) {
       return rejectWithValue(error.response.data)
@@ -37,7 +38,7 @@ export const searchVolunteers = createAsyncThunk(
   "volunteers/search",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`/user/volunteers/search?q=${query}`)
+      const response = await axiosInstance.get(`/user/volunteers/search?q=${query}`)
       return response.data.data
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to search volunteers")

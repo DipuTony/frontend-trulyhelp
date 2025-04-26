@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
+import axiosInstance from "../../utils/axiosInterceptor"
 
 // Get all donations for admin and volunteer
 export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/donations/view-all")
+    const response = await axiosInstance.get("/donations/view-all")
     return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -13,7 +14,7 @@ export const fetchDonations = createAsyncThunk("donations/fetchDonations", async
 // Get all donations of a donor self
 export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/donations/doner-donation-history")
+    const response = await axiosInstance.get("/donations/doner-donation-history")
     return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -25,7 +26,7 @@ export const onlineGuestDonationEazyBuzz = createAsyncThunk(
   "donations/guestDonationEazyBuzz",
   async (donationData, { rejectWithValue }) => {
     try {
-      const response = await axios.post("/donations/guest-donation-online", {
+      const response = await axiosInstance.post("/donations/guest-donation-online", {
         ...donationData,
         // successUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/success`,
         // failureUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/failed`
@@ -43,7 +44,7 @@ export const onlineGuestDonationEazyBuzz = createAsyncThunk(
 // Add new donation
 export const addDonation = createAsyncThunk("donations/addDonation", async (donationData, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/donations/donate", donationData)
+    const response = await axiosInstance.post("/donations/donate", donationData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -53,7 +54,7 @@ export const addDonation = createAsyncThunk("donations/addDonation", async (dona
 // Verify donation
 export const verifyDonation = createAsyncThunk("donations/verifyDonation", async (id, { rejectWithValue }) => {
   try {
-    const response = await axios.put(`/donations/${id}/verify`)
+    const response = await axiosInstance.put(`/donations/${id}/verify`)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -63,7 +64,7 @@ export const verifyDonation = createAsyncThunk("donations/verifyDonation", async
 // Generate report
 export const generateReport = createAsyncThunk("donations/generateReport", async (reportType, { rejectWithValue }) => {
   try {
-    const response = await axios.get(`/donations/report?type=${reportType}`)
+    const response = await axiosInstance.get(`/donations/report?type=${reportType}`)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)

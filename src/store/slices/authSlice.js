@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import axios from "axios"
+import axiosInstance from "../../utils/axiosInterceptor"
 
 // Login thunk
 export const login = createAsyncThunk("auth/login", async (credentials, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/auth/login", credentials)
+    const response = await axiosInstance.post("/auth/login", credentials)
     localStorage.setItem("token", response.data.token)
     localStorage.setItem("user", JSON.stringify(response.data.user))
     return response.data
@@ -16,7 +17,7 @@ export const login = createAsyncThunk("auth/login", async (credentials, { reject
 // Register thunk
 export const register = createAsyncThunk("auth/register", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/auth/register", userData)
+    const response = await axiosInstance.post("/auth/register", userData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -26,7 +27,7 @@ export const register = createAsyncThunk("auth/register", async (userData, { rej
 // Profile thunks
 export const getProfile = createAsyncThunk("auth/profile", async (_, { rejectWithValue }) => {
   try {
-    const response = await axios.get("/auth/profile")
+    const response = await axiosInstance.get("/auth/profile")
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -35,7 +36,7 @@ export const getProfile = createAsyncThunk("auth/profile", async (_, { rejectWit
 
 export const updateProfile = createAsyncThunk("auth/updateProfile", async (userData, { rejectWithValue }) => {
   try {
-    const response = await axios.put("/auth/profile", userData)
+    const response = await axiosInstance.put("/auth/profile", userData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -44,7 +45,7 @@ export const updateProfile = createAsyncThunk("auth/updateProfile", async (userD
 
 export const changePassword = createAsyncThunk("auth/changePassword", async (passwords, { rejectWithValue }) => {
   try {
-    const response = await axios.post("/auth/change-password", passwords)
+    const response = await axiosInstance.post("/auth/change-password", passwords)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -56,7 +57,7 @@ export const forgotPassword = createAsyncThunk(
   'auth/forgotPassword',
   async ({ email }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/auth/forgot-password', { email });
+      const response = await axiosInstance.post('/auth/forgot-password', { email });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message);
@@ -69,7 +70,7 @@ export const resetPassword = createAsyncThunk(
   'auth/resetPassword',
   async ({ token, newPassword }, { rejectWithValue }) => {
     try {
-      const response = await axios.post('/auth/reset-password', { 
+      const response = await axiosInstance.post('/auth/reset-password', { 
         token, 
         newPassword 
       });
