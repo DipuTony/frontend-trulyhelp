@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { onlineGuestDonationEazyBuzz } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
+import 'animate.css'
 
 const GuestDonateNow = () => {
   const dispatch = useDispatch()
@@ -78,7 +79,7 @@ const GuestDonateNow = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-5 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-10">
+        <div className="text-center mb-10 animate__animated animate__fadeIn animate__delay-0.5s">
           <h1 className="text-4xl font-extrabold text-gray-900">
             Make a <span className="text-indigo-600">Difference</span> Today
           </h1>
@@ -86,7 +87,7 @@ const GuestDonateNow = () => {
         </div>
 
         {error && (
-          <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md">
+          <div className="mb-6 bg-red-50 border-l-4 border-red-400 p-4 rounded-md animate__animated animate__shakeX">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -102,10 +103,10 @@ const GuestDonateNow = () => {
           </div>
         )}
 
-        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden animate__animated animate__fadeInUp">
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2">
             {/* Left Column - Donation Amount */}
-            <div className="p-8 bg-gradient-to-br from-indigo-50 via-indigo-100 to-white">
+            <div className="p-8 bg-gradient-to-br from-indigo-50 via-indigo-100 to-white animate__animated animate__fadeInLeft">
               <div className="sticky top-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose Amount</h2>
                 <div className="grid grid-cols-3 gap-4 mb-6">
@@ -159,7 +160,7 @@ const GuestDonateNow = () => {
             </div>
 
             {/* Right Column - Form Details */}
-            <div className="p-8 border-t lg:border-t-0 lg:border-l border-gray-200">
+            <div className="p-8 border-t lg:border-t-0 lg:border-l border-gray-200 animate__animated animate__fadeInRight">
               <div className="space-y-8">
                 {/* Personal Information */}
                 <div>

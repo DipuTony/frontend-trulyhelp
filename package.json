@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@reduxjs/toolkit": "^2.0.1",
+    "animate.css": "^4.1.1",
     "axios": "^1.6.2",
     "chart.js": "^4.4.0",
     "formik": "^2.4.6",

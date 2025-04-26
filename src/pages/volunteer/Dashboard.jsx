@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux"
 import { fetchDonations } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
+import 'animate.css'
 
 const VolunteerDashboard = () => {
   const dispatch = useDispatch()

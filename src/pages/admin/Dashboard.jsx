@@ -6,6 +6,7 @@ import { fetchDonations } from "../../store/slices/donationSlice"
 import { fetchVolunteers } from "../../store/slices/volunteerSlice"
 import { fetchExpenses } from "../../store/slices/expenseSlice"
 import { Link } from "react-router-dom"
+import 'animate.css'
 
 const AdminDashboard = () => {
   const dispatch = useDispatch()
