@@ -256,6 +256,7 @@ const AdminLayout = () => {
                                   ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
                                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                               }`}
+                              onClick={() => setSidebarOpen(false)}
                             >
                               <span className={`mr-3 h-6 w-6 ${getIconClasses(subItem.href)}`}>
                                 <i className={`fas fa-${subItem.icon}`}></i>

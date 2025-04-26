@@ -76,7 +76,12 @@ const VolunteerLayout = () => {
 
               <nav className="mt-8 flex-1 px-4 space-y-2">
                 {navigation.map((item) => (
-                  <Link key={item.name} to={item.href} className={getLinkClasses(item.href)}>
+                  <Link 
+                    key={item.name} 
+                    to={item.href} 
+                    className={getLinkClasses(item.href)}
+                    onClick={() => setSidebarOpen(false)}
+                  >
                     <i className={`fas fa-${item.icon} ${getIconClasses(item.href)}`}></i>
                     {item.name}
                   </Link>
