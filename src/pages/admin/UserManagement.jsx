@@ -7,7 +7,7 @@ import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { useNavigate, useParams } from "react-router-dom"
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
-import { showSuccessToast } from "../../utils/toast"
+import { showErrorToast, showSuccessToast } from "../../utils/toast"
 import axios from 'axios';
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
@@ -76,27 +76,28 @@ const UserManagement = () => {
     validationSchema,
     onSubmit: async (values, { setSubmitting, setStatus, resetForm }) => {
       try {
-        const submitData = {
+        const addUserPayload = {
           name: values.name,
           email: values.email,
           phone: values.phone,
           password: values.password,
           role: roleName,
-          isEditing: values.isEditing
         }
 
-        // Add userId
-        submitData.userId = currentVolunteer.userId; 
+        const updatePayload = {
+          userId: currentVolunteer?.userId,
+          name: values.name,
+          phone: values.phone,
+          role: roleName,
+        }
 
-        delete submitData.isEditing; // Remove isEditing from submitData
-        delete submitData.password; // Remove password from submitData
-        delete submitData.email; // Remove email from submitData not allow in api
+        // delete submitData.isEditing; // Remove isEditing from submitData
 
         if (isEditing && currentVolunteer) {
-          await axios.post(`${BACKEND_URL}user/update`, submitData, header);
+          await axios.post(`${BACKEND_URL}user/update`, updatePayload, header);
           showSuccessToast("User updated successfully");
         } else {
-          await axios.post(`${BACKEND_URL}user/create`, submitData, header);
+          await axios.post(`${BACKEND_URL}user/create`, addUserPayload, header);
           showSuccessToast("User added successfully");
         }
 
@@ -107,7 +108,9 @@ const UserManagement = () => {
         resetForm();
         handleCloseModal();
       } catch (error) {
+        console.log("error adding user", error)
         setStatus(error.response?.data?.message || 'An error occurred');
+        showErrorToast(error.response?.data?.message || 'An error occurred');
       } finally {
         setSubmitting(false);
       }

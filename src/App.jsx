@@ -42,10 +42,12 @@ import PaymentSuccess from "./pages/guest/PaymentSuccess"
 import Profile from "./pages/donor/Profile"
 import ForgotPassword from "./pages/auth/ForgotPassword"
 import ResetPassword from "./pages/auth/ResetPassword"
+import ToastNotification from "./components/common/ToastNotification"
 
 function App() {
   return (
     <Provider store={store}>
+      <ToastNotification />
       <Router>
         <Routes>
           {/* Auth Routes */}
