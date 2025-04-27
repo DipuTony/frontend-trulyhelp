@@ -14,6 +14,7 @@ const DonorDonationHistory = () => {
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(5)
+  const [generatingReceipt, setGeneratingReceipt] = useState(false)
 
   useEffect(() => {
     dispatch(fetchDonerDonations())
@@ -33,36 +34,40 @@ const DonorDonationHistory = () => {
 
   const handleDownloadReceipt = async (donationId) => {
     try {
+      setGeneratingReceipt(true);
       const response = await axios.get(`${import.meta.env.VITE_API_URL}donations/receipt/${donationId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
       });
-  
+
       console.log("this is response", response);
-  
+
       if (!response.data.status) {
         throw new Error('Failed to download receipt');
       }
-  
+
       const filePath = response?.data?.filePath;
       const fileName = response?.data?.fileName || "Download.pdf";
-      console.log("filePath",filePath)
-  
+      console.log("filePath", filePath)
+
       // Try to force download
       const anchor = document.createElement('a');
       anchor.href = filePath;
       anchor.download = fileName;
       anchor.target = '_blank'; // Open in new tab if download fails
       anchor.rel = 'noopener noreferrer';
-      
+
       // This will trigger download if possible, otherwise open in new tab
       anchor.click();
       showSuccessToast("Receipt downloaded successfully!");
-  
+
     } catch (error) {
       console.error('Error downloading receipt:', error);
       alert('Failed to download receipt. Please try again.');
+    }
+    finally {
+      setGeneratingReceipt(false);
     }
   };
 
@@ -231,15 +236,15 @@ const DonorDonationHistory = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <button 
+                      <button
                         onClick={() => handleDownloadReceipt(donation?.donationId)}
-                        disabled={false}
-                        className={`inline-flex items-center px-4 py-2 border rounded-xl shadow-sm text-sm font-medium ${!donation.verified 
-                          ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50' 
+                        disabled={generatingReceipt}
+                        className={`inline-flex items-center px-4 py-2 border rounded-xl shadow-sm text-sm font-medium ${!donation.verified
+                          ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
                           : 'border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'}`}
                       >
                         <i className="fas fa-download mr-2"></i>
-                        {!donation.verified ? 'Download Tax Receipt' : 'Receipt Pending'}
+                        {generatingReceipt ? "Generating..." : !donation.verified ? 'Download Tax Receipt' : 'Receipt Pending'}
                       </button>
                     </td>
                   </tr>
@@ -297,7 +302,7 @@ const DonorDonationHistory = () => {
               <h3 className="text-xl font-semibold text-gray-900">Tax Receipts</h3>
               <p className="mt-1 text-sm text-gray-500">Download all your verified donation receipts in one package</p>
             </div>
-            <button 
+            <button
               onClick={handleDownloadAllReceipts}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
