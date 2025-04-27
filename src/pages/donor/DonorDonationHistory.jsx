@@ -6,6 +6,7 @@ import { fetchDonerDonations } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
 import axios from "axios"
+import { showSuccessToast } from "../../utils/toast"
 
 const DonorDonationHistory = () => {
   const dispatch = useDispatch()
@@ -57,6 +58,7 @@ const DonorDonationHistory = () => {
       
       // This will trigger download if possible, otherwise open in new tab
       anchor.click();
+      showSuccessToast("Receipt downloaded successfully!");
   
     } catch (error) {
       console.error('Error downloading receipt:', error);
