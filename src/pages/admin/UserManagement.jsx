@@ -9,6 +9,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { showSuccessToast } from "../../utils/toast"
 import axios from 'axios';
+import { formatDateShort } from "../../components/common/DateFormatFunctions"
 
 const UserManagement = () => {
   const dispatch = useDispatch()
@@ -83,10 +84,16 @@ const UserManagement = () => {
           role: roleName,
           isEditing: values.isEditing
         }
-        delete submitData.isEditing
+
+        // Add userId
+        submitData.userId = currentVolunteer.userId; 
+
+        delete submitData.isEditing; // Remove isEditing from submitData
+        delete submitData.password; // Remove password from submitData
+        delete submitData.email; // Remove email from submitData not allow in api
 
         if (isEditing && currentVolunteer) {
-          await axios.put(`${BACKEND_URL}user/update/${currentVolunteer.id}`, submitData, header);
+          await axios.post(`${BACKEND_URL}user/update`, submitData, header);
           showSuccessToast("User updated successfully");
         } else {
           await axios.post(`${BACKEND_URL}user/create`, submitData, header);
@@ -125,6 +132,7 @@ const UserManagement = () => {
     fetchVolunteers();
   }, [role]);
 
+  // Remove this line
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -142,22 +150,24 @@ const UserManagement = () => {
     if (volunteer) {
       setIsEditing(true)
       setCurrentVolunteer(volunteer)
-      setFormData({
+      formik.setValues({
         name: volunteer.name || "",
         email: volunteer.email || "",
         phone: volunteer.phone || "",
-        address: volunteer.address || "",
+        password: "", // Password should be empty when editing
         role: roleName,
+        isEditing: true
       })
     } else {
       setIsEditing(false)
       setCurrentVolunteer(null)
-      setFormData({
+      formik.setValues({
         name: "",
         email: "",
         phone: "",
-        address: "",
+        password: "",
         role: roleName,
+        isEditing: false
       })
     }
     setIsModalOpen(true)
@@ -222,6 +232,9 @@ const UserManagement = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                      SL.
+                    </th>
+                    <th scope="col" className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
                       Name
                     </th>
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
@@ -242,15 +255,16 @@ const UserManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {!volunteers?.data ? "No Data Found!" : volunteers?.data?.map((volunteer) => (
+                  {!volunteers?.data ? "No Data Found!" : volunteers?.data?.map((volunteer, index) => (
                     <tr key={volunteer.id}>
+                      <td className="whitespace-nowrap pl-7 py-4 text-sm text-gray-500">{index + 1}.</td>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                         {volunteer.name}
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{volunteer?.email}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{volunteer?.phone}</td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{volunteer?.role}</td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{volunteer?.createdAt}</td>
+                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{formatDateShort(volunteer?.createdAt)}</td>
                       <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                         <button
                           onClick={() => handleOpenModal(volunteer)}
@@ -311,23 +325,23 @@ const UserManagement = () => {
                             <p className="mt-1 text-sm text-red-600">{formik.errors.name}</p>
                           )}
                         </div>
-
-                        <div>
-                          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                            Email
-                          </label>
-                          <input
-                            type="email"
-                            id="email"
-                            {...formik.getFieldProps('email')}
-                            className={`mt-1 block w-full border ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
-                              } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
-                          />
-                          {formik.touched.email && formik.errors.email && (
-                            <p className="mt-1 text-sm text-red-600">{formik.errors.email}</p>
-                          )}
-                        </div>
-
+                        {!isEditing && (
+                          <div>
+                            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              id="email"
+                              {...formik.getFieldProps('email')}
+                              className={`mt-1 block w-full border ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                            />
+                            {formik.touched.email && formik.errors.email && (
+                              <p className="mt-1 text-sm text-red-600">{formik.errors.email}</p>
+                            )}
+                          </div>
+                        )}
                         {!isEditing && (
                           <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
