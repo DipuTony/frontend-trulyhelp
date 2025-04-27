@@ -4,30 +4,138 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchVolunteers, addVolunteer, updateVolunteer } from "../../store/slices/volunteerSlice"
 import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
+import { useFormik } from 'formik'
+import * as Yup from 'yup'
+import { showSuccessToast } from "../../utils/toast"
+import axios from 'axios';
 
 const UserManagement = () => {
   const dispatch = useDispatch()
-  const { volunteers, loading, error } = useSelector((state) => state.volunteers)
+  // const { volunteers, loading, error } = useSelector((state) => state.volunteers)
+  const navigate = useNavigate();
 
-  const { role } = useParams();
-
+  const [volunteers, setVolunteers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [currentVolunteer, setCurrentVolunteer] = useState(null)
 
+  const BACKEND_URL = import.meta.env.VITE_API_URL;
+
+  let { role } = useParams();
+
+  const roleName = {
+    volunteer: "VOLUNTEER",
+    donor: "DONOR",
+    admin: "ADMIN"
+  }[role];
+
+  const header = {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    },
+  }
+
+  // Move validation schema inside component
+  const validationSchema = Yup.object({
+    name: Yup.string()
+      .required('Name is required')
+      .min(2, 'Name must be at least 2 characters'),
+    email: Yup.string()
+      .email('Invalid email address')
+      .required('Email is required'),
+    password: Yup.string()
+      .when('isEditing', {
+        is: false,
+        then: () => Yup.string()
+          .required('Password is required for new users')
+          .min(6, 'Password must be at least 6 characters'),
+        otherwise: () => Yup.string(),
+      }),
+    phone: Yup.string()
+      .matches(/^\d{10}$/, 'Phone number must be 10 digits')
+      .nullable(),
+    // role: Yup.string()
+    //   .required('Role is required')
+  })
+
+  // Move formik configuration inside component
+  const formik = useFormik({
+    initialValues: {
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      role: '',
+      isEditing: false
+    },
+    validationSchema,
+    onSubmit: async (values, { setSubmitting, setStatus, resetForm }) => {
+      try {
+        const submitData = { 
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          password: values.password,
+          role: roleName,
+          isEditing: values.isEditing
+        }
+        delete submitData.isEditing
+
+        if (isEditing && currentVolunteer) {
+          await axios.put(`${BACKEND_URL}user/update/${currentVolunteer.id}`, submitData, header);
+          showSuccessToast("User updated successfully");
+        } else {
+          await axios.post(`${BACKEND_URL}user/create`, submitData, header);
+          showSuccessToast("User added successfully");
+        }
+
+        // Refresh the volunteers list after successful submission
+        fetchVolunteers();
+        setStatus(null);
+        setSubmitting(false);
+        resetForm();
+        handleCloseModal();
+      } catch (error) {
+        setStatus(error.response?.data?.message || 'An error occurred');
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  });
+
+
+  const fetchVolunteers = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`${BACKEND_URL}user/view-all?role=${role?.toUpperCase()}`, header);
+      console.log("data", data?.data)
+      setVolunteers(data);
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.error('Error fetching volunteers:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVolunteers();
+  }, [role]);
 
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
-    role: "volunteer",
+    password: "", // Add password field
+    role: roleName,
   })
 
-  useEffect(() => {
-    dispatch(fetchVolunteers(role?.toUpperCase()))
-  }, [dispatch, role])
+  // useEffect(() => {
+  //   dispatch(fetchVolunteers(role?.toUpperCase()))
+  // }, [dispatch, role])
 
   const handleOpenModal = (volunteer = null) => {
     if (volunteer) {
@@ -38,7 +146,7 @@ const UserManagement = () => {
         email: volunteer.email || "",
         phone: volunteer.phone || "",
         address: volunteer.address || "",
-        role: "volunteer",
+        role: roleName,
       })
     } else {
       setIsEditing(false)
@@ -48,7 +156,7 @@ const UserManagement = () => {
         email: "",
         phone: "",
         address: "",
-        role: "volunteer",
+        role: roleName,
       })
     }
     setIsModalOpen(true)
@@ -63,18 +171,6 @@ const UserManagement = () => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-
-    if (isEditing && currentVolunteer) {
-      dispatch(updateVolunteer({ id: currentVolunteer.id, volunteerData: formData }))
-    } else {
-      dispatch(addVolunteer(formData))
-    }
-
-    handleCloseModal()
-  }
-
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -86,7 +182,7 @@ const UserManagement = () => {
   if (error) {
     return (
       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span className="block sm:inline">{error}</span>
+        <span className="block sm:inline">{typeof error === 'object' ? error.message || 'An error occurred' : error}</span>
       </div>
     )
   }
@@ -95,9 +191,9 @@ const UserManagement = () => {
     <div>
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900 capitalize">{role ? role+"s" :"All Users"}</h1>
+          <h1 className="text-2xl font-semibold text-gray-900 capitalize">{role ? role + "s" : "All Users"}</h1>
           <p className="mt-2 text-sm text-gray-700">
-            A list of all {role ? role+"s" :"All Users"} including their name, email, phone, and address.
+            A list of all {role ? role + "s" : "All Users"} including their name, email, phone, and address.
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
@@ -140,7 +236,7 @@ const UserManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {volunteers?.data?.map((volunteer) => (
+                  {!volunteers?.data ? "No Data Found!" : volunteers?.data?.map((volunteer) => (
                     <tr key={volunteer.id}>
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
                         {volunteer.name}
@@ -187,20 +283,27 @@ const UserManagement = () => {
                       {isEditing ? `Edit ${role}` : `Add ${role}`}
                     </h3>
                     <div className="mt-2">
-                      <form onSubmit={handleSubmit} className="space-y-4">
+                      <form onSubmit={formik.handleSubmit} className="space-y-4">
+                        {formik.status && (
+                          <div className="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                            <span className="block sm:inline">{formik.status}</span>
+                          </div>
+                        )}
+
                         <div>
                           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                             Name
                           </label>
                           <input
                             type="text"
-                            name="name"
                             id="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            {...formik.getFieldProps('name')}
+                            className={`mt-1 block w-full border ${formik.touched.name && formik.errors.name ? 'border-red-500' : 'border-gray-300'
+                              } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                           />
+                          {formik.touched.name && formik.errors.name && (
+                            <p className="mt-1 text-sm text-red-600">{formik.errors.name}</p>
+                          )}
                         </div>
 
                         <div>
@@ -209,14 +312,33 @@ const UserManagement = () => {
                           </label>
                           <input
                             type="email"
-                            name="email"
                             id="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            {...formik.getFieldProps('email')}
+                            className={`mt-1 block w-full border ${formik.touched.email && formik.errors.email ? 'border-red-500' : 'border-gray-300'
+                              } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                           />
+                          {formik.touched.email && formik.errors.email && (
+                            <p className="mt-1 text-sm text-red-600">{formik.errors.email}</p>
+                          )}
                         </div>
+
+                        {!isEditing && (
+                          <div>
+                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                              Password
+                            </label>
+                            <input
+                              type="password"
+                              id="password"
+                              {...formik.getFieldProps('password')}
+                              className={`mt-1 block w-full border ${formik.touched.password && formik.errors.password ? 'border-red-500' : 'border-gray-300'
+                                } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
+                            />
+                            {formik.touched.password && formik.errors.password && (
+                              <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
+                            )}
+                          </div>
+                        )}
 
                         <div>
                           <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
@@ -224,12 +346,14 @@ const UserManagement = () => {
                           </label>
                           <input
                             type="text"
-                            name="phone"
                             id="phone"
-                            value={formData.phone}
-                            onChange={handleChange}
-                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            {...formik.getFieldProps('phone')}
+                            className={`mt-1 block w-full border ${formik.touched.phone && formik.errors.phone ? 'border-red-500' : 'border-gray-300'
+                              } rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`}
                           />
+                          {formik.touched.phone && formik.errors.phone && (
+                            <p className="mt-1 text-sm text-red-600">{formik.errors.phone}</p>
+                          )}
                         </div>
 
                         <div>
@@ -245,27 +369,29 @@ const UserManagement = () => {
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           />
                         </div>
+
+                        <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                          <button
+                            type="submit"
+                            disabled={formik.isSubmitting}
+                            className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50"
+                          >
+                            {formik.isSubmitting ? 'Saving...' : (isEditing ? 'Update' : 'Add')}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={handleCloseModal}
+                            className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </form>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  {isEditing ? "Update" : "Add"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                >
-                  Cancel
-                </button>
-              </div>
+
             </div>
           </div>
         </div>

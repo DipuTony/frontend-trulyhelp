@@ -66,7 +66,7 @@ function App() {
             <Route index element={<AdminDashboard />} />
             <Route path="donations" element={<DonationList />} />
             <Route path="users/:role?" element={<UserManagement />} />
-            <Route path="users/:role?/:userId?" element={"vol;uinter details"} />
+            <Route path="users/:role?/:userId?" element={"user/volunteer  details"} />
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />

@@ -13,10 +13,10 @@ export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", as
 }
 );
 
-// Add new volunteer
+// Add new user (donor / volunteer /admin)
 export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (volunteerData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post("/users", volunteerData)
+    const response = await axiosInstance.post("/user/create", volunteerData)
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
