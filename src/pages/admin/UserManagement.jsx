@@ -56,7 +56,8 @@ const UserManagement = () => {
       }),
     phone: Yup.string()
       .matches(/^\d{10}$/, 'Phone number must be 10 digits')
-      .nullable(),
+      .nullable()
+      .required('Phone number is required'),
     // role: Yup.string()
     //   .required('Role is required')
   })
@@ -74,7 +75,7 @@ const UserManagement = () => {
     validationSchema,
     onSubmit: async (values, { setSubmitting, setStatus, resetForm }) => {
       try {
-        const submitData = { 
+        const submitData = {
           name: values.name,
           email: values.email,
           phone: values.phone,
@@ -163,13 +164,18 @@ const UserManagement = () => {
   }
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
+    setIsModalOpen(false);
+    formik.resetForm();
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      password: "",
+      role: roleName,
+    });
   }
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
 
   if (loading) {
     return (
@@ -355,7 +361,7 @@ const UserManagement = () => {
                             <p className="mt-1 text-sm text-red-600">{formik.errors.phone}</p>
                           )}
                         </div>
-
+                        {/* 
                         <div>
                           <label htmlFor="address" className="block text-sm font-medium text-gray-700">
                             Address
@@ -368,7 +374,7 @@ const UserManagement = () => {
                             onChange={handleChange}
                             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                           />
-                        </div>
+                        </div> */}
 
                         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                           <button
