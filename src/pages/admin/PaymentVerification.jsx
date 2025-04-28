@@ -49,7 +49,7 @@ const PaymentVerification = () => {
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Payment Verification</h1>
           <p className="mt-2 text-sm text-gray-700">
-            Verify pending donation payments by reviewing payment details and receipts.
+            Verify pending donation payments done by volunteers which is offline.
           </p>
         </div>
       </div>

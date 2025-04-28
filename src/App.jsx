@@ -1,6 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
 import { Provider } from "react-redux"
 import { store } from "./store"
+import { ErrorBoundary } from "react-error-boundary"
+import ErrorFallback from "./components/common/ErrorBoundary"
 
 // Auth Pages
 import Login from "./pages/auth/Login"
@@ -48,77 +50,116 @@ function App() {
   return (
     <Provider store={store}>
       <ToastNotification />
-      <Router>
-        <Routes>
-          {/* Auth Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <ErrorBoundary
+        FallbackComponent={({ error, resetErrorBoundary }) => (
+          <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} showNavigation={true} />
+        )}
+        onReset={() => {
+          // Optional: Add any reset logic here
+          window.location.reload();
+        }}
+      >
+        <Router>
+          <Routes>
+            {/* Auth Routes */}
+            <Route path="/login" element={
+              <ErrorBoundary
+                FallbackComponent={ErrorFallback}
+                onReset={() => window.location.reload()}
+              >
+                <Login />
+              </ErrorBoundary>
+            } />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          {/* Admin Routes */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute role="admin">
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<AdminDashboard />} />
-            <Route path="donations" element={<DonationList />} />
-            <Route path="users/:role?" element={<UserManagement />} />
-            <Route path="users/:role?/:userId?" element={"user/volunteer  details"} />
-            {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
-            <Route path="payment-verification" element={<PaymentVerification />} />
-            <Route path="reports" element={<ReportGenerator />} />
-            <Route path="notifications" element={<NotificationPanel />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="add-donation" element={<AddDonation usedFor="admin"/>} />
-          </Route>
+            {/* Admin Routes */}
+            <Route
+              path="/admin"
+              element={
+                <ErrorBoundary
+                  FallbackComponent={ErrorFallback}
+                  onReset={() => window.location.reload()}
+                >
+                  <ProtectedRoute role="admin">
+                    <AdminLayout />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              }
+            >
+              <Route index element={<AdminDashboard />} />
+              <Route path="donations" element={<DonationList />} />
+              <Route path="users/:role?" element={<UserManagement />} />
+              <Route path="users/:role?/:userId?" element={"user/volunteer  details"} />
+              {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
+              <Route path="payment-verification" element={<PaymentVerification />} />
+              <Route path="reports" element={<ReportGenerator />} />
+              <Route path="notifications" element={<NotificationPanel />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
+            </Route>
 
-          {/* Volunteer Routes */}
-          <Route
-            path="/volunteer"
-            element={
-              <ProtectedRoute role="volunteer">
-                <VolunteerLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<VolunteerDashboard />} />
-            <Route path="add-donation" element={<AddDonation usedFor="volunteer"/>} />
-            <Route path="donation-history" element={<VolunteerDonationHistory />} />
-            <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
+            {/* Volunteer Routes */}
+            <Route
+              path="/volunteer"
+              element={
+                <ErrorBoundary
+                  FallbackComponent={ErrorFallback}
+                  onReset={() => window.location.reload()}
+                >
+                  <ProtectedRoute role="volunteer">
+                    <VolunteerLayout />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              }
+            >
+              <Route index element={<VolunteerDashboard />} />
+              <Route path="add-donation" element={<AddDonation usedFor="volunteer" />} />
+              <Route path="donation-history" element={<VolunteerDonationHistory />} />
+              <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
 
-          {/* Donor Routes */}
-          <Route
-            path="/donor"
-            element={
-              <ProtectedRoute role="donor">
-                <DonorLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<DonorDashboard />} />
-            <Route path="history" element={<DonorDonationHistory />} />
-            <Route path="donate" element={<DonateNow />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
+            {/* Donor Routes */}
+            <Route
+              path="/donor"
+              element={
+                <ErrorBoundary
+                  FallbackComponent={ErrorFallback}
+                  onReset={() => window.location.reload()}
+                >
+                  <ProtectedRoute role="donor">
+                    <DonorLayout />
+                  </ProtectedRoute>
+                </ErrorBoundary>
+              }
+            >
+              <Route index element={<DonorDashboard />} />
+              <Route path="history" element={<DonorDonationHistory />} />
+              <Route path="donate" element={<DonateNow />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
 
-          {/* Guest Routes */}
-          <Route path="/" element={<GuestLayout />}>
-            <Route index element={<GuestDonationNow />} />
-            <Route path="payment/success" element={<PaymentSuccess />} />
-            <Route path="payment/failed" element={<PaymentFailed />} />
-          </Route>
+            {/* Guest Routes */}
+            <Route path="/" element={
+              <ErrorBoundary
+                FallbackComponent={ErrorFallback}
+                onReset={() => window.location.reload()}
+              >
+                <GuestLayout />
+              </ErrorBoundary>
+            }>
+              <Route index element={<GuestDonationNow />} />
+              <Route path="payment/success" element={<PaymentSuccess />} />
+              <Route path="payment/failed" element={<PaymentFailed />} />
+            </Route>
 
-          {/* Redirect to login if no route matches */}
-          {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
-        </Routes>
-      </Router>
+            {/* Redirect to login if no route matches */}
+            {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
+          </Routes>
+        </Router>
+      </ErrorBoundary>
     </Provider>
   )
 }
