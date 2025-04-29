@@ -3,9 +3,9 @@ import axios from "axios"
 import axiosInstance from "../../utils/axiosInterceptor"
 
 // Get all donations for admin and volunteer
-export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
+export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (filterBy, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get("/donations/view-all")
+    const response = await axiosInstance.get(`/donations/view-all?paymentStatus=${filterBy}`)
     return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -52,14 +52,19 @@ export const addDonation = createAsyncThunk("donations/addDonation", async (dona
 })
 
 // Verify donation
-export const verifyDonation = createAsyncThunk("donations/verifyDonation", async (id, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.put(`/donations/${id}/verify`)
-    return response.data
-  } catch (error) {
-    return rejectWithValue(error.response.data)
+export const verifyDonation = createAsyncThunk(
+  "donations/verifyDonation",
+  async ({ donationId, amount }, { rejectWithValue }) => {
+
+    console.log("in slice",donationId, amount, "donationId, amount")
+    try {
+      const response = await axiosInstance.post(`/donations/${donationId}/${amount}/verify`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-})
+);
 
 // Generate report
 export const generateReport = createAsyncThunk("donations/generateReport", async (reportType, { rejectWithValue }) => {

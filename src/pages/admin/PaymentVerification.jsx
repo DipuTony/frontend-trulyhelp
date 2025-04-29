@@ -4,17 +4,20 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
+import { showErrorToast, showSuccessToast } from '../../utils/toast';
 
 const PaymentVerification = () => {
   const dispatch = useDispatch()
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [selectedDonation, setSelectedDonation] = useState(null)
 
-  useEffect(() => {
-    dispatch(fetchDonations())
-  }, [dispatch])
+  const fetchPendingDonations = () => {
+    dispatch(fetchDonations("PENDING")) //PENDING, COMPLETED, FAILED, CANCELLED, REFUNDED
+  }
 
-  const pendingDonations = donations.filter((d) => !d.verified)
+  useEffect(() => {
+    fetchPendingDonations()
+  }, [dispatch])
 
   const handleSelectDonation = (donation) => {
     setSelectedDonation(donation)
@@ -22,10 +25,19 @@ const PaymentVerification = () => {
 
   const handleVerify = () => {
     if (selectedDonation) {
-      dispatch(verifyDonation(selectedDonation.id))
-      setSelectedDonation(null)
+      console.log("in jsx", selectedDonation.donationId, selectedDonation.amount)
+      dispatch(verifyDonation({donationId:selectedDonation.donationId, amount:selectedDonation.amount}))
+        .unwrap()
+        .then(() => {
+          showSuccessToast('Donation verified successfully!');
+          setSelectedDonation(null);
+          fetchPendingDonations(); // Refresh the list after verification
+        })
+        .catch((error) => {
+          showErrorToast(error?.message || 'Failed to verify donation');
+        });
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -35,16 +47,13 @@ const PaymentVerification = () => {
     )
   }
 
-  if (error) {
-    return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-        <span className="block sm:inline">{error}</span>
-      </div>
-    )
-  }
-
   return (
     <div>
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Payment Verification</h1>
@@ -59,11 +68,11 @@ const PaymentVerification = () => {
           <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
             <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Donations</h3>
             <div className="mt-2 max-h-96 overflow-y-auto">
-              {pendingDonations.length === 0 ? (
+              {donations?.length === 0 ? (
                 <p className="text-sm text-gray-500 italic">No pending donations to verify.</p>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {pendingDonations.map((donation) => (
+                  {donations?.map((donation) => (
                     <li
                       key={donation.id}
                       className={`py-4 cursor-pointer hover:bg-gray-50 ${
@@ -83,7 +92,7 @@ const PaymentVerification = () => {
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
-                          <p className="text-xs text-gray-500">{formatDateShort(donation.date)}</p>
+                          <p className="text-xs text-gray-500">{formatDateShort(donation.createdAt)}</p>
                         </div>
                       </div>
                     </li>
@@ -105,6 +114,10 @@ const PaymentVerification = () => {
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorName}</dd>
                   </div>
                   <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Donor Phone</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorPhone}</dd>
+                  </div>
+                  <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Donor Email</dt>
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorEmail}</dd>
                   </div>
@@ -115,27 +128,28 @@ const PaymentVerification = () => {
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Date</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {formatDateShort(selectedDonation.date)}
+                      {formatDateShort(selectedDonation.createdAt)}
                     </dd>
                   </div>
                   <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.paymentMethod || "Bank Transfer"}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.method || "N/A"}</dd>
                   </div>
                   <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">Transaction ID</dt>
                     <dd className="mt-1 text-sm text-gray-900">
-                      {selectedDonation.transactionId || "TXN" + selectedDonation.id}
+                      {selectedDonation.donationId || "N/A"}
                     </dd>
                   </div>
-                  <div className="sm:col-span-2">
+                 
+                  {/* <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">Payment Receipt</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       <div className="border border-gray-200 rounded-md p-4 bg-gray-50 flex items-center justify-center">
                         <i className="fas fa-file-invoice text-gray-400 text-4xl"></i>
                       </div>
                     </dd>
-                  </div>
+                  </div> */}
                 </dl>
                 <div className="mt-6 flex justify-end">
                   <button
