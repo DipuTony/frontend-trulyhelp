@@ -89,7 +89,7 @@ function App() {
               }
             >
               <Route index element={<AdminDashboard />} />
-              <Route path="donations" element={<DonationList />} />
+              <Route path="donations" element={<DonationList />} /> {/* user for admin and volunteer */}
               <Route path="users/:role?" element={<UserManagement />} />
               <Route path="users/:role?/:userId?" element={"user/volunteer  details"} />
               {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
@@ -116,7 +116,8 @@ function App() {
             >
               <Route index element={<VolunteerDashboard />} />
               <Route path="add-donation" element={<AddDonation usedFor="volunteer" />} />
-              <Route path="donation-history" element={<VolunteerDonationHistory />} />
+              {/* <Route path="donation-history" element={<VolunteerDonationHistory />} /> */}
+              <Route path="donation-history" element={<DonationList />} /> {/* user for admin and volunteer */}
               <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
               <Route path="profile" element={<Profile />} />
             </Route>

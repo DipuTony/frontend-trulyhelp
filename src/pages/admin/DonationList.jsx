@@ -4,26 +4,27 @@ import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
+import 'animate.css';
 
 const DonationList = () => {
   const dispatch = useDispatch()
   const { donations, loading, error } = useSelector((state) => state.donations)
-  const [filter, setFilter] = useState("all") // all, verified, pending
+  const { user } = useSelector((state) => state.auth)
+  const isAdmin = user?.role === 'ADMIN'
+  const [filter, setFilter] = useState("ALL") // ALL, PENDING, COMPLETED, FAILED,  REFUNDED
 
   useEffect(() => {
-    dispatch(fetchDonations())
-  }, [dispatch])
+    dispatch(fetchDonations(filter))
+  }, [dispatch, filter])
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value)
+  }
 
   const handleVerify = (id) => {
     dispatch(verifyDonation(id))
   }
 
-  const filteredDonations =
-    filter === "all"
-      ? donations
-      : filter === "verified"
-        ? donations.filter((d) => d.verified)
-        : donations.filter((d) => !d.verified)
 
   if (loading) {
     return (
@@ -42,7 +43,7 @@ const DonationList = () => {
   }
 
   return (
-    <div>
+    <div className="animate__animated animate__fadeIn">
       <div className="sm:flex sm:items-center">
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Donations</h1>
@@ -52,28 +53,19 @@ const DonationList = () => {
         </div>
       </div>
 
-      <div className="mt-4 flex space-x-4">
-        <button
-          onClick={() => setFilter("all")}
-          className={`px-3 py-2 rounded-md text-sm font-medium ${filter === "all" ? "bg-indigo-100 text-indigo-800" : "text-gray-700 hover:bg-gray-100"
-            }`}
+      <div className="mt-4 animate__animated animate__fadeInUp">
+        <select
+          value={filter}
+          onChange={handleFilterChange}
+          className="block w-48 rounded-md border border-gray-300 py-2 pl-3 pr-10 text-base focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
         >
-          All
-        </button>
-        <button
-          onClick={() => setFilter("verified")}
-          className={`px-3 py-2 rounded-md text-sm font-medium ${filter === "verified" ? "bg-green-100 text-green-800" : "text-gray-700 hover:bg-gray-100"
-            }`}
-        >
-          Verified
-        </button>
-        <button
-          onClick={() => setFilter("pending")}
-          className={`px-3 py-2 rounded-md text-sm font-medium ${filter === "pending" ? "bg-yellow-100 text-yellow-800" : "text-gray-700 hover:bg-gray-100"
-            }`}
-        >
-          Pending
-        </button>
+          <option value="ALL">All Donations</option>
+          <option value="PENDING">Pending</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="FAILED">Failed</option>
+          {/* <option value="CANCELLED">Cancelled</option> */}
+          <option value="REFUNDED">Refunded</option>
+        </select>
       </div>
 
       <div className="mt-8 flex flex-col">
@@ -101,61 +93,86 @@ const DonationList = () => {
                     <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
                       Self/Volt
                     </th>
-                    <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Actions
-                    </th>
+                    {isAdmin &&
+                      <th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                        Actions
+                      </th>
+                    }
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 bg-white">
-                  {filteredDonations?.map((donation) => (
-                    <tr key={donation.id}>
-                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                        <div className="font-medium text-gray-900">{donation.donorName}</div>
-                        <div className="font-normal text-gray-600">{donation.donorPhone}</div>
-                        <div className="text-gray-500">{donation.donorEmail}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <div className="text-gray-900">{donation.method}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <div className="text-gray-900">₹{donation.amount?.toFixed(2)}</div>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        {new Date(donation.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <p className="text-gray-500 text-xs">{donation.paymentStatus}</p>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                        <span
-                          className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                            }`}
-                        >
-                          {donation?.donorUserId && "Self"}
-                          {donation?.volunteer && (<Link to={`/admin/users/volunteer/${donation?.volunteer?.userId}`}> {donation?.volunteer?.name}</Link>)}
-                        </span>
-                      </td>
-                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
-                        {!donation.settled && (
-                          <button
-                            onClick={() => handleVerify(donation.id)}
-                            className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  {donations?.length > 0 ? (
+                    donations.map((donation) => (
+                      <tr key={donation.id} className="animate__animated animate__fadeIn">
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                          <div className="font-medium text-gray-900">{donation.donorName}</div>
+                          <div className="font-normal text-gray-600">{donation.donorPhone}</div>
+                          <div className="text-gray-500">{donation.donorEmail}</div>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <div className="text-gray-900">{donation.method}</div>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <div className="text-gray-900">₹{donation.amount?.toFixed(2)}</div>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {new Date(donation.createdAt).toLocaleDateString()}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium 
+                            ${donation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                              donation.paymentStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                donation.paymentStatus === 'FAILED' ? 'bg-red-100 text-red-800' :
+                                  donation.paymentStatus === 'REFUNDED' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'}`}>
+                            {donation.paymentStatus}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          <span
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                              }`}
                           >
-                            <i className="fas fa-check mr-1"></i>
-                            Verify
-                          </button>
-
-                        )}
-                        <button
-                          onClick={() => console.log("View Details", donation.id)}
-                          className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                        >
-                          <i className="fas fa-eye mr-1"></i>
-                          View Details
-                        </button>
+                            {donation?.donorUserId && "Self"}
+                            {donation?.volunteer && (<Link to={`/admin/users/volunteer/${donation?.volunteer?.userId}`}> {donation?.volunteer?.name}</Link>)}
+                          </span>
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
+                          {isAdmin && (
+                            <>
+                              {!donation.settled && (
+                                <button
+                                  onClick={() => handleVerify(donation.id)}
+                                  className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                >
+                                  <i className="fas fa-check mr-1"></i>
+                                  Verify
+                                </button>
+                              )}
+                              <button
+                                onClick={() => console.log("View Details", donation.id)}
+                                className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                              >
+                                <i className="fas fa-eye mr-1"></i>
+                                View Details
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr className="animate__animated animate__fadeIn">
+                      <td colSpan="7" className="py-8 text-center">
+                        <div className="text-gray-500">
+                          No donations found for {filter === 'PENDING' ? 'Pending' :
+                            filter === 'COMPLETED' ? 'Completed' :
+                              filter === 'FAILED' ? 'Failed' :
+                                filter === 'REFUNDED' ? 'Refunded' : 'All'}
+                        </div>
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
