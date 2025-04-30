@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import 'animate.css';
 
 const DonationList = () => {
@@ -13,6 +13,8 @@ const DonationList = () => {
   const isAdmin = user?.role === 'ADMIN'
   const [filter, setFilter] = useState("ALL") // ALL, PENDING, COMPLETED, FAILED,  REFUNDED
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     dispatch(fetchDonations(filter))
   }, [dispatch, filter])
@@ -21,10 +23,9 @@ const DonationList = () => {
     setFilter(e.target.value)
   }
 
-  const handleVerify = (id) => {
-    dispatch(verifyDonation(id))
+  const handleViewDonation = (donationId) => {
+    navigate(`/admin/donations/${donationId}`);
   }
-
 
   if (loading) {
     return (
@@ -139,18 +140,9 @@ const DonationList = () => {
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 ">
                           {isAdmin && (
-                            <>
-                              {!donation.settled && (
-                                <button
-                                  onClick={() => handleVerify(donation.id)}
-                                  className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-indigo-700 bg-indigo-100 hover:bg-indigo-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                  <i className="fas fa-check mr-1"></i>
-                                  Verify
-                                </button>
-                              )}
+                            <>                            
                               <button
-                                onClick={() => console.log("View Details", donation.id)}
+                                onClick={() => handleViewDonation(donation?.donationId)}
                                 className="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded text-green-700 bg-green-100 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                               >
                                 <i className="fas fa-eye mr-1"></i>

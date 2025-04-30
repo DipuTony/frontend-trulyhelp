@@ -191,6 +191,7 @@ const DonorDonationHistory = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donation Id</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Method</th>
@@ -218,33 +219,38 @@ const DonorDonationHistory = () => {
                 currentDonations.map((donation) => (
                   <tr key={donation.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {donation?.donationId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {formatDateShort(donation.date)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">₹{donation.amount?.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {donation.paymentMethod || "Online"}
+                      {donation.method || "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                        ${donation.verified
-                          ? "bg-green-100 text-green-800"
-                          : "bg-yellow-100 text-yellow-800"}`}
-                      >
-                        {!donation.verified ? "Verified" : "Pending"}
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium 
+                            ${donation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                          donation.paymentStatus === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                            donation.paymentStatus === 'FAILED' ? 'bg-red-100 text-red-800' :
+                              donation.paymentStatus === 'REFUNDED' ? 'bg-blue-100 text-blue-800' :
+                                'bg-gray-100 text-gray-800'}`}>
+                        {donation.paymentStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => handleDownloadReceipt(donation?.donationId)}
-                        disabled={generatingReceipt}
-                        className={`inline-flex items-center px-4 py-2 border rounded-xl shadow-sm text-sm font-medium ${!donation.verified
-                          ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
-                          : 'border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'}`}
+                        disabled={generatingReceipt || donation.paymentStatus !== "COMPLETED"}
+                        className={`inline-flex items-center px-4 py-2 border rounded-xl shadow-sm text-sm font-medium disabled:opacity-50 transition-all duration-200
+                          ${!donation.verified
+                            ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                            : 'border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'}`}
                       >
-                        <i className="fas fa-download mr-2"></i>
-                        {generatingReceipt ? "Generating..." : !donation.verified ? 'Download Tax Receipt' : 'Receipt Pending'}
+                        {donation.paymentStatus === "COMPLETED" && <i className="fas fa-download mr-2"></i>}
+                        {generatingReceipt ? "Generating..." : donation.paymentStatus === "COMPLETED" ? 'Download Tax Receipt' : `Not Available`}
                       </button>
                     </td>
                   </tr>
