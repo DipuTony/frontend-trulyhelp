@@ -176,7 +176,7 @@ const DonorDonationHistory = () => {
             </div>
             <div className="ml-5">
               <p className="text-sm font-medium text-gray-500">Pending Donations</p>
-              <p className="text-2xl font-bold text-gray-900">{pendingDonations.length}</p>
+              <p className="text-2xl font-bold text-gray-900">{pendingDonations.length || "N/A"}</p>
             </div>
           </div>
         </div>

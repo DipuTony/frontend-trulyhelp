@@ -10,10 +10,17 @@ const PaymentVerification = () => {
   const dispatch = useDispatch()
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [selectedDonation, setSelectedDonation] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
 
   const fetchPendingDonations = () => {
-    dispatch(fetchDonations("PENDING")) //PENDING, COMPLETED, FAILED, CANCELLED, REFUNDED
+    dispatch(fetchDonations("PENDING"))
   }
+
+  const filteredDonations = donations?.filter(donation => 
+    donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+    donation?.donorPhone?.includes(searchTerm) ||
+    donation?.donationId?.includes(searchTerm)
+  )
 
   useEffect(() => {
     fetchPendingDonations()
@@ -63,21 +70,29 @@ const PaymentVerification = () => {
         </div>
       </div>
 
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Search by name, phone, or transaction ID"
+          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
         <div className="sm:col-span-3">
           <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
             <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Donations</h3>
             <div className="mt-2 max-h-96 overflow-y-auto">
-              {donations?.length === 0 ? (
-                <p className="text-sm text-gray-500 italic">No pending donations to verify.</p>
+              {filteredDonations?.length === 0 ? (
+                <p className="text-sm text-gray-500 italic">No matching donations found.</p>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {donations?.map((donation) => (
+                  {filteredDonations?.map((donation) => (
                     <li
                       key={donation.id}
-                      className={`py-4 cursor-pointer hover:bg-gray-50 ${
-                        selectedDonation?.id === donation.id ? "bg-indigo-50" : ""
-                      }`}
+                      className={`py-4 cursor-pointer hover:bg-gray-50 ${selectedDonation?.id === donation.id ? "bg-indigo-50" : ""}`}
                       onClick={() => handleSelectDonation(donation)}
                     >
                       <div className="flex items-center space-x-4">
@@ -89,10 +104,13 @@ const PaymentVerification = () => {
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium text-gray-900 truncate">{donation.donorName}</p>
                           <p className="text-sm text-gray-500 truncate">{donation.donorEmail}</p>
+                          <p className="text-sm text-gray-500 truncate">{donation.donorPhone}</p>
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
                           <p className="text-xs text-gray-500">{formatDateShort(donation.createdAt)}</p>
+                          <p className="text-xs text-gray-500">ID: {donation.donationId}</p>
+                          <p className="text-xs text-gray-500">Method: {donation.method}</p>
                         </div>
                       </div>
                     </li>
