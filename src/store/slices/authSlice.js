@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
 import axiosInstance from "../../utils/axiosInterceptor"
 
 // Login thunk
@@ -10,7 +9,10 @@ export const login = createAsyncThunk("auth/login", async (credentials, { reject
     localStorage.setItem("user", JSON.stringify(response.data.user))
     return response.data
   } catch (error) {
-    return rejectWithValue(error.response.data)
+    if (error.response) {
+      return rejectWithValue(error.response.data)
+    }
+    return rejectWithValue({ message: "Network error" })
   }
 })
 

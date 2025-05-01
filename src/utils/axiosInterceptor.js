@@ -1,14 +1,21 @@
 import axios from 'axios';
 
-// Create a new axios instance
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://donation.toolvid.in/",
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
-// Add request interceptor
+// Store a reference to the navigate function (to be set later)
+let navigateRef = null;
+
+// Function to set navigate (to be called from a React component)
+export const setAxiosNavigate = (navigate) => {
+  navigateRef = navigate;
+};
+
+// Request interceptor (adds token)
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -20,17 +27,19 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Add response interceptor
+// Response interceptor (handles 401 errors)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear localStorage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      
-      // Redirect to login page
-      window.location.href = "/login";
+
+      if (navigateRef) {
+        navigateRef('/login'); // Use React Router navigation (no reload)
+      } else {
+        window.location.href = "/login"; // Fallback (reloads)
+      }
     }
     return Promise.reject(error);
   }
