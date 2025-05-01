@@ -48,6 +48,7 @@ import ToastNotification from "./components/common/ToastNotification"
 import ViewDonationDetails from "./pages/admin/ViewDonationDetails"
 import { useEffect } from "react"
 import { setAxiosNavigate } from "./utils/axiosInterceptor"
+import HomePage from "./pages/guest/HomePage"
 
 function App() {
 
@@ -161,7 +162,8 @@ function App() {
               <GuestLayout />
             </ErrorBoundary>
           }>
-            <Route index element={<GuestDonationNow />} />
+            <Route index element={<GuestDonationNow />} /> {/* This is Home Route */}
+            <Route path="home" element={<HomePage />} />
             <Route path="payment/success" element={<PaymentSuccess />} />
             <Route path="payment/failed" element={<PaymentFailed />} />
           </Route>
