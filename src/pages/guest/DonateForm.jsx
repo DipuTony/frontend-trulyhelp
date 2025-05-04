@@ -1,81 +1,93 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { onlineGuestDonationEazyBuzz } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
+import { useFormik } from "formik"
+import * as Yup from "yup"
 import 'animate.css'
 
-const GuestDonateNow = () => {
+const validationSchema = Yup.object({
+  name: Yup.string().required('Full name is required'),
+  email: Yup.string().email('Invalid email address').required('Email is required'),
+  phone: Yup.string()
+    .matches(/^\d{10}$/, 'Phone number must be 10 digits')
+    .required('Phone number is required'),
+  address: Yup.string().required('Address is required'),
+  city: Yup.string().required('City is required'),
+  pincode: Yup.string()
+    .matches(/^\d{6}$/, 'Pincode must be 6 digits')
+    .required('Pincode is required'),
+  state: Yup.string().required('State is required'),
+  panNumber: Yup.string()
+    .required('PAN number is required'),
+  //  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid PAN number format'),
+  dateOfBirth: Yup.date()
+    .max(new Date(), 'Date of birth cannot be in the future')
+    .nullable(),
+  receiveG80Certificate: Yup.boolean()
+})
+
+const DonateForm = ({ donationData, onBackClick }) => {
   const dispatch = useDispatch()
   const { loading, error } = useSelector((state) => state.donations)
+  const [submitting, setSubmitting] = useState(false);
 
-  // Update the initial state
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    dateOfBirth: "",
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    country: "INDIA",
-    panNumber: "",
-    amount: "",
-    category: "general",
-    receiveG80Certificate: false,
+  // console.log(donationData);
+
+  const formik = useFormik({
+    initialValues: {
+      name: "",
+      email: "",
+      phone: "",
+      dateOfBirth: "",
+      address: "",
+      city: "",
+      state: "",
+      pincode: "",
+      country: "INDIA",
+      panNumber: "",
+      amount: donationData?.amount?.toString() || "",
+      category: donationData?.cause || "general",
+      receiveG80Certificate: false,
+    },
+    validationSchema,
+    onSubmit: values => {
+
+      const newDonation = {
+        name: values.name,
+        email: values.email,
+        phone: values.phone,
+        dob: values.dateOfBirth,
+        pan: values.panNumber,
+        address: values.address,
+        donationAmount: Number.parseFloat(donationData?.amount?.toString()),
+      }
+      // dispatch(onlineGuestDonationEazyBuzz(newDonation))
+      handleSubmit(newDonation)
+    },
   })
 
-  const donationAmounts = [100, 500, 1000, 2000, 5000, 10000]
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
-  }
-
-  const handleAmountSelect = (amount) => {
-    setFormData((prev) => ({
-      ...prev,
-      amount: amount.toString(),
-    }))
-  }
-
-  // First, update the error handling in the form validation
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    
-    // Basic phone validation before API call
-    if (!/^\d{10}$/.test(formData.phone)) {
-      dispatch({
-        type: 'donations/setError',
-        payload: 'Please enter a valid 10-digit phone number'
-      })
-      return
+  const handleSubmit = async (values) => {
+    setSubmitting(true);
+    try {
+      const response = await dispatch(onlineGuestDonationEazyBuzz(values));
+      if (response.error) {
+        setSubmitting(false);
+        // Update button state here
+        return;
+      }
+      // Handle success case
+    } catch (error) {
+      setSubmitting(false);
+      // Update button state here
     }
-  
-    const newDonation = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone,
-      dob: formData.dateOfBirth,
-      pan: formData.panNumber,
-      address: formData.address,
-      address: formData.address,
-      donationAmount: Number.parseFloat(formData.amount),
-      // category: formData.category,
-    }
+  };
 
-    console.log(newDonation)
-    // return
-  
-    dispatch(onlineGuestDonationEazyBuzz(newDonation))
-  }
+  console.log("error", error)
 
-  // Update the error display in the JSX
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-5 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
@@ -96,7 +108,7 @@ const GuestDonateNow = () => {
               </div>
               <div className="ml-3">
                 <p className="text-sm text-red-700">
-                  {typeof error === 'string' ? error : error.message || 'An error occurred. Please try again.'}
+                  {error || error.message || 'An error occurred. Please try again.'}
                 </p>
               </div>
             </div>
@@ -104,55 +116,29 @@ const GuestDonateNow = () => {
         )}
 
         <div className="bg-white shadow-xl rounded-2xl overflow-hidden animate__animated animate__fadeInUp">
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Left Column - Donation Amount */}
+          <form onSubmit={formik.handleSubmit} className="grid grid-cols-1 lg:grid-cols-2">
+            {/* Left Column - Donation Summary */}
             <div className="p-8 bg-gradient-to-br from-indigo-50 via-indigo-100 to-white animate__animated animate__fadeInLeft">
               <div className="sticky top-4">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">Choose Amount</h2>
-                <div className="grid grid-cols-3 gap-4 mb-6">
-                  {donationAmounts.map((amount) => (
-                    <button
-                      key={amount}
-                      type="button"
-                      onClick={() => handleAmountSelect(amount)}
-                      className={`${formData.amount === amount.toString()
-                          ? "bg-indigo-600 text-white ring-2 ring-offset-2 ring-indigo-600"
-                          : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-50"
-                        } px-4 py-3 rounded-xl text-lg font-semibold transition-all duration-200`}
-                    >
-                      ₹{amount.toLocaleString()}
-                    </button>
-                  ))}
-                </div>
-                <div className="mb-8">
-                  <div className="relative rounded-xl shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center">
-                      <span className="text-gray-500 text-lg">₹</span>
-                    </div>
-                    <input
-                      type="number"
-                      name="amount"
-                      value={formData.amount}
-                      onChange={handleChange}
-                      className="block w-full pl-10 pr-4 py-3 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      placeholder="Custom amount"
-                    />
-                  </div>
-                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">Donation Summary</h2>
 
-                {/* Donation Summary */}
                 <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
                   <div className="space-y-3 text-base">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Amount</span>
                       <span className="font-semibold text-gray-900">
-                        ₹{formData.amount ? Number(formData.amount).toLocaleString() : '0'}
+                        { }
+                        ₹ {donationData?.amount ? Number(donationData?.amount?.toString().toLocaleString()) : '0'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Category</span>
-                      <span className="text-gray-900 capitalize">{formData.category}</span>
+                      <span className="text-gray-900 capitalize">{donationData?.cause}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Type</span>
+                      <span className="text-gray-900 capitalize">{donationData?.frequency}</span>
                     </div>
                   </div>
                 </div>
@@ -172,22 +158,28 @@ const GuestDonateNow = () => {
                         <input
                           type="text"
                           name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.name}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.name && formik.errors.name ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.name}</div>
+                        ) : null}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                         <input
                           type="date"
                           name="dateOfBirth"
-                          value={formData.dateOfBirth}
-                          onChange={handleChange}
+                          value={formik.values.dateOfBirth}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                          placeholder="dd-mm-yyyy"
                         />
+                        {formik.touched.dateOfBirth && formik.errors.dateOfBirth ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.dateOfBirth}</div>
+                        ) : null}
                       </div>
                     </div>
 
@@ -197,25 +189,30 @@ const GuestDonateNow = () => {
                         <input
                           type="email"
                           name="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.email}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.email && formik.errors.email ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.email}</div>
+                        ) : null}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number *</label>
                         <input
                           type="tel"
                           name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          required
-                          pattern="[0-9]{10}"
+                          value={formik.values.phone}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           maxLength={10}
                           placeholder="Enter 10 digit number"
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.phone && formik.errors.phone ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.phone}</div>
+                        ) : null}
                       </div>
                     </div>
 
@@ -223,12 +220,15 @@ const GuestDonateNow = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
                       <textarea
                         name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
+                        value={formik.values.address}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         rows={2}
                         className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       />
+                      {formik.touched.address && formik.errors.address ? (
+                        <div className="mt-1 text-sm text-red-600">{formik.errors.address}</div>
+                      ) : null}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -237,43 +237,53 @@ const GuestDonateNow = () => {
                         <input
                           type="text"
                           name="city"
-                          value={formData.city}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.city}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.city && formik.errors.city ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.city}</div>
+                        ) : null}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
                         <input
                           type="text"
                           name="pincode"
-                          value={formData.pincode}
-                          onChange={handleChange}
-                          required
+                          value={formik.values.pincode}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.pincode && formik.errors.pincode ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.pincode}</div>
+                        ) : null}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">State*</label>
                         <input
                           type="text"
                           name="state"
-                          value={formData.state}
-                          onChange={handleChange}
+                          value={formik.values.state}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         />
+                        {formik.touched.state && formik.errors.state ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.state}</div>
+                        ) : null}
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
                         <input
                           type="text"
                           name="country"
-                          value={formData.country}
-                          onChange={handleChange}
+                          value={formik.values.country}
+                          onChange={formik.handleChange}
                           readOnly
                           className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
                         />
@@ -281,22 +291,26 @@ const GuestDonateNow = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number*</label>
                       <input
                         type="text"
                         name="panNumber"
-                        value={formData.panNumber}
-                        onChange={handleChange}
+                        value={formik.values.panNumber}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
                         className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       />
+                      {formik.touched.panNumber && formik.errors.panNumber ? (
+                        <div className="mt-1 text-sm text-red-600">{formik.errors.panNumber}</div>
+                      ) : null}
                     </div>
 
                     <div className="flex items-center">
                       <input
                         type="checkbox"
                         name="receiveG80Certificate"
-                        checked={formData.receiveG80Certificate}
-                        onChange={(e) => handleChange({ target: { name: e.target.name, value: e.target.checked } })}
+                        checked={formik.values.receiveG80Certificate}
+                        onChange={formik.handleChange}
                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
                       <label className="ml-2 block text-sm text-gray-700">
@@ -310,10 +324,10 @@ const GuestDonateNow = () => {
                 <div className="pt-6 border-t border-gray-200">
                   <button
                     type="submit"
-                    disabled={loading || !formData.amount || !formData.name || !formData.email}
+                    disabled={loading || submitting}
                     className="w-full px-8 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
-                    {loading ? "Processing..." : "Proceed to Payment"}
+                    {loading || submitting ? "Processing..." : "Proceed to Payment"}
                   </button>
                   <p className="mt-4 text-sm text-center text-gray-500">
                     Already have an account?{" "}
@@ -327,8 +341,15 @@ const GuestDonateNow = () => {
           </form>
         </div>
       </div>
+
+      <button
+        onClick={onBackClick}
+        className="fixed top-4 left-4 bg-white p-2 rounded-full shadow-md hover:bg-gray-50"
+      >
+        ← Back
+      </button>
     </div>
   )
 }
 
-export default GuestDonateNow
+export default DonateForm

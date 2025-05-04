@@ -28,8 +28,6 @@ import DonateNow from "./pages/donor/DonateNow"
 import DonorDonationHistory from "./pages/donor/DonorDonationHistory"
 import DonorDashboard from "./pages/donor/Dashboard"
 
-// Guest Pages
-import GuestDonationNow from "./pages/guest/GuestDonateNow"
 
 // Layout Components
 import AdminLayout from "./components/layouts/AdminLayout"
@@ -48,7 +46,10 @@ import ToastNotification from "./components/common/ToastNotification"
 import ViewDonationDetails from "./pages/admin/ViewDonationDetails"
 import { useEffect } from "react"
 import { setAxiosNavigate } from "./utils/axiosInterceptor"
-import HomePage from "./pages/guest/HomePage"
+
+// Guest Pages
+import GuestIndex from "./pages/guest/GuestIndex"
+// import HomePage from "./pages/guest/HomePage"
 
 function App() {
 
@@ -162,8 +163,8 @@ function App() {
               <GuestLayout />
             </ErrorBoundary>
           }>
-            <Route index element={<GuestDonationNow />} /> {/* This is Home Route */}
-            <Route path="home" element={<HomePage />} />
+            <Route index element={<GuestIndex />} /> {/* This is Home Route */}
+            {/* <Route path="home" element={<HomePage />} /> */}
             <Route path="payment/success" element={<PaymentSuccess />} />
             <Route path="payment/failed" element={<PaymentFailed />} />
           </Route>

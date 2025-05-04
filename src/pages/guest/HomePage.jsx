@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 
-const HomePage = () => {
+const HomePage = ({ onDonateClick }) => {
     const [activeCause, setActiveCause] = useState('sight');
     const [selectedAmount, setSelectedAmount] = useState(null);
     const [donationFrequency, setDonationFrequency] = useState('once');
+
+    const handleDonate = () => {
+        const donationData = {
+            amount: donationOptions[activeCause][donationFrequency].amounts[selectedAmount],
+            frequency: donationFrequency,
+            cause: activeCause
+        };
+        onDonateClick(donationData);
+    };
 
     // Donation amounts and corresponding messages for each cause and frequency
     const donationOptions = {
@@ -145,8 +154,8 @@ const HomePage = () => {
                                     key={cause}
                                     onClick={() => handleCauseClick(cause)}
                                     className={`w-full p-6 rounded-xl text-left transition-all duration-300 shadow-md hover:shadow-lg ${isActive
-                                            ? `bg-gradient-to-r from-${colors.primary} to-${colors.secondary} text-white`
-                                            : `bg-white hover:bg-${colors.light} border-l-4 border-${colors.primary}`
+                                        ? `bg-gradient-to-r from-${colors.primary} to-${colors.secondary} text-white`
+                                        : `bg-white hover:bg-${colors.light} border-l-4 border-${colors.primary}`
                                         }`}
                                     style={{
                                         background: isActive ? `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` : 'white',
@@ -229,8 +238,8 @@ const HomePage = () => {
                                         onClick={() => handleFrequencyChange('once')}
                                         type="button"
                                         className={`px-6 py-3 text-sm font-medium rounded-l-full border ${donationFrequency === 'once'
-                                                ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
-                                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                                            ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
+                                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
                                             }`}
                                         style={{
                                             background: donationFrequency === 'once' ? currentColors.primary : 'white',
@@ -243,8 +252,8 @@ const HomePage = () => {
                                         onClick={() => handleFrequencyChange('monthly')}
                                         type="button"
                                         className={`px-6 py-3 text-sm font-medium rounded-r-full border ${donationFrequency === 'monthly'
-                                                ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
-                                                : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                                            ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
+                                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
                                             }`}
                                         style={{
                                             background: donationFrequency === 'monthly' ? currentColors.primary : 'white',
@@ -273,8 +282,8 @@ const HomePage = () => {
                                             key={amount}
                                             onClick={() => handleAmountClick(index)}
                                             className={`py-5 px-4 rounded-xl border-2 text-lg font-medium transition-all flex flex-col items-center relative overflow-hidden ${selectedAmount === index
-                                                    ? `border-${currentColors.primary} bg-${currentColors.light}`
-                                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                                                ? `border-${currentColors.primary} bg-${currentColors.light}`
+                                                : 'border-gray-200 hover:border-gray-300 bg-white'
                                                 }`}
                                             style={{
                                                 borderColor: selectedAmount === index ? currentColors.primary : '#e5e7eb',
@@ -332,10 +341,11 @@ const HomePage = () => {
                                 {/* Donate Now Button */}
                                 <div className="text-center">
                                     <button
+                                        onClick={handleDonate}
                                         disabled={selectedAmount === null}
                                         className={`py-4 px-12 rounded-full text-lg font-bold text-white shadow-lg transition-all transform hover:scale-105 ${selectedAmount !== null
-                                                ? `bg-gradient-to-r from-${currentColors.primary} to-${currentColors.secondary} hover:shadow-xl`
-                                                : 'bg-gray-400 cursor-not-allowed'
+                                            ? `bg-gradient-to-r from-${currentColors.primary} to-${currentColors.secondary} hover:shadow-xl`
+                                            : 'bg-gray-400 cursor-not-allowed'
                                             }`}
                                         style={{
                                             background: selectedAmount !== null
