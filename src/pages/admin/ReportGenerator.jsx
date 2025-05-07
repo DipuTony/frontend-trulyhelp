@@ -72,6 +72,36 @@ const data=[
         showTime: '11:00 AM',
         buyer_name: 'Jane Smith',
         buyer_phone: '234-567-8901',
+    },
+    {
+        showTime: '12:00 PM',
+        buyer_name: 'Bob Johnson',
+        buyer_phone: '345-678-9012',
+    },
+    {
+        showTime: '1:00 PM',
+        buyer_name: 'Alice Smith',
+        buyer_phone: '456-789-0123',   
+    },
+    {
+        showTime: '2:00 PM',
+        buyer_name: 'Eve Smith',
+        buyer_phone: '567-890-1234',
+    },
+    {
+        showTime: '3:00 PM',
+        buyer_name: 'Mike Johnson',
+        buyer_phone: '678-901-2345',
+    },
+    {
+        showTime: '4:00 PM',
+        buyer_name: 'Sarah Smith',
+        buyer_phone: '789-012-3456',
+    },
+    {
+        showTime: '5:00 PM',
+        buyer_name: 'Tom Johnson',
+        buyer_phone: '890-123-4567',
     }
 ]
 
