@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { useTable, usePagination, useRowSelect, useSortBy, useGlobalFilter } from 'react-table'
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTable, usePagination, useSortBy, useGlobalFilter } from 'react-table';
 import { CSVLink } from "react-csv";
 import {
   FiChevronsLeft,
@@ -10,16 +10,23 @@ import {
   FiPlus,
   FiFilter
 } from 'react-icons/fi';
+import { useSelector } from 'react-redux';
 
-function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
-  const userIs = 9;
+function DataTable({ searchText, fun, columns, data: propData, addBtn, ...rest }) {
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+  const isAdmin = user?.role === 'ADMIN';
+
   const [isHoveringExport, setIsHoveringExport] = useState(false);
-  const [isMounted, setIsMounted] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [internalData, setInternalData] = useState(propData);
 
+  // Update internal data when propData changes
   useEffect(() => {
-    setIsMounted(true);
-    return () => setIsMounted(false);
-  }, []);
+    setInternalData(propData);
+  }, [propData]);
+
+  const memoizedColumns = useMemo(() => columns, [columns]);
+  const memoizedData = useMemo(() => internalData, [internalData]);
 
   const {
     getTableProps,
@@ -39,14 +46,28 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
     state: { pageIndex, pageSize, selectedRowIds, globalFilter },
   } = useTable(
     {
-      columns,
-      data,
-      initialState: { pageIndex: 0 }
+      columns: memoizedColumns,
+      data: memoizedData,
+      initialState: { pageIndex: 0 },
+      autoResetPage: false,
+      autoResetSortBy: false,
+      autoResetFilters: false,
     },
     useGlobalFilter,
     useSortBy,
     usePagination
   );
+
+  // Debounce the search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setGlobalFilter(inputValue);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [inputValue, setGlobalFilter]);
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -63,21 +84,21 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
               type="text"
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               placeholder={searchText || "Search..."}
-              value={globalFilter || ''}
-              onChange={e => setGlobalFilter(e.target.value)}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
             />
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
           {/* Export Button (Admin Only) */}
-          {userIs === 9 && (
+          {isAdmin && (
             <button
               className="relative flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-600 hover:to-blue-700"
               onMouseEnter={() => setIsHoveringExport(true)}
               onMouseLeave={() => setIsHoveringExport(false)}
             >
-              <CSVLink data={data} className="flex items-center">
+              <CSVLink data={memoizedData} className="flex items-center">
                 Export
                 <FiArrowDown className={`ml-2 transition-transform duration-300 ${isHoveringExport ? 'translate-y-1' : ''}`} />
               </CSVLink>
@@ -103,10 +124,11 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
       <div className="overflow-x-auto">
         <table {...getTableProps()} className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
-            {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
+            {headerGroups.map((headerGroup) => (
+              <tr key={headerGroup.getHeaderGroupProps().key} {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map((column) => (
                   <th
+                    key={column.getHeaderProps().key}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
                   >
@@ -133,20 +155,14 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
               </tr>
             ))}
           </thead>
-          <tbody
-            {...getTableBodyProps()}
-            className="bg-white divide-y divide-gray-200"
-          >
-            {page.map((row, i) => {
+          <tbody {...getTableBodyProps()} className="bg-white divide-y divide-gray-200">
+            {page.map((row) => {
               prepareRow(row);
               return (
-                <tr
-                  {...row.getRowProps()}
-                  className={`hover:bg-gray-50 transition-colors duration-150 ${row.isSelected ? 'bg-blue-50' : ''
-                    }`}
-                >
-                  {row.cells.map(cell => (
+                <tr key={row.getRowProps().key} {...row.getRowProps()} className="hover:bg-gray-50 transition-colors duration-150">
+                  {row.cells.map((cell) => (
                     <td
+                      key={cell.getCellProps().key}
                       {...cell.getCellProps()}
                       className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
                     >
@@ -166,20 +182,19 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
           <span className="text-sm text-gray-700">
             Showing <span className="font-medium">{pageIndex * pageSize + 1}</span> to{' '}
             <span className="font-medium">
-              {Math.min((pageIndex + 1) * pageSize, data.length)}
+              {Math.min((pageIndex + 1) * pageSize, memoizedData.length)}
             </span>{' '}
-            of <span className="font-medium">{data.length}</span> results
+            of <span className="font-medium">{memoizedData.length}</span> results
           </span>
         </div>
 
-
-          <div className="hidden sm:flex items-center text-nowrap">
-            <span className="text-sm text-gray-700">
-              Page{' '}
-              <span className="font-medium">{pageIndex + 1}</span>{' '}
-              of <span className="font-medium">{pageOptions.length}</span>
-            </span>
-          </div>
+        <div className="hidden sm:flex items-center text-nowrap">
+          <span className="text-sm text-gray-700">
+            Page{' '}
+            <span className="font-medium">{pageIndex + 1}</span>{' '}
+            of <span className="font-medium">{pageOptions.length}</span>
+          </span>
+        </div>
 
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-1">
@@ -213,7 +228,6 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
             </button>
           </div>
 
-
           <select
             value={pageSize}
             onChange={e => setPageSize(Number(e.target.value))}
@@ -225,8 +239,6 @@ function DataTable({ searchText, fun, columns, data, addBtn, ...rest }) {
               </option>
             ))}
           </select>
-
-
         </div>
       </div>
     </div>
