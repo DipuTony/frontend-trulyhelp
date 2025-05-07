@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from "react-redux"
 import { generateReport } from "../../store/slices/donationSlice"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
-import DataTable from "../../components/common/DataTable/DataTable"
 
 const ReportGenerator = () => {
   const dispatch = useDispatch()
@@ -42,69 +41,6 @@ const ReportGenerator = () => {
     })
   }
 
-  const COLUMNS = [
-    {
-        Header: '#',
-        Cell: ({ row }) => (
-            <div className='pr-2'>{row.index + 1}</div>
-        )
-    },
-    {
-        Header: 'Show Time',
-        accessor: 'showTime',
-    },
-    {
-        Header: 'Buyer Name',
-        accessor: 'buyer_name',
-    },
-    {
-        Header: 'Buyer Phone',
-        accessor: 'buyer_phone',
-    },
-]
-const data=[
-    {
-        showTime: '10:00 AM',
-        buyer_name: 'John Doe',
-        buyer_phone: '123-456-7890',
-    },
-    {
-        showTime: '11:00 AM',
-        buyer_name: 'Jane Smith',
-        buyer_phone: '234-567-8901',
-    },
-    {
-        showTime: '12:00 PM',
-        buyer_name: 'Bob Johnson',
-        buyer_phone: '345-678-9012',
-    },
-    {
-        showTime: '1:00 PM',
-        buyer_name: 'Alice Smith',
-        buyer_phone: '456-789-0123',   
-    },
-    {
-        showTime: '2:00 PM',
-        buyer_name: 'Eve Smith',
-        buyer_phone: '567-890-1234',
-    },
-    {
-        showTime: '3:00 PM',
-        buyer_name: 'Mike Johnson',
-        buyer_phone: '678-901-2345',
-    },
-    {
-        showTime: '4:00 PM',
-        buyer_name: 'Sarah Smith',
-        buyer_phone: '789-012-3456',
-    },
-    {
-        showTime: '5:00 PM',
-        buyer_name: 'Tom Johnson',
-        buyer_phone: '890-123-4567',
-    }
-]
-
   return (
     <div>
       <div className="sm:flex sm:items-center">
@@ -113,12 +49,6 @@ const data=[
           <p className="mt-2 text-sm text-gray-700">Generate and download donation reports.</p>
         </div>
       </div>
-
-      <DataTable
-        columns={COLUMNS}
-        data={data}
-      />
-
       <div className="mt-6 bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-3 md:gap-6">
           <div className="md:col-span-1">
