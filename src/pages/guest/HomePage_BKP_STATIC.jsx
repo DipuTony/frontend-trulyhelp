@@ -1,62 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
 const HomePage = ({ onDonateClick }) => {
-    const [donationOptions, setDonationOptions] = useState({});
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [activeCause, setActiveCause] = useState(null);
+    const [activeCause, setActiveCause] = useState('sight');
     const [selectedAmount, setSelectedAmount] = useState(null);
     const [donationFrequency, setDonationFrequency] = useState('once');
-    const [availableCauses, setAvailableCauses] = useState([]);
-
-    // Fetch donation options from API
-    useEffect(() => {
-        const fetchDonationOptions = async () => {
-            try {
-                setLoading(true);
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
-                
-                if (response.data.success) {
-                    setDonationOptions(response.data.data);
-                    // Set available causes from API response
-                    const causeNames = Object.keys(response.data.data);
-                    setAvailableCauses(causeNames);
-                    // Set first cause as active if we have causes and none is selected
-                    if (causeNames.length > 0 && !activeCause) {
-                        setActiveCause(causeNames[0]);
-                    }
-                } else {
-                    setError('Failed to fetch donation options');
-                }
-            } catch (err) {
-                console.error('Error fetching donation options:', err);
-                setError(err.message || 'An error occurred while fetching donation options');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDonationOptions();
-    }, []);
 
     const handleDonate = () => {
-        if (!activeCause || selectedAmount === null || !donationOptions[activeCause]?.options) return;
-        
-        const frequency = donationFrequency;
-        const options = donationOptions[activeCause].options;
-        
-        // Find the correct amount and message based on frequency and selected index
-        const frequencyOptions = options[frequency];
-        if (!frequencyOptions) return;
-        
         const donationData = {
-            amount: frequencyOptions.amounts[selectedAmount],
+            amount: donationOptions[activeCause][donationFrequency].amounts[selectedAmount],
             frequency: donationFrequency,
             cause: activeCause
         };
-        
         onDonateClick(donationData);
+    };
+
+    // Donation amounts and corresponding messages for each cause and frequency
+    const donationOptions = {
+        sight: {
+            once: {
+                amounts: [5500, 11000, 22000, 33000],
+                messages: [
+                    "Support one sight-restoring surgery",
+                    "Support two sight-restoring surgeries",
+                    "Help four people regain their vision",
+                    "Help six people see again"
+                ]
+            },
+            monthly: {
+                amounts: [1500, 2500, 3500, 5000],
+                messages: [
+                    "Monthly support for sight-restoring surgeries",
+                    "Help two people see every month",
+                    "Transform lives monthly through vision care",
+                    "Sustained support for sight restoration"
+                ]
+            }
+        },
+        education: {
+            once: {
+                amounts: [2500, 5000, 10000, 15000],
+                messages: [
+                    "Support a Child for 3 months with accessible educational resources",
+                    "Support a Child for 6 months with accessible educational resources",
+                    "Support a Child for a year with accessible educational resources",
+                    "Support two Children for a year with accessible educational resources"
+                ]
+            },
+            monthly: {
+                amounts: [800, 1500, 2500, 3500],
+                messages: [
+                    "Monthly educational support for a child",
+                    "Provide continuous learning resources monthly",
+                    "Sustained education for visually impaired children",
+                    "Comprehensive monthly educational support"
+                ]
+            }
+        },
+        training: {
+            once: {
+                amounts: [1500, 3000, 6000, 9000],
+                messages: [
+                    "Provide vocational training for one person",
+                    "Provide vocational training for two people",
+                    "Help four people gain livelihood skills",
+                    "Help six people become self-sufficient"
+                ]
+            },
+            monthly: {
+                amounts: [500, 1000, 2000, 3000],
+                messages: [
+                    "Monthly skills training support",
+                    "Continuous livelihood training monthly",
+                    "Sustained vocational training program",
+                    "Comprehensive monthly training support"
+                ]
+            }
+        }
     };
 
     const handleCauseClick = (cause) => {
@@ -73,89 +92,36 @@ const HomePage = ({ onDonateClick }) => {
         setSelectedAmount(null);
     };
 
-    // Get color scheme from API or use default
-    const getCauseColors = (causeName) => {
-        if (donationOptions[causeName]?.colorScheme) {
-            return {
-                primary: donationOptions[causeName].colorScheme.primary || '#4f46e5',
-                secondary: donationOptions[causeName].colorScheme.secondary || '#6366f1',
-                light: donationOptions[causeName].colorScheme.light || '#e0e7ff',
-                text: donationOptions[causeName].colorScheme.text || '#312e81'
-            };
+    // Color schemes for each cause
+    const causeColors = {
+        sight: {
+            primary: '#4f46e5',  // Indigo
+            secondary: '#6366f1',
+            light: '#e0e7ff',
+            text: '#312e81'
+        },
+        education: {
+            primary: '#10b981',  // Emerald
+            secondary: '#34d399',
+            light: '#d1fae5',
+            text: '#064e3b'
+        },
+        training: {
+            primary: '#f59e0b',  // Amber
+            secondary: '#fbbf24',
+            light: '#fef3c7',
+            text: '#92400e'
         }
-        
-        // Default color schemes as fallback
-        const defaultColors = {
-            sight: {
-                primary: '#4f46e5',  // Indigo
-                secondary: '#6366f1',
-                light: '#e0e7ff',
-                text: '#312e81'
-            },
-            education: {
-                primary: '#10b981',  // Emerald
-                secondary: '#34d399',
-                light: '#d1fae5',
-                text: '#064e3b'
-            },
-            training: {
-                primary: '#f59e0b',  // Amber
-                secondary: '#fbbf24',
-                light: '#fef3c7',
-                text: '#92400e'
-            }
-        };
-        
-        return defaultColors[causeName] || defaultColors.sight;
     };
 
-    // Get current colors based on active cause
-    const currentColors = activeCause ? getCauseColors(activeCause) : { primary: '#4f46e5', secondary: '#6366f1', light: '#e0e7ff', text: '#312e81' };
+    const currentColors = causeColors[activeCause];
 
-    const bgImage = "https://img.freepik.com/free-photo/photorealistic-kid-refugee-camp_23-2151494502.jpg";
-
-    // Show loading state
-    if (loading) {
-        return (
-            <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
-            </div>
-        );
-    }
-
-    // Show error state
-    if (error) {
-        return (
-            <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="bg-white p-8 rounded-xl shadow-lg max-w-md">
-                    <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Donation Options</h2>
-                    <p className="text-gray-700">{error}</p>
-                    <button 
-                        onClick={() => window.location.reload()} 
-                        className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                    >
-                        Try Again
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
-    // If no causes available
-    if (availableCauses.length === 0) {
-        return (
-            <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="bg-white p-8 rounded-xl shadow-lg max-w-md text-center">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">No Donation Options Available</h2>
-                    <p className="text-gray-700">Please check back later for donation opportunities.</p>
-                </div>
-            </div>
-        );
-    }
+    const bgImage = "https://img.freepik.com/free-photo/photorealistic-kid-refugee-camp_23-2151494502.jpg"
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
             {/* Vibrant Banner Section */}
+            {/* <div className="w-full h-64 bg-cover bg-center relative overflow-hidden" style={{ backgroundImage: "url('/images/banner.jpg')" }}> */}
             <div
                 className="w-full h-64 bg-cover bg-center relative overflow-hidden"
                 style={{
@@ -180,28 +146,31 @@ const HomePage = ({ onDonateClick }) => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Left Side - Cause Selection */}
                     <div className="space-y-4">
-                        {availableCauses.map((cause) => {
+                        {['sight', 'education', 'training'].map((cause) => {
                             const isActive = activeCause === cause;
-                            const colors = getCauseColors(cause);
-                            const causeData = donationOptions[cause];
-                            
+                            const colors = causeColors[cause];
                             return (
                                 <button
                                     key={cause}
                                     onClick={() => handleCauseClick(cause)}
-                                    className={`w-full p-6 rounded-xl text-left transition-all duration-300 shadow-md hover:shadow-lg`}
+                                    className={`w-full p-6 rounded-xl text-left transition-all duration-300 shadow-md hover:shadow-lg ${isActive
+                                        ? `bg-gradient-to-r from-${colors.primary} to-${colors.secondary} text-white`
+                                        : `bg-white hover:bg-${colors.light} border-l-4 border-${colors.primary}`
+                                        }`}
                                     style={{
                                         background: isActive ? `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` : 'white',
-                                        borderLeftWidth: '4px',
-                                        borderLeftColor: colors.primary,
-                                        color: isActive ? 'white' : 'inherit'
+                                        borderLeftColor: colors.primary
                                     }}
                                 >
                                     <h3 className="font-bold text-lg mb-1">
-                                        {causeData.displayName}
+                                        {cause === 'sight' && 'Help the visually impaired see'}
+                                        {cause === 'education' && 'Uplift visually impaired children'}
+                                        {cause === 'training' && 'Support people with disabilities'}
                                     </h3>
                                     <p className={`text-sm ${isActive ? 'text-white opacity-90' : 'text-gray-600'}`}>
-                                        {causeData.description}
+                                        {cause === 'sight' && 'with a SIGHT RESTORATION SURGERY'}
+                                        {cause === 'education' && 'with EDUCATION SUPPORT'}
+                                        {cause === 'training' && 'through LIVELIHOOD TRAINING'}
                                     </p>
                                 </button>
                             );
@@ -268,11 +237,13 @@ const HomePage = ({ onDonateClick }) => {
                                     <button
                                         onClick={() => handleFrequencyChange('once')}
                                         type="button"
-                                        className={`px-6 py-3 text-sm font-medium rounded-l-full border`}
+                                        className={`px-6 py-3 text-sm font-medium rounded-l-full border ${donationFrequency === 'once'
+                                            ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
+                                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                                            }`}
                                         style={{
                                             background: donationFrequency === 'once' ? currentColors.primary : 'white',
-                                            borderColor: donationFrequency === 'once' ? currentColors.primary : '#e5e7eb',
-                                            color: donationFrequency === 'once' ? 'white' : '#374151'
+                                            borderColor: donationFrequency === 'once' ? currentColors.primary : '#e5e7eb'
                                         }}
                                     >
                                         Give Once
@@ -280,11 +251,13 @@ const HomePage = ({ onDonateClick }) => {
                                     <button
                                         onClick={() => handleFrequencyChange('monthly')}
                                         type="button"
-                                        className={`px-6 py-3 text-sm font-medium rounded-r-full border`}
+                                        className={`px-6 py-3 text-sm font-medium rounded-r-full border ${donationFrequency === 'monthly'
+                                            ? `bg-${currentColors.primary} text-white border-${currentColors.primary}`
+                                            : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-100'
+                                            }`}
                                         style={{
                                             background: donationFrequency === 'monthly' ? currentColors.primary : 'white',
-                                            borderColor: donationFrequency === 'monthly' ? currentColors.primary : '#e5e7eb',
-                                            color: donationFrequency === 'monthly' ? 'white' : '#374151'
+                                            borderColor: donationFrequency === 'monthly' ? currentColors.primary : '#e5e7eb'
                                         }}
                                     >
                                         Give Monthly
@@ -303,50 +276,46 @@ const HomePage = ({ onDonateClick }) => {
                                 </p>
 
                                 {/* Donation Amount Buttons */}
-                                {activeCause && donationOptions[activeCause]?.options && donationOptions[activeCause].options[donationFrequency] ? (
-                                    <div className="grid grid-cols-2 gap-4 mb-8">
-                                        {donationOptions[activeCause].options[donationFrequency].amounts.map((amount, index) => (
-                                            <button
-                                                key={amount}
-                                                onClick={() => handleAmountClick(index)}
-                                                className={`py-5 px-4 rounded-xl border-2 text-lg font-medium transition-all flex flex-col items-center relative overflow-hidden`}
-                                                style={{
-                                                    borderColor: selectedAmount === index ? currentColors.primary : '#e5e7eb',
-                                                    backgroundColor: selectedAmount === index ? currentColors.light : 'white'
-                                                }}
-                                            >
-                                                <span className="font-bold" style={{ color: currentColors.text }}>
-                                                    ₹{amount.toLocaleString('en-IN')}
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    {donationOptions[activeCause][donationFrequency].amounts.map((amount, index) => (
+                                        <button
+                                            key={amount}
+                                            onClick={() => handleAmountClick(index)}
+                                            className={`py-5 px-4 rounded-xl border-2 text-lg font-medium transition-all flex flex-col items-center relative overflow-hidden ${selectedAmount === index
+                                                ? `border-${currentColors.primary} bg-${currentColors.light}`
+                                                : 'border-gray-200 hover:border-gray-300 bg-white'
+                                                }`}
+                                            style={{
+                                                borderColor: selectedAmount === index ? currentColors.primary : '#e5e7eb',
+                                                backgroundColor: selectedAmount === index ? currentColors.light : 'white'
+                                            }}
+                                        >
+                                            <span className="font-bold" style={{ color: currentColors.text }}>
+                                                ₹{amount.toLocaleString('en-IN')}
+                                            </span>
+                                            {selectedAmount === index && (
+                                                <span className="text-xs mt-2 text-center text-gray-600">
+                                                    {donationOptions[activeCause][donationFrequency].messages[index]}
                                                 </span>
-                                                {selectedAmount === index && (
-                                                    <span className="text-xs mt-2 text-center text-gray-600">
-                                                        {donationOptions[activeCause].options[donationFrequency].messages[index]}
-                                                    </span>
-                                                )}
-                                                {selectedAmount === index && (
-                                                    <div
-                                                        className="absolute top-0 left-0 w-full h-1"
-                                                        style={{ backgroundColor: currentColors.primary }}
-                                                    ></div>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        No donation options available for {donationFrequency} frequency.
-                                    </div>
-                                )}
+                                            )}
+                                            {selectedAmount === index && (
+                                                <div
+                                                    className="absolute top-0 left-0 w-full h-1"
+                                                    style={{ backgroundColor: currentColors.primary }}
+                                                ></div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
 
                                 {/* Selected Amount Message */}
-                                {selectedAmount !== null && activeCause && donationOptions[activeCause]?.options && 
-                                 donationOptions[activeCause].options[donationFrequency] && (
+                                {selectedAmount !== null && (
                                     <div
                                         className="p-4 rounded-lg mb-8 text-center"
                                         style={{ backgroundColor: currentColors.light }}
                                     >
                                         <p style={{ color: currentColors.text }}>
-                                            {donationOptions[activeCause].options[donationFrequency].messages[selectedAmount]}
+                                            {donationOptions[activeCause][donationFrequency].messages[selectedAmount]}
                                         </p>
                                     </div>
                                 )}
@@ -374,12 +343,14 @@ const HomePage = ({ onDonateClick }) => {
                                     <button
                                         onClick={handleDonate}
                                         disabled={selectedAmount === null}
-                                        className={`py-4 px-12 rounded-full text-lg font-bold text-white shadow-lg transition-all transform hover:scale-105`}
+                                        className={`py-4 px-12 rounded-full text-lg font-bold text-white shadow-lg transition-all transform hover:scale-105 ${selectedAmount !== null
+                                            ? `bg-gradient-to-r from-${currentColors.primary} to-${currentColors.secondary} hover:shadow-xl`
+                                            : 'bg-gray-400 cursor-not-allowed'
+                                            }`}
                                         style={{
                                             background: selectedAmount !== null
                                                 ? `linear-gradient(135deg, ${currentColors.primary}, ${currentColors.secondary})`
-                                                : '#9ca3af',
-                                            cursor: selectedAmount !== null ? 'pointer' : 'not-allowed'
+                                                : '#9ca3af'
                                         }}
                                     >
                                         {donationFrequency === 'once' ? 'Donate Now' : 'Start Monthly Donation'}

@@ -49,6 +49,7 @@ import { setAxiosNavigate } from "./utils/axiosInterceptor"
 
 // Guest Pages
 import GuestIndex from "./pages/guest/GuestIndex"
+import DonationSettings from "./pages/admin/DonationSettings/DonationSettings"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -109,6 +110,7 @@ function App() {
             <Route path="reports" element={<ReportGenerator />} />
             <Route path="notifications" element={<NotificationPanel />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
           </Route>
 
