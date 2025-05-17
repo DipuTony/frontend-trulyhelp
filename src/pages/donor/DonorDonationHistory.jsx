@@ -222,7 +222,7 @@ const DonorDonationHistory = () => {
                       {donation?.donationId}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDateShort(donation.date)}
+                      {donation?.createdAt ? formatDateShort(donation?.createdAt) : "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">₹{donation.amount?.toFixed(2)}</div>

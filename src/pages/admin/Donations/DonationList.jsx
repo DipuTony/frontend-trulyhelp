@@ -19,7 +19,6 @@ const DonationList = () => {
   const [view, setView] = useState("DATA") // DATA, DETAILS
   const [selectedData, setSelectedData] = useState("");// Selected data for view details
 
-  console.log("selectedData", selectedData)
 
   // Single useEffect to handle data fetching
   useEffect(() => {
@@ -73,6 +72,18 @@ const DonationList = () => {
         </button>
       )
     },
+    // {
+    //   Header: 'Phone Email',
+    //   Cell: ({ row }) => (
+    //     <div
+    //       className="items-center"
+    //     >
+    //       <p>{row.original.donorPhone}</p>
+    //       <p>{row.original.donorEmail}</p>
+          
+    //     </div>
+    //   )
+    // },
     {
       Header: 'Email',
       accessor: 'donorEmail',

@@ -18,7 +18,7 @@ const DonationDetails = ({ donation, goBack }) => {
 
     const [showOldDonations, setShowOldDonations] = useState(false);
 
-    console.log("seleted data in donation details", donation)
+    // console.log("seleted data in donation details", donation)
     // Static donation data - replace with your actual data
     const donation1 = {
         id: 1,
@@ -103,6 +103,10 @@ const DonationDetails = ({ donation, goBack }) => {
 
                             <div className="space-y-3">
                                 <div>
+                                    <p className="text-sm text-gray-500">Donor ID</p>
+                                    <p className="font-medium">{donation?.donorUserId || "N/A"}</p>
+                                </div>
+                                <div>
                                     <p className="text-sm text-gray-500">Full Name</p>
                                     <p className="font-medium">{donation?.donorName || "N/A"}</p>
                                 </div>
@@ -157,6 +161,14 @@ const DonationDetails = ({ donation, goBack }) => {
                                     <div>
                                         <p className="text-sm text-gray-500">Payment Gateway</p>
                                         <p className="font-medium">{donation?.gateway || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-500">Payment Method</p>
+                                        <p className="font-medium">{donation?.method || "N/A"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-sm text-gray-500">Payment Status</p>
+                                        <p className="font-medium">{donation?.paymentStatus || "N/A"}</p>
                                     </div>
 
                                     <div>
@@ -243,7 +255,7 @@ const DonationDetails = ({ donation, goBack }) => {
 
                 {
                     showOldDonations && (
-                        <DonationHistory />
+                        <DonationHistory userId={donation?.donorUserId}/>
                     )
                 }
             </div>

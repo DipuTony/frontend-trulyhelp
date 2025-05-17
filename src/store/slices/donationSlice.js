@@ -11,10 +11,10 @@ export const fetchDonations = createAsyncThunk("donations/fetchDonations", async
     return rejectWithValue(error.response.data)
   }
 })
-// Get all donations of a donor self
+// Get donation history of donor and admin : for donor get form token for admin send from req.query.userId
 export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get("/donations/doner-donation-history")
+    const response = await axiosInstance.get("/donations/donor-donation-history")
     return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
@@ -75,6 +75,19 @@ export const generateReport = createAsyncThunk("donations/generateReport", async
     return rejectWithValue(error.response.data)
   }
 })
+
+// Get all donations of a specific user (for admin)
+export const fetchUserDonations = createAsyncThunk(
+  "donations/fetchUserDonations", 
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/donations/donor-donation-history`)
+      return response.data.data
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
 
 const initialState = {
   donations: [],

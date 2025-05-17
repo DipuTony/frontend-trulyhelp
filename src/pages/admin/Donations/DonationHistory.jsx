@@ -1,8 +1,49 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import DataTable from '../../../components/common/DataTable/DataTable';
 import { formatDateShort } from '../../../components/common/DateFormatFunctions';
+import { fetchUserDonations } from '../../../store/slices/donationSlice';
+import axiosInstance from '../../../utils/axiosInterceptor';
 
-function DonationHistory() {
+function DonationHistory({ userId }) {
+    const dispatch = useDispatch();
+    // const { donations, loading, error } = useSelector((state) => state.donations);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [donations, setDonations] = useState([]);
+
+    const fetchUserDonations = async (userId) => {
+        setLoading(true);
+        setError(null);
+
+        axiosInstance.get(`donations/donor-donation-history?userId=${userId}`)
+            .then((response) => {
+                console.log('API Response:', response.data);
+                setDonations(response?.data?.data);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('Error fetching user donations:', error);
+                setError(error.message);
+                setLoading(false);
+            });
+    }
+
+    useEffect(() => {
+        fetchUserDonations(userId);
+    }, [userId]);
+
+
+    console.log("donations in history", donations);
+
+    // useEffect(() => {
+    //     if (userId) {
+    //         dispatch(fetchUserDonations(userId))
+    //             .then((result) => {
+    //                 console.log('API Response:', result);
+    //             });
+    //     }
+    // }, [userId, dispatch]);
 
     const COLUMNS = [
         {
@@ -11,10 +52,6 @@ function DonationHistory() {
                 <div className='pr-2'>{row.index + 1}</div>
             )
         },
-        // {
-        //   Header: 'Donor Name',
-        //   accessor: 'donorName',
-        // },
         {
             Header: 'Donation Id',
             Cell: ({ row }) => (
@@ -25,14 +62,6 @@ function DonationHistory() {
                     {row.original.donationId}
                 </button>
             )
-        },
-        // {
-        //     Header: 'Email',
-        //     accessor: 'donorEmail',
-        // },
-        {
-            Header: 'Phone',
-            accessor: 'donorPhone',
         },
         {
             Header: 'Amount',
@@ -56,66 +85,12 @@ function DonationHistory() {
             Header: 'Actions',
             Cell: ({ row }) => (
                 <button
-                    // onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
+                    onClick={() => handleViewDonation(row.original.donationId)}
                     className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
                 >
                     View Details
                 </button>
             )
-        }
-    ];
-
-    // Dummy data for the table (5 records)
-    const data = [
-        {
-            donationId: 'DON123456',
-            donorName: 'Rahul Sharma',
-            donorEmail: 'rahul.sharma@example.com',
-            donorPhone: '9876543210',
-            amount: 5000,
-            method: 'UPI',
-            paymentStatus: 'Completed',
-            createdAt: new Date('2023-10-15')
-        },
-        {
-            donationId: 'DON789012',
-            donorName: 'Priya Patel',
-            donorEmail: 'priya.patel@example.com',
-            donorPhone: '8765432109',
-            amount: 2500,
-            method: 'Credit Card',
-            paymentStatus: 'Completed',
-            createdAt: new Date('2023-11-05')
-        },
-        {
-            donationId: 'DON345678',
-            donorName: 'Amit Kumar',
-            donorEmail: 'amit.kumar@example.com',
-            donorPhone: '7654321098',
-            amount: 10000,
-            method: 'Net Banking',
-            paymentStatus: 'Completed',
-            createdAt: new Date('2023-12-20')
-        },
-        {
-            donationId: 'DON901234',
-            donorName: 'Sneha Gupta',
-            donorEmail: 'sneha.gupta@example.com',
-            donorPhone: '6543210987',
-            amount: 1000,
-            method: 'UPI',
-            paymentStatus: 'Pending',
-            createdAt: new Date('2024-01-10')
-        },
-        {
-            donationId: 'DON567890',
-            donorName: 'Vikram Singh',
-            donorEmail: 'vikram.singh@example.com',
-            donorPhone: '5432109876',
-            amount: 7500,
-            method: 'Debit Card',
-            paymentStatus: 'Completed',
-            createdAt: new Date('2024-02-15')
         }
     ];
 
@@ -125,16 +100,47 @@ function DonationHistory() {
         // Add your logic to view donation details
     };
 
-    return (
-        <div className="container mx-auto px-4 py-6 justify-center items-center text-center">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">Previous Donation History</h1>
-                <p className="text-sm text-gray-600">View and manage all past donations</p>
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
             </div>
-            <DataTable
-                data={data}
-                columns={COLUMNS}
-            />
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center py-10">
+                <p className="text-red-500">Error loading donations: {error}</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="container mx-auto px-4 py-6">
+            <div className="mb-6 text-center">
+                <h1 className="text-2xl font-bold text-gray-800 mb-2">User Donation History</h1>
+                <p className="text-sm text-gray-600 mb-4">View and manage donation history for a specific user</p>
+
+                {userId && (
+                    <div className="text-left mb-4 p-2 bg-gray-100 rounded-md">
+                        <p className="text-sm font-medium">Currently viewing donations for User ID: <span className="text-indigo-600">{userId}</span></p>
+                    </div>
+                )}
+            </div>
+
+            {donations && donations.length > 0 ? (
+                <DataTable
+                    data={donations}
+                    columns={COLUMNS}
+                />
+            ) : (
+                <div className="text-center py-10">
+                    <p className="text-gray-500">
+                        {userId ? `No donation records found for User ID: ${userId}` : "Enter a User ID to view donation history"}
+                    </p>
+                </div>
+            )}
         </div>
     )
 }
