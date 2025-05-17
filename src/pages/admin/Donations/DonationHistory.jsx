@@ -5,7 +5,7 @@ import { formatDateShort } from '../../../components/common/DateFormatFunctions'
 import { fetchUserDonations } from '../../../store/slices/donationSlice';
 import axiosInstance from '../../../utils/axiosInterceptor';
 
-function DonationHistory({ userId }) {
+function DonationHistory({ userId, setDonationId }) {
     const dispatch = useDispatch();
     // const { donations, loading, error } = useSelector((state) => state.donations);
     const [loading, setLoading] = useState(false);
@@ -52,16 +52,20 @@ function DonationHistory({ userId }) {
                 <div className='pr-2'>{row.index + 1}</div>
             )
         },
+        // {
+        //     Header: 'Donation Id',
+        //     Cell: ({ row }) => (
+        //         <button
+        //             onClick={() => handleViewDonation(row.original.donationId)}
+        //             className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
+        //         >
+        //             {row.original.donationId}
+        //         </button>
+        //     )
+        // },
         {
             Header: 'Donation Id',
-            Cell: ({ row }) => (
-                <button
-                    onClick={() => handleViewDonation(row.original.donationId)}
-                    className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
-                >
-                    {row.original.donationId}
-                </button>
-            )
+            accessor: 'donationId',
         },
         {
             Header: 'Amount',
@@ -85,7 +89,7 @@ function DonationHistory({ userId }) {
             Header: 'Actions',
             Cell: ({ row }) => (
                 <button
-                    onClick={() => handleViewDonation(row.original.donationId)}
+                    onClick={() => handleViewDonation(row.original)}
                     className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
                 >
                     View Details
@@ -97,7 +101,7 @@ function DonationHistory({ userId }) {
     // Function to handle viewing donation details
     const handleViewDonation = (donationId) => {
         console.log('Viewing donation:', donationId);
-        // Add your logic to view donation details
+        setDonationId(donationId);
     };
 
     if (loading) {

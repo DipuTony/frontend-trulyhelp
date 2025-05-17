@@ -14,30 +14,10 @@ import {
 } from 'react-icons/fi';
 import DonationHistory from './DonationHistory';
 
-const DonationDetails = ({ donation, goBack }) => {
+const DonationDetails = ({ donationData, goBack }) => {
 
     const [showOldDonations, setShowOldDonations] = useState(false);
-
-    // console.log("seleted data in donation details", donation)
-    // Static donation data - replace with your actual data
-    const donation1 = {
-        id: 1,
-        donationId: 'DON-2023-001',
-        donorName: 'Rahul Sharma',
-        donorEmail: 'rahul.sharma@example.com',
-        donorPhone: '+91 9876543210',
-        donorDob: '1985-04-15',
-        donorPan: 'ABCDE1234F',
-        donorAddress: '123, MG Road, Bangalore, Karnataka - 560001',
-        amount: 2500,
-        method: 'UPI',
-        transactionId: 'TXN123456789',
-        paymentStatus: 'COMPLETED',
-        gateway: 'Razorpay',
-        createdAt: '2023-05-15T10:30:00Z',
-        receiptPath: '/receipts/DON-2023-001.pdf',
-        receiptGeneratedAt: '2023-05-15T11:15:00Z'
-    };
+    const [donation, setDonation] = useState(donationData)
 
     // Format date for display
     const formatDate = (dateString) => {
@@ -236,7 +216,7 @@ const DonationDetails = ({ donation, goBack }) => {
                 {/* Footer Actions */}
                 <div className='flex justify-between'>
                     <div className="px-6 py-4 flex justify-start space-x-3">
-                        <button onClick={()=>setShowOldDonations(!showOldDonations)} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        <button onClick={() => setShowOldDonations(!showOldDonations)} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                             {showOldDonations ? 'Hide' : 'Show'} Previous Donations
                         </button>
                     </div>
@@ -255,7 +235,7 @@ const DonationDetails = ({ donation, goBack }) => {
 
                 {
                     showOldDonations && (
-                        <DonationHistory userId={donation?.donorUserId}/>
+                        <DonationHistory userId={donation?.donorUserId} setDonationId={setDonation} />
                     )
                 }
             </div>

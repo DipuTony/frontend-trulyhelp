@@ -130,7 +130,7 @@ function DataTable({ searchText, fun, columns, data: propData, addBtn, ...rest }
                   <th
                     key={column.getHeaderProps().key}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
+                    className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hover:bg-gray-100 transition-colors duration-150 cursor-pointer"
                   >
                     <div className="flex items-center">
                       <span>{column.render('Header')}</span>
@@ -164,7 +164,7 @@ function DataTable({ searchText, fun, columns, data: propData, addBtn, ...rest }
                     <td
                       key={cell.getCellProps().key}
                       {...cell.getCellProps()}
-                      className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                      className="px-3 py-4 whitespace-nowrap text-sm text-gray-700"
                     >
                       {cell.render('Cell')}
                     </td>

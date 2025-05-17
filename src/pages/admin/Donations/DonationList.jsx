@@ -196,7 +196,7 @@ const DonationList = () => {
       {
         view === "DETAILS" && (
           selectedData ?
-            <DonationDetails donation={selectedData} goBack={() => (setSelectedData(""), setView("DATA"))} />
+            <DonationDetails donationData={selectedData} goBack={() => (setSelectedData(""), setView("DATA"))} />
             : "Please select a donation to view its details"
         )
       }
