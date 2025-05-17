@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FiUser,
     FiMail,
@@ -17,7 +17,12 @@ import DonationHistory from './DonationHistory';
 const DonationDetails = ({ donationData, goBack }) => {
 
     const [showOldDonations, setShowOldDonations] = useState(false);
-    const [donation, setDonation] = useState(donationData)
+    const [donation, setDonation] = useState(donationData);
+
+    // Scroll to top when donation changes
+    useEffect(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, [donation]);
 
     // Format date for display
     const formatDate = (dateString) => {
@@ -216,7 +221,23 @@ const DonationDetails = ({ donationData, goBack }) => {
                 {/* Footer Actions */}
                 <div className='flex justify-between'>
                     <div className="px-6 py-4 flex justify-start space-x-3">
-                        <button onClick={() => setShowOldDonations(!showOldDonations)} className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+                        <button
+                            onClick={() => {
+                                setShowOldDonations(!showOldDonations);
+                                setTimeout(() => { // Wait for state update and DOM render
+                                    if (!showOldDonations) {
+                                        // Scroll to bottom of donations container
+                                        const container = document.querySelector('.donations-container');
+                                        if (container) {
+                                            container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                                        }
+                                    } else {
+                                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                                    }
+                                }, 0);
+                            }}
+                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                        >
                             {showOldDonations ? 'Hide' : 'Show'} Previous Donations
                         </button>
                     </div>
@@ -235,9 +256,13 @@ const DonationDetails = ({ donationData, goBack }) => {
 
                 {
                     showOldDonations && (
-                        <DonationHistory userId={donation?.donorUserId} setDonationId={setDonation} />
+                        <div className="">
+                            <DonationHistory userId={donation?.donorUserId} setDonationId={setDonation} />
+                        </div>
                     )
                 }
+
+            <div className="mt-36 donations-container"></div>
             </div>
         </div>
     );
