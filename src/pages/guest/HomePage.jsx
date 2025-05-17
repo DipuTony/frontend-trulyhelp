@@ -168,9 +168,9 @@ const HomePage = ({ onDonateClick }) => {
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-40"></div>
                 <div className="relative h-full flex items-center justify-center">
                     <div className="text-center px-4">
-                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Make a Difference Today</h1>
+                        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Vision of a Better and Empowered India</h1>
                         <p className="text-xl text-white opacity-90 max-w-2xl mx-auto">
-                            Your support transforms lives. Choose how you want to help.
+                        Train, Educate, Raise Awareness, and Enable them towards a better life.
                         </p>
                     </div>
                 </div>

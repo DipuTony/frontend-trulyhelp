@@ -88,7 +88,7 @@ const DonateNow = () => {
         {/* Header Section */}
         <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-2xl shadow-xl p-8 mb-8 text-white">
           <div className="max-w-3xl">
-            <h1 className="text-4xl font-bold mb-4">Make a Difference Today</h1>
+            <h1 className="text-4xl font-bold mb-4">Vision of a Better and Empowered India</h1>
             <p className="text-xl text-indigo-100">
               Your generosity powers positive change. Every contribution creates ripples of impact in our community.
             </p>

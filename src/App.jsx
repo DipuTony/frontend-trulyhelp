@@ -11,7 +11,7 @@ import Signup from "./pages/auth/Signup"
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard"
 import UserManagement from "./pages/admin/UserManagement"
-import DonationList from "./pages/admin/DonationList"
+import DonationList from "./pages/admin/Donations/DonationList"
 import ExpenseManagement from "./pages/admin/ExpenseManagement"
 import PaymentVerification from "./pages/admin/PaymentVerification"
 import ReportGenerator from "./pages/admin/ReportGenerator"
