@@ -305,16 +305,18 @@ const DonateForm = ({ donationData, onBackClick }) => {
                       ) : null}
                     </div>
 
-                    <div className="flex items-center">
+                    <div className="flex items-start">
                       <input
                         type="checkbox"
                         name="receiveG80Certificate"
                         checked={formik.values.receiveG80Certificate}
                         onChange={formik.handleChange}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mt-1"
                       />
                       <label className="ml-2 block text-sm text-gray-700">
-                        I would like to receive 80(G) Certificate.
+                        I accept the <span className="underline cursor-pointer text-indigo-500 hover:text-indigo-600"> Terms & Conditions </span> and also confirm that information provided above true.
+                        Your donations are tax exempted under 80G of the Indian Income Tax Act.
+
                       </label>
                     </div>
                   </div>

@@ -207,6 +207,10 @@ const UserManagement = () => {
     )
   }
 
+  const handleViewDonation = (donationId) => {
+    navigate(`/admin/UserDetails/${donationId}`);
+  }
+
   const COLUMNS = [
     {
         Header: '#',
@@ -215,8 +219,15 @@ const UserManagement = () => {
         )
     },
     {
-        Header: 'Name',
-        accessor: 'name',
+      Header: 'Donor Name',
+      Cell: ({ row }) => (
+        <button
+          onClick={() => handleViewDonation(row.original.userId)}
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
+        >
+          {row.original.name}
+        </button>
+      )
     },
     {
         Header: 'Email',

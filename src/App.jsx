@@ -43,13 +43,13 @@ import Profile from "./pages/donor/Profile"
 import ForgotPassword from "./pages/auth/ForgotPassword"
 import ResetPassword from "./pages/auth/ResetPassword"
 import ToastNotification from "./components/common/ToastNotification"
-import ViewDonationDetails from "./pages/admin/ViewDonationDetails"
 import { useEffect } from "react"
 import { setAxiosNavigate } from "./utils/axiosInterceptor"
 
 // Guest Pages
 import GuestIndex from "./pages/guest/GuestIndex"
 import DonationSettings from "./pages/admin/DonationSettings/DonationSettings"
+import UserDetails from "./pages/admin/Users/UserDetails"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -102,9 +102,8 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="donations" element={<DonationList />} /> {/* used for admin and volunteer */}
-            <Route path="donations/:donationId" element={<ViewDonationDetails />} /> {/* used for admin only */}
             <Route path="users/:role?" element={<UserManagement />} />
-            <Route path="users/:role?/:userId?" element={"user/volunteer  details"} />
+            <Route path="UserDetails/:userId?" element={<UserDetails />} />
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />

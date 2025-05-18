@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import axiosInstance from "../../../utils/axiosInterceptor";
 
 const DonationSettings = () => {
   const { user } = useSelector((state) => state.auth);
@@ -33,7 +34,7 @@ const DonationSettings = () => {
   const fetchCauses = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
+      const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}donation-options`);
       
       if (response.data.success) {
         // Transform the data structure to match our component needs

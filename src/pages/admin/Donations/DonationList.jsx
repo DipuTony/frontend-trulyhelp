@@ -6,7 +6,6 @@ import 'animate.css';
 import DataTable from "../../../components/common/DataTable/DataTable"
 import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { formatDateShort } from "../../../components/common/DateFormatFunctions"
-import ViewDonationDetails from "../ViewDonationDetails";
 import DonationDetails from "./DonationDetails";
 
 const DonationList = () => {
@@ -31,7 +30,7 @@ const DonationList = () => {
   }
 
   const handleViewDonation = (donationId) => {
-    navigate(`/admin/donations/${donationId}`);
+    navigate(`/admin/UserDetails/${donationId}`);
   }
 
   if (loading) {
@@ -65,7 +64,7 @@ const DonationList = () => {
       Header: 'Donor Name',
       Cell: ({ row }) => (
         <button
-          onClick={() => handleViewDonation(row.original.donationId)}
+          onClick={() => handleViewDonation(row.original.donorUserId)}
           className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
         >
           {row.original.donorName}
