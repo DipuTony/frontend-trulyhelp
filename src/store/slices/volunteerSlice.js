@@ -82,7 +82,7 @@ export const fetchICardList = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/user/icard-list");
-      return response.data.data || response.data;
+      return response.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
