@@ -2,41 +2,32 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchICard, requestICard } from '../../store/slices/volunteerSlice';
 import { FiDownload, FiUser, FiClock, FiCheckCircle, FiSend } from 'react-icons/fi';
+// import { toast } from '../../utils/toast';
 
 const ICardVolunteer = () => {
+  const [apiError, setApiError] = useState(null);
   const dispatch = useDispatch();
   const { iCardData, iCardRequested, loading, error } = useSelector((state) => state.volunteers);
 
   console.log(iCardData)
-  
+
   useEffect(() => {
     dispatch(fetchICard());
   }, [dispatch]);
 
   const handleRequestICard = async () => {
+    setApiError(null);
     try {
-      await dispatch(requestICard());
-      // Refetch the iCard data after successful request
-      // await dispatch(fetchICard());
+      const result = await dispatch(requestICard());
+      if (result.error) {
+        setApiError(result.payload?.message || 'Failed to request iCard');
+      } else {
+        await dispatch(fetchICard());
+      }
     } catch (error) {
-      console.error('Error requesting iCard:', error);
+      setApiError(error.message || 'An unexpected error occurred');
     }
   };
-
-  // Use iCardData from Redux instead of local sample data
-  // State to simulate different statuses - change this to use your actual data
-  // const [status, setStatus] = useState('approved'); // can be 'approved', 'pending', or 'unassigned'
-  
-  // Sample iCard data
-  // const iCardData = {
-  //   name: "Alex Johnson",
-  //   volunteerId: "VOL-2023-0425",
-  //   role: "Community Helper",
-  //   issueDate: "15 April 2023",
-  //   expiryDate: "15 April 2024",
-  //   qrCode: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VOL-2023-0425"
-  // };
-
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -50,7 +41,7 @@ const ICardVolunteer = () => {
 
         {/* Status Indicator */}
         <div className="mb-8">
-          {iCardData?.iCardStatus === 'APPROVED' && (
+          {iCardData?.iCardStatus === 'ACTIVE' && (
             <div className="flex items-center justify-center bg-green-50 p-4 rounded-lg">
               <FiCheckCircle className="h-6 w-6 text-green-500 mr-2" />
               <span className="text-green-700 font-medium">Your iCard is approved and ready</span>
@@ -68,16 +59,17 @@ const ICardVolunteer = () => {
               <span className="text-blue-700 font-medium">You haven't requested an iCard yet</span>
             </div>
           )}
-          {iCardData?.iCardStatus === 'DISABLED' && (
+          {iCardData?.iCardStatus === 'DISABLED' && (<>
             <div className="flex items-center justify-center bg-red-50 p-4 rounded-lg">
               <FiUser className="h-6 w-6 text-red-500 mr-2" />
               <span className="text-red-700 font-medium">Your iCard has been disabled</span>
             </div>
-          )}
+            <p className='text-center text-gray-500 font-medium mt-1'>You can contact Admin for more details.</p>
+          </>)}
         </div>
 
         {/* iCard Display */}
-        {iCardData?.iCardStatus === 'APPROVED' && (
+        {iCardData?.iCardStatus === 'ACTIVE' && (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-200">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
               <div className="flex justify-between items-start">
@@ -86,15 +78,15 @@ const ICardVolunteer = () => {
                   <p className="text-blue-100">{iCardData?.role}</p>
                 </div>
                 <div className="bg-white p-1 rounded-lg">
-                  <img 
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${iCardData?.userId}`} 
-                    alt="QR Code" 
+                  <img
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${iCardData?.userId}`}
+                    alt="QR Code"
                     className="h-16 w-16"
                   />
                 </div>
               </div>
             </div>
-            
+
             <div className="p-6">
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
@@ -110,14 +102,14 @@ const ICardVolunteer = () => {
                   <p className="font-medium">{iCardData?.iCardExpiryDate}</p>
                 </div>
               </div>
-              
+
               <div className="border-t border-gray-200 pt-4">
                 <p className="text-xs text-gray-500">
                   This card identifies you as an authorized volunteer. Please present it when required.
                 </p>
               </div>
             </div>
-            
+
             <div className="bg-gray-50 px-6 py-4 flex justify-end">
               <button
                 className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
@@ -180,8 +172,13 @@ const ICardVolunteer = () => {
           </div>
         )}
       </div>
+      {/* Add this below the status indicator */}
+      {apiError && (
+        <div className="mb-4 p-4 bg-red-200 text-red-700 rounded-lg">
+          {apiError}
+        </div>
+      )}
     </div>
   );
-};
-
-export default ICardVolunteer;
+}
+export default ICardVolunteer
