@@ -50,6 +50,8 @@ import { setAxiosNavigate } from "./utils/axiosInterceptor"
 import GuestIndex from "./pages/guest/GuestIndex"
 import DonationSettings from "./pages/admin/DonationSettings/DonationSettings"
 import UserDetails from "./pages/admin/Users/UserDetails"
+import IdCardList from "./pages/admin/IdCard/IdCardList"
+import ICardVolunteer from "./pages/volunteer/ICardVolunteer"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -111,6 +113,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
+            <Route path="id-card" element={<IdCardList/>} />
           </Route>
 
           {/* Volunteer Routes */}
@@ -131,6 +134,7 @@ function App() {
             <Route path="add-donation" element={<AddDonation usedFor="volunteer" />} />
             {/* <Route path="donation-history" element={<VolunteerDonationHistory />} /> */}
             <Route path="donation-history" element={<DonationList />} /> {/* user for admin and volunteer */}
+            <Route path="iCard" element={<ICardVolunteer />} />
             <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
             <Route path="profile" element={<Profile />} />
           </Route>

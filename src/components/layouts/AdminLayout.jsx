@@ -43,6 +43,7 @@ const AdminLayout = () => {
     { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
     { name: "Notifications", href: "/admin/notifications", icon: "bell" },
     { name: "Donation Setting", href: "/admin/donation-setting", icon: "bell" },
+    { name: "iCard", href: "/admin/id-card", icon: "icard" },
   ]
 
   // Automatically open submenu if current route matches any subitem
