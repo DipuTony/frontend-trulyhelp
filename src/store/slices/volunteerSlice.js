@@ -1,141 +1,176 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import axios from "axios"
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../../utils/axiosInterceptor";
 
 // Get all volunteers
-export const fetchVolunteers = createAsyncThunk("volunteers/fetchVolunteers", async (role, { rejectWithValue }) => { // Accept role parameter
-  try {
-    const response = await axiosInstance.get(`/user/view-all?role=${role}`); // or `/user/${role}/view-all`
-    return response.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchVolunteers = createAsyncThunk(
+  "volunteers/fetchVolunteers",
+  async (role, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/user/view-all?role=${role}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-}
 );
 
 // Add new user (donor / volunteer /admin)
-export const addVolunteer = createAsyncThunk("volunteers/addVolunteer", async (volunteerData, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post("/user/create", volunteerData)
-    return response.data
-  } catch (error) {
-    return rejectWithValue(error.response.data)
+export const addVolunteer = createAsyncThunk(
+  "volunteers/addVolunteer",
+  async (volunteerData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/user/create", volunteerData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-})
+);
 
 // Update volunteer
-export const updateVolunteer = createAsyncThunk("volunteers/updateVolunteer",async ({ id, volunteerData }, { rejectWithValue }) => {
+export const updateVolunteer = createAsyncThunk(
+  "volunteers/updateVolunteer",
+  async ({ id, volunteerData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/users/${id}`, volunteerData)
-      return response.data
+      const response = await axiosInstance.put(`/users/${id}`, volunteerData);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response.data)
+      return rejectWithValue(error.response?.data || error.message);
     }
-  },
-)
-// search volunteer
+  }
+);
+
+// Search volunteer
 export const searchVolunteers = createAsyncThunk(
   "volunteers/search",
   async (query, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get(`/user/volunteers/search?q=${query}`)
-      return response.data.data
+      const response = await axiosInstance.get(`/user/volunteers/search?q=${query}`);
+      return response.data.data || response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to search volunteers")
+      return rejectWithValue(error.response?.data || "Failed to search volunteers");
     }
   }
-)
+);
 
-
-export const fetchICard = createAsyncThunk("volunteers/fetchICard", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get("/user/view-icard");
-    return response.data.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const fetchICard = createAsyncThunk(
+  "volunteers/fetchICard",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/user/view-icard");
+      return response.data.data || response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-});
+);
 
-export const requestICard = createAsyncThunk("volunteers/requestICard", async (_, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.post("/user/request-icard");
-    return response.data.data;
-  } catch (error) {
-    return rejectWithValue(error.response.data);
+export const requestICard = createAsyncThunk(
+  "volunteers/requestICard",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/user/request-icard");
+      return response.data.data || response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
   }
-});
+);
+
+export const fetchICardList = createAsyncThunk(
+  "volunteers/fetchICardList",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/user/icard-list");
+      return response.data.data || response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
 
 const initialState = {
   volunteers: [],
+  iCardList: null,
+  iCardData: null,
+  iCardRequested: false,
   loading: false,
-  error: null,
-}
+  error: null
+};
 
 const volunteerSlice = createSlice({
   name: "volunteers",
   initialState,
   reducers: {
     clearVolunteerError: (state) => {
-      state.error = null
+      state.error = null;
     },
+    resetICardRequested: (state) => {
+      state.iCardRequested = false;
+    }
   },
   extraReducers: (builder) => {
     builder
-    .addCase(searchVolunteers.pending, (state) => {
-      state.loading = true
-      state.error = null
-    })
-    .addCase(searchVolunteers.fulfilled, (state, action) => {
-      state.loading = false
-      state.volunteers = action.payload
-    })
-    .addCase(searchVolunteers.rejected, (state, action) => {
-      state.loading = false
-      state.error = action.payload
-    })
-      // Fetch volunteers cases
+      // Search volunteers
+      .addCase(searchVolunteers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchVolunteers.fulfilled, (state, action) => {
+        state.loading = false;
+        state.volunteers = action.payload;
+      })
+      .addCase(searchVolunteers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Fetch volunteers
       .addCase(fetchVolunteers.pending, (state) => {
-        state.loading = true
-        state.error = null
+        state.loading = true;
+        state.error = null;
       })
       .addCase(fetchVolunteers.fulfilled, (state, action) => {
-        state.loading = false
-        state.volunteers = action.payload
+        state.loading = false;
+        state.volunteers = action.payload;
       })
       .addCase(fetchVolunteers.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload || "Failed to fetch volunteers"
+        state.loading = false;
+        state.error = action.payload;
       })
-      // Add volunteer cases
+      
+      // Add volunteer
       .addCase(addVolunteer.pending, (state) => {
-        state.loading = true
-        state.error = null
+        state.loading = true;
+        state.error = null;
       })
       .addCase(addVolunteer.fulfilled, (state, action) => {
-        state.loading = false
-        state.volunteers.push(action.payload)
+        state.loading = false;
+        state.volunteers.push(action.payload);
       })
       .addCase(addVolunteer.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload || "Failed to add volunteer"
+        state.loading = false;
+        state.error = action.payload;
       })
-      // Update volunteer cases
+      
+      // Update volunteer
       .addCase(updateVolunteer.pending, (state) => {
-        state.loading = true
-        state.error = null
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateVolunteer.fulfilled, (state, action) => {
-        state.loading = false
-        const index = state.volunteers.findIndex((v) => v.id === action.payload.id)
+        state.loading = false;
+        const index = state.volunteers.findIndex((v) => v.id === action.payload.id);
         if (index !== -1) {
-          state.volunteers[index] = action.payload
+          state.volunteers[index] = action.payload;
         }
       })
       .addCase(updateVolunteer.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload || "Failed to update volunteer"
+        state.loading = false;
+        state.error = action.payload;
       })
-      // Add these to the extraReducers builder:
+      
+      // Fetch ICard
       .addCase(fetchICard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -148,6 +183,8 @@ const volunteerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      
+      // Request ICard
       .addCase(requestICard.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -160,16 +197,22 @@ const volunteerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Also add iCardData and iCardRequested to the initialState
-      const initialState = {
-        volunteers: [],
-        iCardData: null,
-        iCardRequested: false,
-        loading: false,
-        error: null,
-      };
-  },
-})
+      
+      // Fetch ICard List
+      .addCase(fetchICardList.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchICardList.fulfilled, (state, action) => {
+        state.loading = false;
+        state.iCardList = action.payload;
+      })
+      .addCase(fetchICardList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  }
+});
 
-export const { clearVolunteerError } = volunteerSlice.actions
-export default volunteerSlice.reducer
+export const { clearVolunteerError, resetICardRequested } = volunteerSlice.actions;
+export default volunteerSlice.reducer;
