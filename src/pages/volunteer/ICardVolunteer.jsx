@@ -1,24 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchICard, requestICard } from '../../store/slices/volunteerSlice';
 import { FiDownload, FiUser, FiClock, FiCheckCircle, FiSend } from 'react-icons/fi';
 
 const ICardVolunteer = () => {
-  // State to simulate different statuses - change this to use your actual data
-  const [status, setStatus] = useState('approved'); // can be 'approved', 'pending', or 'unassigned'
+  const dispatch = useDispatch();
+  const { iCardData, iCardRequested, loading, error } = useSelector((state) => state.volunteers);
+
+  console.log(iCardData)
   
-  // Sample iCard data
-  const iCardData = {
-    name: "Alex Johnson",
-    volunteerId: "VOL-2023-0425",
-    role: "Community Helper",
-    issueDate: "15 April 2023",
-    expiryDate: "15 April 2024",
-    qrCode: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VOL-2023-0425"
+  useEffect(() => {
+    dispatch(fetchICard());
+  }, [dispatch]);
+
+  const handleRequestICard = async () => {
+    try {
+      await dispatch(requestICard());
+      // Refetch the iCard data after successful request
+      // await dispatch(fetchICard());
+    } catch (error) {
+      console.error('Error requesting iCard:', error);
+    }
   };
 
-  const handleRequestICard = () => {
-    // API call or logic to request iCard would go here
-    setStatus('pending');
-  };
+  // Use iCardData from Redux instead of local sample data
+  // State to simulate different statuses - change this to use your actual data
+  // const [status, setStatus] = useState('approved'); // can be 'approved', 'pending', or 'unassigned'
+  
+  // Sample iCard data
+  // const iCardData = {
+  //   name: "Alex Johnson",
+  //   volunteerId: "VOL-2023-0425",
+  //   role: "Community Helper",
+  //   issueDate: "15 April 2023",
+  //   expiryDate: "15 April 2024",
+  //   qrCode: "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=VOL-2023-0425"
+  // };
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -32,38 +50,44 @@ const ICardVolunteer = () => {
 
         {/* Status Indicator */}
         <div className="mb-8">
-          {status === 'approved' && (
+          {iCardData?.iCardStatus === 'APPROVED' && (
             <div className="flex items-center justify-center bg-green-50 p-4 rounded-lg">
               <FiCheckCircle className="h-6 w-6 text-green-500 mr-2" />
               <span className="text-green-700 font-medium">Your iCard is approved and ready</span>
             </div>
           )}
-          {status === 'pending' && (
+          {iCardData?.iCardStatus === 'PENDING' && (
             <div className="flex items-center justify-center bg-yellow-50 p-4 rounded-lg">
               <FiClock className="h-6 w-6 text-yellow-500 mr-2" />
               <span className="text-yellow-700 font-medium">Your iCard request is pending approval</span>
             </div>
           )}
-          {status === 'unassigned' && (
+          {iCardData?.iCardStatus === 'UNASSIGN' && (
             <div className="flex items-center justify-center bg-blue-50 p-4 rounded-lg">
               <FiUser className="h-6 w-6 text-blue-500 mr-2" />
               <span className="text-blue-700 font-medium">You haven't requested an iCard yet</span>
             </div>
           )}
+          {iCardData?.iCardStatus === 'DISABLED' && (
+            <div className="flex items-center justify-center bg-red-50 p-4 rounded-lg">
+              <FiUser className="h-6 w-6 text-red-500 mr-2" />
+              <span className="text-red-700 font-medium">Your iCard has been disabled</span>
+            </div>
+          )}
         </div>
 
         {/* iCard Display */}
-        {status === 'approved' && (
+        {iCardData?.iCardStatus === 'APPROVED' && (
           <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-200">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
               <div className="flex justify-between items-start">
                 <div>
-                  <h2 className="text-2xl font-bold">{iCardData.name}</h2>
-                  <p className="text-blue-100">{iCardData.role}</p>
+                  <h2 className="text-2xl font-bold">{iCardData?.name}</h2>
+                  <p className="text-blue-100">{iCardData?.role}</p>
                 </div>
                 <div className="bg-white p-1 rounded-lg">
                   <img 
-                    src={iCardData.qrCode} 
+                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${iCardData?.userId}`} 
                     alt="QR Code" 
                     className="h-16 w-16"
                   />
@@ -75,15 +99,15 @@ const ICardVolunteer = () => {
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <div>
                   <p className="text-sm text-gray-500">Volunteer ID</p>
-                  <p className="font-medium">{iCardData.volunteerId}</p>
+                  <p className="font-medium">{iCardData?.userId}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Issue Date</p>
-                  <p className="font-medium">{iCardData.issueDate}</p>
+                  <p className="font-medium">{iCardData?.iCardAssignDate}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Expiry Date</p>
-                  <p className="font-medium">{iCardData.expiryDate}</p>
+                  <p className="font-medium">{iCardData?.iCardExpiryDate}</p>
                 </div>
               </div>
               
@@ -106,7 +130,7 @@ const ICardVolunteer = () => {
         )}
 
         {/* Actions based on status */}
-        {status === 'unassigned' && (
+        {iCardData?.iCardStatus === 'UNASSIGN' && (
           <div className="bg-white rounded-xl shadow-md p-8 text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
               <FiUser className="h-6 w-6 text-blue-600" />
@@ -117,15 +141,28 @@ const ICardVolunteer = () => {
             </p>
             <button
               onClick={handleRequestICard}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              disabled={loading}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-75"
             >
-              <FiSend className="mr-2 h-4 w-4" />
-              Request iCard
+              {loading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <FiSend className="mr-2 h-4 w-4" />
+                  Request iCard
+                </>
+              )}
             </button>
           </div>
         )}
 
-        {status === 'pending' && (
+        {iCardData?.iCardStatus === 'PENDING' && (
           <div className="bg-white rounded-xl shadow-md p-8 text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
               <FiClock className="h-6 w-6 text-yellow-600" />

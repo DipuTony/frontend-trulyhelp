@@ -47,6 +47,24 @@ export const searchVolunteers = createAsyncThunk(
 )
 
 
+export const fetchICard = createAsyncThunk("volunteers/fetchICard", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.get("/user/view-icard");
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
+export const requestICard = createAsyncThunk("volunteers/requestICard", async (_, { rejectWithValue }) => {
+  try {
+    const response = await axiosInstance.post("/user/request-icard");
+    return response.data.data;
+  } catch (error) {
+    return rejectWithValue(error.response.data);
+  }
+});
+
 const initialState = {
   volunteers: [],
   loading: false,
@@ -117,6 +135,39 @@ const volunteerSlice = createSlice({
         state.loading = false
         state.error = action.payload || "Failed to update volunteer"
       })
+      // Add these to the extraReducers builder:
+      .addCase(fetchICard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchICard.fulfilled, (state, action) => {
+        state.loading = false;
+        state.iCardData = action.payload;
+      })
+      .addCase(fetchICard.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(requestICard.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestICard.fulfilled, (state) => {
+        state.loading = false;
+        state.iCardRequested = true;
+      })
+      .addCase(requestICard.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Also add iCardData and iCardRequested to the initialState
+      const initialState = {
+        volunteers: [],
+        iCardData: null,
+        iCardRequested: false,
+        loading: false,
+        error: null,
+      };
   },
 })
 
