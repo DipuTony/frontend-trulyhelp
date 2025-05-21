@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchICardList } from '../../../store/slices/volunteerSlice';
 import DataTable from '../../../components/common/DataTable/DataTable';
 import { formatDateShort } from '../../../components/common/DateFormatFunctions';
+import axiosInstance from '../../../utils/axiosInterceptor';
 
 const IdCardList = () => {
     const dispatch = useDispatch();
     const { iCardList, loading, error } = useSelector((state) => state.volunteers);
-    
+    const [errorMsg, setErrorMsg] = useState(null);
+    const [activeFilter, setActiveFilter] = useState('ALL');
     const [openModal, setOpenModal] = useState(false);
     const [modalType, setModalType] = useState('assign'); // 'assign', 'view', 'edit'
     const [selectedCard, setSelectedCard] = useState(null);
@@ -29,6 +31,7 @@ const IdCardList = () => {
             setSelectedCard(card);
             if (type === 'edit') {
                 setFormData({
+                    userId: card.userId, // this is volunteer user id
                     name: card.name,
                     email: card.email,
                     status: card.iCardStatus,
@@ -64,9 +67,22 @@ const IdCardList = () => {
     };
 
     const handleUpdateCard = () => {
-        // API call to update card
-        console.log('Updating card with data:', formData);
-        handleModalClose();
+        setErrorMsg(null);
+        const payload = {
+            "volunteerUserId": formData?.userId,
+            "iCardStatus": formData?.status,
+            "iCardExpiryDate": formData?.expiryDate
+        }
+        axiosInstance.post(`/user/update-icard`, payload)
+            .then(response => {
+                console.log('Card updated successfully:', response.data);
+                dispatch(fetchICardList());
+                handleModalClose();
+            })
+            .catch(error => {
+                console.error('Error updating card:', error);
+                setErrorMsg(error.response?.data?.message || 'Failed to update card');
+            })
     };
 
     const formatDateForInput = (dateString) => {
@@ -80,9 +96,9 @@ const IdCardList = () => {
         </div>
     );
 
-    if (error) return (
+    if (error || errorMsg) (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-            <strong>Error:</strong> {error.message || 'Failed to load ID cards'}
+            <strong>Error:</strong> {error?.message || errorMsg?.message || 'Failed to load ID cards'}
         </div>
     );
 
@@ -91,59 +107,55 @@ const IdCardList = () => {
     const statusCounts = iCardList.counts || {};
     const totalCards = iCardList.total || 0;
 
+    const filteredData = activeFilter === 'ALL' 
+        ? iCardList.data 
+        : iCardList.data.filter(card => card.iCardStatus === activeFilter);
+
     return (
         <div className="container mx-auto px-4 py-8">
             {/* Header with Stats */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">ID Card Management</h1>
-                    <div className="flex flex-wrap items-center gap-4">
-                        <select 
-                            className="px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            onChange={(e) => console.log('Filter by:', e.target.value)}
+                    
+                    {/* Tab Filter */}
+                    <div className="flex flex-wrap gap-2 mt-4">
+                        <button
+                            onClick={() => setActiveFilter('ALL')}
+                            className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === 'ALL' 
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
                         >
-                            <option value="ALL">All Statuses</option>
-                            <option value="ACTIVE">Active</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="DISABLED">Disabled</option>
-                            <option value="UNASSIGN">Unassigned</option>
-                        </select>
+                            <span className={`inline-block w-2 h-2 rounded-full mr-2 ${activeFilter === 'ALL' ? 'bg-blue-500' : 'bg-gray-400'}`}></span>
+                            <span className="text-sm font-medium">All ({totalCards})</span>
+                        </button>
                         
-                        <div className="flex flex-wrap gap-2">
-                            {Object.entries(statusCounts).map(([status, count]) => (
-                                <div key={status} className="flex items-center bg-gray-50 px-3 py-1 rounded-full">
-                                    <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                                        status === 'ACTIVE' ? 'bg-green-500' :
-                                        status === 'PENDING' ? 'bg-yellow-500' :
-                                        status === 'DISABLED' ? 'bg-red-500' : 'bg-gray-500'
-                                    }`}></span>
-                                    <span className="text-sm font-medium">{status}: {count}</span>
-                                </div>
-                            ))}
-                            <div className="flex items-center bg-blue-50 px-3 py-1 rounded-full">
-                                <span className="inline-block w-2 h-2 rounded-full mr-2 bg-blue-500"></span>
-                                <span className="text-sm font-medium">Total: {totalCards}</span>
-                            </div>
-                        </div>
+                        {Object.entries(statusCounts).map(([status, count]) => (
+                            <button
+                                key={status}
+                                onClick={() => setActiveFilter(status)}
+                                className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === status 
+                                    ? `${status === 'ACTIVE' ? 'bg-green-100 text-green-800 border border-green-200' : 
+                                       status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 
+                                       status === 'DISABLED' ? 'bg-red-100 text-red-800 border border-red-200' : 
+                                       'bg-gray-100 text-gray-800 border border-gray-200'}` 
+                                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
+                            >
+                                <span className={`inline-block w-2 h-2 rounded-full mr-2 ${status === 'ACTIVE' ? 'bg-green-500' :
+                                    status === 'PENDING' ? 'bg-yellow-500' :
+                                    status === 'DISABLED' ? 'bg-red-500' : 'bg-gray-500'}`}></span>
+                                <span className="text-sm font-medium">{status} ({count})</span>
+                            </button>
+                        ))}
                     </div>
                 </div>
-                
-                <button
-                    onClick={() => handleModalOpen('assign')}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd" />
-                    </svg>
-                    Assign New Card
-                </button>
             </div>
 
             {/* Data Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <DataTable
                     columns={COLUMNS(handleModalOpen)}
-                    data={iCardList.data}
+                    data={filteredData}
                     fetchData={() => dispatch(fetchICardList())}
                 />
             </div>
@@ -154,11 +166,11 @@ const IdCardList = () => {
                     <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                         <div className="p-6 border-b">
                             <h2 className="text-xl font-semibold text-gray-800">
-                                {modalType === 'assign' ? 'Assign New ID Card' : 
-                                 modalType === 'edit' ? 'Edit ID Card' : 'ID Card Details'}
+                                {modalType === 'assign' ? 'Assign New ID Card' :
+                                    modalType === 'edit' ? 'Edit ID Card' : 'ID Card Details'}
                             </h2>
                         </div>
-                        
+
                         <div className="p-6">
                             {modalType === 'view' ? (
                                 <div className="space-y-4">
@@ -179,12 +191,11 @@ const IdCardList = () => {
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-600 mb-1">Status</label>
-                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                                selectedCard.iCardStatus === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${selectedCard.iCardStatus === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                                                 selectedCard.iCardStatus === 'DISABLED' ? 'bg-red-100 text-red-800' :
-                                                selectedCard.iCardStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }`}>
+                                                    selectedCard.iCardStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                }`}>
                                                 {selectedCard.iCardStatus}
                                             </span>
                                         </div>
@@ -231,7 +242,7 @@ const IdCardList = () => {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label htmlFor="status" className="block text-sm font-medium text-gray-600 mb-1">Status</label>
@@ -260,7 +271,7 @@ const IdCardList = () => {
                                             />
                                         </div>
                                     </div>
-                                    
+
                                     <div>
                                         <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-600 mb-1">Expiry Date</label>
                                         <input
@@ -275,7 +286,7 @@ const IdCardList = () => {
                                 </form>
                             )}
                         </div>
-                        
+
                         <div className="p-4 border-t flex justify-end gap-3">
                             <button
                                 type="button"
@@ -329,12 +340,11 @@ const COLUMNS = (handleModalOpen) => [
         Header: 'Status',
         accessor: 'iCardStatus',
         Cell: ({ value }) => (
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                value === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${value === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                 value === 'DISABLED' ? 'bg-red-100 text-red-800' :
-                value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                'bg-gray-100 text-gray-800'
-            }`}>
+                    value === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-gray-100 text-gray-800'
+                }`}>
                 {value}
             </span>
         )
