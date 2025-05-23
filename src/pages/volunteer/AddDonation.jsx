@@ -15,12 +15,14 @@ const AddDonation = ({ usedFor }) => {
 
   const [donationData, setDonationData] = useState({
     donorName: "",
+    aadharNo: "",
     donorEmail: "",
     donorPhone: "",
     donorDob: "",
     donorPan: "",
     donorAddress: "",
     amount: "",
+    donationType: "",
     method: "",
     chequeNo: "",
   })
@@ -64,10 +66,12 @@ const AddDonation = ({ usedFor }) => {
 
     const newDonation = {
       name: donationData.donorName,
+      aadharNo: donationData.aadharNo,
       email: donationData.donorEmail,
       phone: donationData.donorPhone,
       dob: donationData.donorDob,
       pan: donationData.donorPan,
+      donationType: donationData.donationType,
       address: donationData.donorAddress,
       amount: Number(donationData.amount),
       method: donationData.method,
@@ -82,10 +86,12 @@ const AddDonation = ({ usedFor }) => {
         setFormErrors([])
         setDonationData({
           donorName: "",
+          aadharNo: "",
           donorEmail: "",
           donorPhone: "",
           donorDob: "",
           donorPan: "",
+          donationType: "",
           donorAddress: "",
           amount: "",
           method: "",
@@ -142,8 +148,8 @@ const AddDonation = ({ usedFor }) => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">
-                    {typeof error === 'string' ? error : 
-                     error.message || "An error occurred"}
+                    {typeof error === 'string' ? error :
+                      error.message || "An error occurred"}
                   </p>
                 </div>
               </div>
@@ -186,7 +192,7 @@ const AddDonation = ({ usedFor }) => {
                     placeholder="Search volunteer by name or email..."
                     className="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   />
-                  
+
                   {Array.isArray(volunteers) && volunteers.length > 0 ? (
                     <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
                       {volunteers.map((volunteer) => (
@@ -206,7 +212,7 @@ const AddDonation = ({ usedFor }) => {
                     </div>
                   )}
                 </div>
-              
+
                 {selectedVolunteer && (
                   <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                     <div className="flex items-center justify-between">
@@ -258,15 +264,17 @@ const AddDonation = ({ usedFor }) => {
                     />
                   </div>
 
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Email</label>
+                      <label className="block text-sm font-medium text-gray-700">Email*</label>
                       <input
                         type="email"
                         name="donorEmail"
                         value={donationData.donorEmail}
                         onChange={handleChange}
                         className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        required
                       />
                     </div>
 
@@ -308,6 +316,18 @@ const AddDonation = ({ usedFor }) => {
                   </div>
 
                   <div>
+                    <label className="block text-sm font-medium text-gray-700">Aadhar No</label>
+                    <input
+                      type="number"
+                      name="aadharNo"
+                      value={donationData.aadharNo}
+                      onChange={handleChange}
+                      required
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div>
                     <label className="block text-sm font-medium text-gray-700">Address</label>
                     <textarea
                       name="donorAddress"
@@ -332,6 +352,22 @@ const AddDonation = ({ usedFor }) => {
                 </div>
 
                 <div className="space-y-6">
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Donation Type*</label>
+                    <select
+                      name="donationType"
+                      value={donationData.donationType}
+                      onChange={handleChange}
+                      required
+                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    >
+                      <option value="">Select</option>
+                      <option value="Individual">Individual</option>
+                      <option value="Organization">Organization</option>
+                    </select>
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Amount*</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
@@ -361,10 +397,9 @@ const AddDonation = ({ usedFor }) => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Select Payment Method</option>
-                      <option value="CHEQUE">Cheque</option>
-                      <option value="CASH">Cash</option>
-                      <option value="ONLINE">Online Transfer</option>
-                      <option value="UPI">UPI</option>
+                      <option value="BANK">Bank Transfers</option>
+                      <option value="OFFLINE">Offline Methods</option>
+                      <option value="ONLINE">UPI/Online Transfer</option>
                     </select>
                   </div>
 

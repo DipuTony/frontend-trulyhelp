@@ -22,6 +22,12 @@ const validationSchema = Yup.object({
   state: Yup.string().required('State is required'),
   panNumber: Yup.string()
     .required('PAN number is required'),
+
+  donationType: Yup
+    .string()
+    .required('Please select a donation type')
+    .oneOf(['Individual', 'Organization'], 'Invalid donation type selected'),
+
   //  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid PAN number format'),
   dateOfBirth: Yup.date()
     .max(new Date(), 'Date of birth cannot be in the future')
@@ -48,6 +54,7 @@ const DonateForm = ({ donationData, onBackClick }) => {
       pincode: "",
       country: "INDIA",
       panNumber: "",
+      donationType: "",
       amount: donationData?.amount?.toString() || "",
       category: donationData?.cause || "general",
       receiveG80Certificate: false,
@@ -61,6 +68,7 @@ const DonateForm = ({ donationData, onBackClick }) => {
         phone: values.phone,
         dob: values.dateOfBirth,
         pan: values.panNumber,
+        donationType: values.donationType,
         address: values.address,
         donationAmount: Number.parseFloat(donationData?.amount?.toString()),
       }
@@ -290,19 +298,39 @@ const DonateForm = ({ donationData, onBackClick }) => {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number*</label>
-                      <input
-                        type="text"
-                        name="panNumber"
-                        value={formik.values.panNumber}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                      {formik.touched.panNumber && formik.errors.panNumber ? (
-                        <div className="mt-1 text-sm text-red-600">{formik.errors.panNumber}</div>
-                      ) : null}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Donation Type*</label>
+                        <select
+                          name="donationType"
+                          value={formik.values.donationType}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
+                        >
+                          <option value="">Select</option>
+                          <option value="Individual">Individual</option>
+                          <option value="Organization">Organization</option>
+                        </select>
+                        {formik.touched.donationType && formik.errors.donationType ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.donationType}</div>
+                        ) : null}
+                      </div>
+                      <div>
+
+                        <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number*</label>
+                        <input
+                          type="text"
+                          name="panNumber"
+                          value={formik.values.panNumber}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        {formik.touched.panNumber && formik.errors.panNumber ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.panNumber}</div>
+                        ) : null}
+                      </div>
                     </div>
 
                     <div className="flex items-start">

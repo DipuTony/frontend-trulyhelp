@@ -127,6 +127,20 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         {donation?.donorPan || "N/A"}
                                     </p>
                                 </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Donation Type</p>
+                                    <p className="font-medium flex items-center">
+                                        <FiFileText className="mr-2 text-gray-400" size={16} />
+                                        {donation?.donationType || "N/A"}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Aadhar No</p>
+                                    <p className="font-medium flex items-center">
+                                        <FiFileText className="mr-2 text-gray-400" size={16} />
+                                        {donation?.aadharNo || "N/A"}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
