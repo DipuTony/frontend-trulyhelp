@@ -4,6 +4,8 @@ import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { addDonation } from "../../store/slices/donationSlice"
 import { searchVolunteers } from "../../store/slices/volunteerSlice"
+import axios from 'axios';
+import { useEffect } from 'react';
 
 const AddDonation = ({ usedFor }) => {
   const dispatch = useDispatch()
@@ -12,6 +14,9 @@ const AddDonation = ({ usedFor }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedVolunteer, setSelectedVolunteer] = useState(null)
   const [volunteers, setVolunteers] = useState([])
+  const [loadingCauses, setLoadingCauses] = useState(false);
+  const [availableCauses, setAvailableCauses] = useState([]);
+  const [causeError, setCauseError] = useState(null);
 
   const [donationData, setDonationData] = useState({
     donorName: "",
@@ -19,6 +24,7 @@ const AddDonation = ({ usedFor }) => {
     donorEmail: "",
     donorPhone: "",
     donorDob: "",
+    donationCause: "",
     donorPan: "",
     donorAddress: "",
     amount: "",
@@ -36,6 +42,29 @@ const AddDonation = ({ usedFor }) => {
     const { name, value } = e.target
     setDonationData((prev) => ({ ...prev, [name]: value }))
   }
+
+  // Add this effect to fetch causes
+  useEffect(() => {
+    const fetchDonationOptions = async () => {
+      try {
+        setLoadingCauses(true);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
+
+        if (response.data.success) {
+          setAvailableCauses(Object.keys(response.data.data));
+        } else {
+          setCauseError('Failed to fetch donation options');
+        }
+      } catch (err) {
+        console.error('Error fetching donation options:', err);
+        setCauseError(err.message || 'An error occurred while fetching donation options');
+      } finally {
+        setLoadingCauses(false);
+      }
+    };
+
+    fetchDonationOptions();
+  }, []);
 
   const handleVolunteerSearch = async (query) => {
     setSearchQuery(query)
@@ -70,6 +99,7 @@ const AddDonation = ({ usedFor }) => {
       name: donationData.donorName,
       aadharNo: donationData.aadharNo,
       email: donationData.donorEmail,
+      donationCause: donationData.donationCause,
       phone: donationData.donorPhone,
       dob: donationData.donorDob,
       pan: donationData.donorPan,
@@ -355,6 +385,31 @@ const AddDonation = ({ usedFor }) => {
 
                 <div className="space-y-6">
 
+                {/* // In the form section, add this after the Donation Type field: */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-700">Donation Cause*</label>
+                    {loadingCauses ? (
+                      <div className="animate-pulse h-10 bg-gray-200 rounded"></div>
+                    ) : causeError ? (
+                      <p className="text-red-500 text-sm">{causeError}</p>
+                    ) : (
+                      <select
+                        name="donationCause"
+                        value={donationData.donationCause || ''}
+                        onChange={handleChange}
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        required
+                      >
+                        <option value="">Select a cause</option>
+                        {availableCauses.map((cause) => (
+                          <option key={cause} value={cause}>
+                            {cause}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Donation Type*</label>
                     <select
@@ -415,6 +470,7 @@ const AddDonation = ({ usedFor }) => {
                         <option value="GPay">GPay</option>
                         <option value="PhonePe">PhonePe</option>
                         <option value="QR">QR Code</option>
+                        <option value="OTHER">Other</option>
                       </optgroup>
                     </select>
 
@@ -499,3 +555,6 @@ const AddDonation = ({ usedFor }) => {
 }
 
 export default AddDonation
+
+
+

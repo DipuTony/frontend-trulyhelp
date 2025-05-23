@@ -135,6 +135,13 @@ const DonationDetails = ({ donationData, goBack }) => {
                                     </p>
                                 </div>
                                 <div>
+                                    <p className="text-sm text-gray-500">Donation Cause</p>
+                                    <p className="font-medium flex items-center">
+                                        <FiFileText className="mr-2 text-gray-400" size={16} />
+                                        {donation?.donationCause || "N/A"}
+                                    </p>
+                                </div>
+                                <div>
                                     <p className="text-sm text-gray-500">Aadhar No</p>
                                     <p className="font-medium flex items-center">
                                         <FiFileText className="mr-2 text-gray-400" size={16} />
