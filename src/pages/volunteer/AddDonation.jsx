@@ -25,6 +25,8 @@ const AddDonation = ({ usedFor }) => {
     donationType: "",
     method: "",
     chequeNo: "",
+    issueDate: "",
+    expiryDate: ""
   })
 
   const [success, setSuccess] = useState(false)
@@ -397,54 +399,96 @@ const AddDonation = ({ usedFor }) => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="">Select Payment Method</option>
-                      <option value="BANK">Bank Transfers</option>
-                      <option value="OFFLINE">Offline Methods</option>
-                      <option value="ONLINE">UPI/Online Transfer</option>
+                      <optgroup label="💳 Bank Transfers">
+                        <option value="NEFT">NEFT</option>
+                        <option value="RTGS">RTGS</option>
+                        <option value="IMPS">IMPS</option>
+                        <option value="SWIFT">SWIFT</option>
+                      </optgroup>
+                      <optgroup label="🧾 Offline Methods">
+                        <option value="CHEQUE">Cheque</option>
+                        <option value="DD">Demand Draft (DD)</option>
+                        <option value="CASH">Cash</option>
+                      </optgroup>
+                      <optgroup label="📱 UPI-Based Payments">
+                        <option value="UPI">UPI</option>
+                        <option value="GPay">GPay</option>
+                        <option value="PhonePe">PhonePe</option>
+                        <option value="QR">QR Code</option>
+                      </optgroup>
                     </select>
-                  </div>
 
-                  {donationData.method === "CHEQUE" && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Cheque Number*</label>
-                      <input
-                        type="text"
-                        name="chequeNo"
-                        value={donationData.chequeNo}
-                        onChange={handleChange}
-                        required
-                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                    </div>
-                  )}
+                    {(donationData.method === "CHEQUE" || donationData.method === "DD") && (
+                      <div className="space-y-4 mt-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700">
+                            {donationData.method === "CHEQUE" ? "Cheque" : "DD"} Number*
+                          </label>
+                          <input
+                            type="text"
+                            name="chequeNo"
+                            value={donationData.chequeNo}
+                            onChange={handleChange}
+                            required
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                          />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Issue Date*</label>
+                            <input
+                              type="date"
+                              name="issueDate"
+                              value={donationData.issueDate}
+                              onChange={handleChange}
+                              required
+                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700">Expiry Date*</label>
+                            <input
+                              type="date"
+                              name="expiryDate"
+                              value={donationData.expiryDate}
+                              onChange={handleChange}
+                              required
+                              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-            <div className="px-8 py-6 bg-gray-50">
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-transform duration-150 hover:scale-105"
-                >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      Submit Donation
-                      <svg className="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </>
-                  )}
-                </button>
+              {/* Submit Button */}
+              <div className="px-8 py-6 bg-gray-50">
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-transform duration-150 hover:scale-105"
+                  >
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        Submit Donation
+                        <svg className="ml-2 -mr-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </form>
