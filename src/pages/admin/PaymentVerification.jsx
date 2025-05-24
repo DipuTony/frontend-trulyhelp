@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
-import { formatDateShort } from "../../components/common/DateFormatFunctions"
+import { formatDateShort, formatRelativeTime } from "../../components/common/DateFormatFunctions"
 import { showErrorToast, showSuccessToast } from '../../utils/toast';
 
 const PaymentVerification = () => {
@@ -16,7 +16,7 @@ const PaymentVerification = () => {
     dispatch(fetchDonations("PENDING"))
   }
 
-  const filteredDonations = donations?.filter(donation => 
+  const filteredDonations = donations?.filter(donation =>
     donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
     donation?.donorPhone?.includes(searchTerm) ||
     donation?.donationId?.includes(searchTerm)
@@ -33,7 +33,7 @@ const PaymentVerification = () => {
   const handleVerify = () => {
     if (selectedDonation) {
       console.log("in jsx", selectedDonation.donationId, selectedDonation.amount)
-      dispatch(verifyDonation({donationId:selectedDonation.donationId, amount:selectedDonation.amount}))
+      dispatch(verifyDonation({ donationId: selectedDonation.donationId, amount: selectedDonation.amount }))
         .unwrap()
         .then(() => {
           showSuccessToast('Donation verified successfully!');
@@ -123,10 +123,25 @@ const PaymentVerification = () => {
 
         <div className="sm:col-span-3">
           <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">Payment Details</h3>
+            <div className="flex justify-between">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">Payment Details</h3>
+              <h3>{selectedDonation?.paymentStatus && selectedDonation?.paymentStatus}</h3>
+            </div>
             {selectedDonation ? (
               <div className="mt-5 border-t border-gray-200 pt-5">
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Donation ID</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {selectedDonation.donationId || "N/A"}
+                    </dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500">Transaction ID</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {selectedDonation.transactionId || "N/A"}
+                    </dd>
+                  </div>
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Donor Name</dt>
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorName}</dd>
@@ -144,22 +159,33 @@ const PaymentVerification = () => {
                     <dd className="mt-1 text-sm text-gray-900">₹{selectedDonation.amount?.toFixed(2)}</dd>
                   </div>
                   <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Date</dt>
+                    <dt className="text-sm font-medium text-gray-500">Payment Date</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {formatDateShort(selectedDonation.createdAt)}
                     </dd>
                   </div>
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.method || "N/A"}</dd>
                   </div>
-                  <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Transaction ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {selectedDonation.donationId || "N/A"}
-                    </dd>
-                  </div>
-                 
+                  {selectedDonation?.checkIssueDate &&
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">Check Issue Date</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{formatDateShort(selectedDonation.checkIssueDate) || "N/A"}
+                        <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkIssueDate)})</span>
+                      </dd>
+                    </div>
+                  }
+                  {selectedDonation?.checkExpiryDate &&
+                    <div className="sm:col-span-1">
+                      <dt className="text-sm font-medium text-gray-500">Check Expiry Date</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{formatDateShort(selectedDonation.checkExpiryDate) || "N/A"}
+                      <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkExpiryDate)})</span>
+                      </dd>
+                    </div>
+                  }
+
+
                   {/* <div className="sm:col-span-2">
                     <dt className="text-sm font-medium text-gray-500">Payment Receipt</dt>
                     <dd className="mt-1 text-sm text-gray-900">

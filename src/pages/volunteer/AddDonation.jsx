@@ -50,8 +50,11 @@ const AddDonation = ({ usedFor }) => {
         setLoadingCauses(true);
         const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
 
+        console.log("{response",response.data.data)
+        // console.log("{key",Object.keys(response.data.data))
+
         if (response.data.success) {
-          setAvailableCauses(Object.keys(response.data.data));
+          setAvailableCauses(response.data.data);
         } else {
           setCauseError('Failed to fetch donation options');
         }
@@ -108,6 +111,8 @@ const AddDonation = ({ usedFor }) => {
       amount: Number(donationData.amount),
       method: donationData.method,
       chequeNo: donationData.method === "CHEQUE" ? donationData.chequeNo : undefined,
+      checkIssueDate: donationData.issueDate,
+      checkExpiryDate: donationData.expiryDate,
       volunteerUserId: usedFor === "admin" ? selectedVolunteer?.userId : user?.userId,
     }
 
@@ -128,6 +133,8 @@ const AddDonation = ({ usedFor }) => {
           amount: "",
           method: "",
           chequeNo: "",
+          issueDate: "",
+          expiryDate: "",
         })
         setTimeout(() => setSuccess(false), 3000)
       })
@@ -385,7 +392,7 @@ const AddDonation = ({ usedFor }) => {
 
                 <div className="space-y-6">
 
-                {/* // In the form section, add this after the Donation Type field: */}
+                  {/* // In the form section, add this after the Donation Type field: */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Donation Cause*</label>
                     {loadingCauses ? (
@@ -401,9 +408,9 @@ const AddDonation = ({ usedFor }) => {
                         required
                       >
                         <option value="">Select a cause</option>
-                        {availableCauses.map((cause) => (
-                          <option key={cause} value={cause}>
-                            {cause}
+                        {Object.keys(availableCauses).map((key) => (
+                          <option key={key} value={key}>
+                            {availableCauses[key].displayName}
                           </option>
                         ))}
                       </select>

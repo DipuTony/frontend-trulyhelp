@@ -13,6 +13,7 @@ import {
     FiXCircle
 } from 'react-icons/fi';
 import DonationHistory from './DonationHistory';
+import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
@@ -67,7 +68,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                             <div className="flex items-center mb-2 sm:mb-0">
                                 <FiCreditCard className="text-blue-600 mr-2" size={20} />
                                 <span className="font-semibold">Payment Method:</span>
-                                <span className="ml-2 capitalize">{donation?.method?.toLowerCase() || "N/A"}</span>
+                                <span className="ml-2 capitalize">{donation?.method?.toUpperCase() || "N/A"}</span>
                             </div>
 
                             <div className="flex items-center">
@@ -166,12 +167,31 @@ const DonationDetails = ({ donationData, goBack }) => {
 
                                     <div>
                                         <p className="text-sm text-gray-500">Payment Gateway</p>
-                                        <p className="font-medium">{donation?.gateway || "N/A"}</p>
+                                        <p className="font-medium">{donation?.gateway || "OFFLINE"}</p>
                                     </div>
                                     <div>
                                         <p className="text-sm text-gray-500">Payment Method</p>
                                         <p className="font-medium">{donation?.method || "N/A"}</p>
                                     </div>
+
+                                    <div className='md:flex md:justify-between'>
+                                        {donation?.checkIssueDate &&
+                                            (<div>
+                                                <p className="text-sm text-gray-500">Check Issue On</p>
+                                                <p className="font-medium">{formatDateDMY(donation?.checkIssueDate) || "N/A"}</p>
+                                            </div>)}
+                                        {
+                                            donation?.checkExpiryDate && (
+                                                <div>
+                                                    <p className="text-sm text-gray-500">Check Expiry On</p>
+                                                    <p className="font-medium">{formatDateDMY(donation?.checkExpiryDate) || "N/A"}
+                                                        <span className='text-red-500 px-3'>({formatRelativeTime(donation?.checkExpiryDate)})</span>
+                                                    </p>
+
+                                                </div>
+                                            )}
+                                    </div>
+
                                     <div>
                                         <p className="text-sm text-gray-500">Payment Status</p>
                                         <p className="font-medium">{donation?.paymentStatus || "N/A"}</p>
@@ -283,7 +303,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                     )
                 }
 
-            <div className="mt-36 donations-container"></div>
+                <div className="mt-36 donations-container"></div>
             </div>
         </div>
     );
