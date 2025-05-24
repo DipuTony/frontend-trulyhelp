@@ -54,11 +54,11 @@ export const addDonation = createAsyncThunk("donations/addDonation", async (dona
 // Verify donation
 export const verifyDonation = createAsyncThunk(
   "donations/verifyDonation",
-  async ({ donationId, amount }, { rejectWithValue }) => {
+  async ({ donationId, amount, paymentStatus }, { rejectWithValue }) => {
 
-    console.log("in slice",donationId, amount, "donationId, amount")
+    console.log("in slice", donationId, amount, paymentStatus)
     try {
-      const response = await axiosInstance.post(`/donations/${donationId}/${amount}/verify`);
+      const response = await axiosInstance.post(`/donations/${donationId}/${amount}/verify`, { paymentStatus });
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
@@ -78,7 +78,7 @@ export const generateReport = createAsyncThunk("donations/generateReport", async
 
 // Get all donations of a specific user (for admin)
 export const fetchUserDonations = createAsyncThunk(
-  "donations/fetchUserDonations", 
+  "donations/fetchUserDonations",
   async (userId, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get(`/donations/donor-donation-history`)

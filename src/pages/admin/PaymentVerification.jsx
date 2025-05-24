@@ -5,16 +5,27 @@ import { useDispatch, useSelector } from "react-redux"
 import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice"
 import { formatDateShort, formatRelativeTime } from "../../components/common/DateFormatFunctions"
 import { showErrorToast, showSuccessToast } from '../../utils/toast';
+import axios from "axios"
 
 const PaymentVerification = () => {
   const dispatch = useDispatch()
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [selectedDonation, setSelectedDonation] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [paymentStatuses, setPaymentStatuses] = useState([]);
+  const [selectedStatus, setSelectedStatus] = useState('PENDING');
+  const [loadingStatuses, setLoadingStatuses] = useState(false);
 
+  // 'PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'REFUNDED'
   const fetchPendingDonations = () => {
     dispatch(fetchDonations("PENDING"))
   }
+  
+
+  //fetch pending donations
+  useEffect(() => {
+    fetchPendingDonations()
+  }, [dispatch])
 
   const filteredDonations = donations?.filter(donation =>
     donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
@@ -22,18 +33,34 @@ const PaymentVerification = () => {
     donation?.donationId?.includes(searchTerm)
   )
 
-  useEffect(() => {
-    fetchPendingDonations()
-  }, [dispatch])
+
 
   const handleSelectDonation = (donation) => {
     setSelectedDonation(donation)
   }
 
+  useEffect(() => {
+    const fetchPaymentStatusesMasterData = async () => {
+      try {
+        setLoadingStatuses(true);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`);
+        if (response.data.status) {
+          setPaymentStatuses(response.data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching payment statuses:', err);
+      } finally {
+        setLoadingStatuses(false);
+      }
+    };
+
+    fetchPaymentStatusesMasterData();
+  }, []);
+
   const handleVerify = () => {
     if (selectedDonation) {
-      console.log("in jsx", selectedDonation.donationId, selectedDonation.amount)
-      dispatch(verifyDonation({ donationId: selectedDonation.donationId, amount: selectedDonation.amount }))
+      console.log("in jsx", selectedDonation.donationId, selectedDonation.amount, selectedStatus)
+      dispatch(verifyDonation({ paymentStatus: selectedStatus, donationId: selectedDonation.donationId, amount: selectedDonation.amount }))
         .unwrap()
         .then(() => {
           showSuccessToast('Donation verified successfully!');
@@ -84,7 +111,7 @@ const PaymentVerification = () => {
         <div className="sm:col-span-3">
           <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
             <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Donations</h3>
-            <div className="mt-2 max-h-96 overflow-y-auto">
+            <div className="mt-2 max-h-96 overflow-y-auto ">
               {filteredDonations?.length === 0 ? (
                 <p className="text-sm text-gray-500 italic">No matching donations found.</p>
               ) : (
@@ -180,7 +207,7 @@ const PaymentVerification = () => {
                     <div className="sm:col-span-1">
                       <dt className="text-sm font-medium text-gray-500">Check Expiry Date</dt>
                       <dd className="mt-1 text-sm text-gray-900">{formatDateShort(selectedDonation.checkExpiryDate) || "N/A"}
-                      <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkExpiryDate)})</span>
+                        <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkExpiryDate)})</span>
                       </dd>
                     </div>
                   }
@@ -195,7 +222,22 @@ const PaymentVerification = () => {
                     </dd>
                   </div> */}
                 </dl>
-                <div className="mt-6 flex justify-end">
+                <div className="mt-6 flex justify-end space-x-4">
+                  {loadingStatuses ? (
+                    <div className="animate-pulse h-10 w-32 bg-gray-200 rounded"></div>
+                  ) : (
+                    <select
+                      value={selectedStatus}
+                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      {paymentStatuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                   <button
                     type="button"
                     onClick={handleVerify}
@@ -219,3 +261,5 @@ const PaymentVerification = () => {
 }
 
 export default PaymentVerification
+
+
