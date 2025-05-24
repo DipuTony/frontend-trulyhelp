@@ -18,6 +18,10 @@ const AddDonation = ({ usedFor }) => {
   const [availableCauses, setAvailableCauses] = useState([]);
   const [causeError, setCauseError] = useState(null);
 
+  const [paymentMethods, setPaymentMethods] = useState({ groups: [] });
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
+  const [paymentMethodError, setPaymentMethodError] = useState(null);
+
   const [donationData, setDonationData] = useState({
     donorName: "",
     aadharNo: "",
@@ -50,7 +54,7 @@ const AddDonation = ({ usedFor }) => {
         setLoadingCauses(true);
         const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
 
-        console.log("{response",response.data.data)
+        console.log("{response", response.data.data)
         // console.log("{key",Object.keys(response.data.data))
 
         if (response.data.success) {
@@ -67,6 +71,27 @@ const AddDonation = ({ usedFor }) => {
     };
 
     fetchDonationOptions();
+  }, []);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        setLoadingPaymentMethods(true);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`);
+        if (response.data.status) {
+          setPaymentMethods(response.data.data);
+        } else {
+          setPaymentMethodError('Failed to fetch payment methods');
+        }
+      } catch (err) {
+        console.error('Error fetching payment methods:', err);
+        setPaymentMethodError(err.message || 'An error occurred while fetching payment methods');
+      } finally {
+        setLoadingPaymentMethods(false);
+      }
+    };
+
+    fetchPaymentMethods();
   }, []);
 
   const handleVolunteerSearch = async (query) => {
@@ -453,33 +478,31 @@ const AddDonation = ({ usedFor }) => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Payment Method*</label>
-                    <select
-                      name="method"
-                      value={donationData.method}
-                      onChange={handleChange}
-                      required
-                      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    >
-                      <option value="">Select Payment Method</option>
-                      <optgroup label="💳 Bank Transfers">
-                        <option value="NEFT">NEFT</option>
-                        <option value="RTGS">RTGS</option>
-                        <option value="IMPS">IMPS</option>
-                        <option value="SWIFT">SWIFT</option>
-                      </optgroup>
-                      <optgroup label="🧾 Offline Methods">
-                        <option value="CHEQUE">Cheque</option>
-                        <option value="DD">Demand Draft (DD)</option>
-                        <option value="CASH">Cash</option>
-                      </optgroup>
-                      <optgroup label="📱 UPI-Based Payments">
-                        <option value="UPI">UPI</option>
-                        <option value="GPay">GPay</option>
-                        <option value="PhonePe">PhonePe</option>
-                        <option value="QR">QR Code</option>
-                        <option value="OTHER">Other</option>
-                      </optgroup>
-                    </select>
+
+                    {loadingPaymentMethods ? (
+                      <div className="animate-pulse h-10 bg-gray-200 rounded"></div>
+                    ) : paymentMethodError ? (
+                      <p className="text-red-500 text-sm">{paymentMethodError}</p>
+                    ) : (
+                      <select
+                        name="method"
+                        value={donationData.method}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select Payment Method</option>
+                        {paymentMethods.groups.map((group) => (
+                          <optgroup key={group.label} label={group.label}>
+                            {group.options.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                      </select>
+                    )}
 
                     {(donationData.method === "CHEQUE" || donationData.method === "DD") && (
                       <div className="space-y-4 mt-4">
