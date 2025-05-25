@@ -4,6 +4,7 @@ import donationReducer from "./slices/donationSlice"
 import volunteerReducer from "./slices/volunteerSlice"
 import expenseReducer from "./slices/expenseSlice"
 import notificationReducer from "./slices/notificationSlice"
+import masterReducer from "./slices/masterSlice";
 
 export const store = configureStore({
   reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
     volunteers: volunteerReducer,
     expenses: expenseReducer,
     notifications: notificationReducer,
+    master: masterReducer,
   },
 })

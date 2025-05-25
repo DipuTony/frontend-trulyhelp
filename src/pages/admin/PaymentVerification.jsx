@@ -12,28 +12,65 @@ const PaymentVerification = () => {
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [selectedDonation, setSelectedDonation] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [paymentStatuses, setPaymentStatuses] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState('PENDING');
-  const [loadingStatuses, setLoadingStatuses] = useState(false);
+  const [paymentStatuses, setPaymentStatuses] = useState([])
+  const [paymentMethods, setPaymentMethods] = useState([])
+  const [selectedStatus, setSelectedStatus] = useState('PENDING')
+  const [selectedMethod, setSelectedMethod] = useState('ALL')
+  const [loadingStatuses, setLoadingStatuses] = useState(false)
+  const [loadingMethods, setLoadingMethods] = useState(false)
+  const [activeTab, setActiveTab] = useState('ALL')
 
-  // 'PENDING', 'PROCESSING', 'COMPLETED', 'FAILED', 'REFUNDED'
-  const fetchPendingDonations = () => {
-    dispatch(fetchDonations("PENDING"))
-  }
-  
-
-  //fetch pending donations
+  // Fetch both master data
   useEffect(() => {
-    fetchPendingDonations()
-  }, [dispatch])
+    const fetchMasterData = async () => {
+      try {
+        setLoadingStatuses(true)
+        setLoadingMethods(true)
+
+        // Fetch payment statuses
+        const statusResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`)
+        if (statusResponse.data.status) {
+          setPaymentStatuses(statusResponse.data.data)
+        }
+
+        // In the useEffect where you fetch payment methods:
+        const methodResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`)
+        if (methodResponse.data.status) {
+        // Flatten the grouped options into a single array
+        const flattenedMethods = methodResponse.data.data.groups.flatMap(
+        group => group.options
+        )
+        setPaymentMethods(flattenedMethods)
+        }
+      } catch (err) {
+        console.error('Error fetching master data:', err)
+      } finally {
+        setLoadingStatuses(false)
+        setLoadingMethods(false)
+      }
+    }
+
+    fetchMasterData()
+  }, [])
+
+  const fetchDonationsByMethod = (method = 'ALL') => {
+    if (method === 'ALL') {
+      dispatch(fetchDonations("PENDING"));
+    } else {
+      dispatch(fetchDonations("PENDING", method));
+    }
+  }
+
+  useEffect(() => {
+    fetchDonationsByMethod(activeTab);
+  }, [dispatch, activeTab])
 
   const filteredDonations = donations?.filter(donation =>
-    donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
-    donation?.donorPhone?.includes(searchTerm) ||
-    donation?.donationId?.includes(searchTerm)
-  )
-
-
+    (donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      donation?.donorPhone?.includes(searchTerm) ||
+      donation?.donationId?.includes(searchTerm)) &&
+    (activeTab === 'ALL' || donation?.method === activeTab)
+  );
 
   const handleSelectDonation = (donation) => {
     setSelectedDonation(donation)
@@ -65,7 +102,7 @@ const PaymentVerification = () => {
         .then(() => {
           showSuccessToast('Donation verified successfully!');
           setSelectedDonation(null);
-          fetchPendingDonations(); // Refresh the list after verification
+          fetchDonationsByMethod(activeTab); // Refresh the list after verification
         })
         .catch((error) => {
           showErrorToast(error?.message || 'Failed to verify donation');
@@ -80,6 +117,9 @@ const PaymentVerification = () => {
       </div>
     )
   }
+  
+
+  console.log(paymentMethods)
 
   return (
     <div>
@@ -97,6 +137,71 @@ const PaymentVerification = () => {
         </div>
       </div>
 
+      {/* Payment Filter */}
+      <div className="flex space-x-4 mb-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+          {loadingStatuses ? (
+            <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+          ) : (
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              {paymentStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        <div className="flex-1">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+          {loadingMethods ? (
+            <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+          ) : (
+            <select
+              value={selectedMethod}
+              onChange={(e) => setSelectedMethod(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="ALL">All Methods</option>
+              {paymentMethods.map((method) => (
+                <option key={method.value} value={method.value}>
+                  {method.label}
+                </option>
+              ))}
+            </select>
+            // <select
+            //   value={selectedMethod}
+            //   onChange={(e) => setSelectedMethod(e.target.value)}
+            //   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            // >
+            //   <option value="ALL">All Methods</option>
+            //   {paymentMethods && paymentMethods?.map((method) => (
+            //     <option key={method.id} value={method.id}>
+            //       {method.name}
+            //     </option>
+            //   ))}
+            // </select>
+          )}
+        </div>
+
+        <div className="flex items-end">
+          <button
+            onClick={() => fetchDonationsByMethod(selectedMethod)}
+            className="h-10 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+
+      {/* Search Bar */}
       <div className="mt-4">
         <input
           type="text"
@@ -211,16 +316,6 @@ const PaymentVerification = () => {
                       </dd>
                     </div>
                   }
-
-
-                  {/* <div className="sm:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Payment Receipt</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      <div className="border border-gray-200 rounded-md p-4 bg-gray-50 flex items-center justify-center">
-                        <i className="fas fa-file-invoice text-gray-400 text-4xl"></i>
-                      </div>
-                    </dd>
-                  </div> */}
                 </dl>
                 <div className="mt-6 flex justify-end space-x-4">
                   {loadingStatuses ? (
@@ -261,5 +356,3 @@ const PaymentVerification = () => {
 }
 
 export default PaymentVerification
-
-
