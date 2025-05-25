@@ -18,81 +18,71 @@ const PaymentVerification = () => {
   const [selectedMethod, setSelectedMethod] = useState('ALL')
   const [loadingStatuses, setLoadingStatuses] = useState(false)
   const [loadingMethods, setLoadingMethods] = useState(false)
-  const [activeTab, setActiveTab] = useState('ALL')
 
-  // Fetch both master data
   useEffect(() => {
-    const fetchMasterData = async () => {
-      try {
-        setLoadingStatuses(true)
-        setLoadingMethods(true)
+    fetchPaymentStatusesMasterData();
+  }, []);
 
-        // Fetch payment statuses
-        const statusResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`)
-        if (statusResponse.data.status) {
-          setPaymentStatuses(statusResponse.data.data)
-        }
-
-        // In the useEffect where you fetch payment methods:
-        const methodResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`)
-        if (methodResponse.data.status) {
-        // Flatten the grouped options into a single array
-        const flattenedMethods = methodResponse.data.data.groups.flatMap(
-        group => group.options
-        )
-        setPaymentMethods(flattenedMethods)
-        }
-      } catch (err) {
-        console.error('Error fetching master data:', err)
-      } finally {
-        setLoadingStatuses(false)
-        setLoadingMethods(false)
-      }
-    }
-
+  useEffect(() => {
     fetchMasterData()
   }, [])
 
-  const fetchDonationsByMethod = (method = 'ALL') => {
-    if (method === 'ALL') {
-      dispatch(fetchDonations("PENDING"));
-    } else {
-      dispatch(fetchDonations("PENDING", method));
+  useEffect(() => {
+    fetchDonationsByMethod();
+  }, [dispatch]);
+
+  const fetchDonationsByMethod = () => {
+    dispatch(fetchDonations({
+      selectedStatus: selectedStatus || 'PENDING',
+      selectedMethod: selectedMethod || 'ALL'
+    }));
+  }
+
+  const fetchMasterData = async () => {
+    try {
+      setLoadingStatuses(true)
+      setLoadingMethods(true)
+
+      // Fetch payment statuses
+      const statusResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`)
+      if (statusResponse.data.status) {
+        setPaymentStatuses(statusResponse.data.data)
+      }
+
+      //  fetch payment methods:
+      const methodResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`)
+      if (methodResponse.data.status) {
+        // Use the same structure as VolunteerLayout's navigation
+        const formattedMethods = methodResponse.data.data.groups.flatMap(group =>
+          group.options.map(option => ({
+            id: option.value,
+            name: option.label
+          }))
+        )
+        setPaymentMethods(formattedMethods)
+      }
+    } catch (err) {
+      console.error('Error fetching master data:', err)
+    } finally {
+      setLoadingStatuses(false)
+      setLoadingMethods(false)
     }
   }
 
-  useEffect(() => {
-    fetchDonationsByMethod(activeTab);
-  }, [dispatch, activeTab])
-
-  const filteredDonations = donations?.filter(donation =>
-    (donation?.donorName?.toLowerCase().includes(searchTerm?.toLowerCase()) ||
-      donation?.donorPhone?.includes(searchTerm) ||
-      donation?.donationId?.includes(searchTerm)) &&
-    (activeTab === 'ALL' || donation?.method === activeTab)
-  );
-
-  const handleSelectDonation = (donation) => {
-    setSelectedDonation(donation)
-  }
-
-  useEffect(() => {
-    const fetchPaymentStatusesMasterData = async () => {
-      try {
-        setLoadingStatuses(true);
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`);
-        if (response.data.status) {
-          setPaymentStatuses(response.data.data);
-        }
-      } catch (err) {
-        console.error('Error fetching payment statuses:', err);
-      } finally {
-        setLoadingStatuses(false);
+  const fetchPaymentStatusesMasterData = async () => {
+    try {
+      setLoadingStatuses(true);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`);
+      if (response.data.status) {
+        setPaymentStatuses(response.data.data);
       }
-    };
+    } catch (err) {
+      console.error('Error fetching payment statuses:', err);
+    } finally {
+      setLoadingStatuses(false);
+    }
+  };
 
-    fetchPaymentStatusesMasterData();
-  }, []);
 
   const handleVerify = () => {
     if (selectedDonation) {
@@ -102,7 +92,7 @@ const PaymentVerification = () => {
         .then(() => {
           showSuccessToast('Donation verified successfully!');
           setSelectedDonation(null);
-          fetchDonationsByMethod(activeTab); // Refresh the list after verification
+          fetchDonationsByMethod(); // Refresh the list after verification
         })
         .catch((error) => {
           showErrorToast(error?.message || 'Failed to verify donation');
@@ -117,9 +107,6 @@ const PaymentVerification = () => {
       </div>
     )
   }
-  
-
-  console.log(paymentMethods)
 
   return (
     <div>
@@ -170,29 +157,17 @@ const PaymentVerification = () => {
             >
               <option value="ALL">All Methods</option>
               {paymentMethods.map((method) => (
-                <option key={method.value} value={method.value}>
-                  {method.label}
+                <option key={method.id} value={method.id}>
+                  {method.name}
                 </option>
               ))}
             </select>
-            // <select
-            //   value={selectedMethod}
-            //   onChange={(e) => setSelectedMethod(e.target.value)}
-            //   className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            // >
-            //   <option value="ALL">All Methods</option>
-            //   {paymentMethods && paymentMethods?.map((method) => (
-            //     <option key={method.id} value={method.id}>
-            //       {method.name}
-            //     </option>
-            //   ))}
-            // </select>
           )}
         </div>
 
         <div className="flex items-end">
           <button
-            onClick={() => fetchDonationsByMethod(selectedMethod)}
+            onClick={() => fetchDonationsByMethod()}
             className="h-10 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
             Apply Filters
@@ -217,15 +192,15 @@ const PaymentVerification = () => {
           <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
             <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Donations</h3>
             <div className="mt-2 max-h-96 overflow-y-auto ">
-              {filteredDonations?.length === 0 ? (
+              {donations?.length === 0 ? (
                 <p className="text-sm text-gray-500 italic">No matching donations found.</p>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {filteredDonations?.map((donation) => (
+                  {donations?.map((donation) => (
                     <li
                       key={donation.id}
                       className={`py-4 cursor-pointer hover:bg-gray-50 ${selectedDonation?.id === donation.id ? "bg-indigo-50" : ""}`}
-                      onClick={() => handleSelectDonation(donation)}
+                      onClick={() => setSelectedDonation(donation)}
                     >
                       <div className="flex items-center space-x-4">
                         <div className="flex-shrink-0">
@@ -241,7 +216,7 @@ const PaymentVerification = () => {
                         <div>
                           <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
                           <p className="text-xs text-gray-500">{formatDateShort(donation.createdAt)}</p>
-                          <p className="text-xs text-gray-500">ID: {donation.donationId}</p>
+                          <p className="text-xs text-gray-500">TID: {donation.transactionId}</p>
                           <p className="text-xs text-gray-500">Method: {donation.method}</p>
                         </div>
                       </div>
@@ -325,12 +300,18 @@ const PaymentVerification = () => {
                       value={selectedStatus}
                       onChange={(e) => setSelectedStatus(e.target.value)}
                       className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      required
                     >
-                      {paymentStatuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
+                      <option value="">Select</option>
+                      {paymentStatuses
+                        .filter(status => selectedDonation?.paymentStatus !== status)
+                        .map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))
+                      }
+
                     </select>
                   )}
                   <button

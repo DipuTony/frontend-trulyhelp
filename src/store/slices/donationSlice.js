@@ -3,14 +3,28 @@ import axios from "axios"
 import axiosInstance from "../../utils/axiosInterceptor"
 
 // Get all donations for admin and volunteer
-export const fetchDonations = createAsyncThunk("donations/fetchDonations", async (filterBy, { rejectWithValue }) => {
-  try {
-    const response = await axiosInstance.get(`/donations/view-all?paymentStatus=${filterBy}`)
-    return response.data.data
-  } catch (error) {
-    return rejectWithValue(error.response.data)
+export const fetchDonations = createAsyncThunk(
+  'donations/fetchDonations',
+  async ({ selectedStatus, selectedMethod }, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(
+        `/donations/view-all?paymentStatus=${selectedStatus}&paymentMethod=${selectedMethod}`
+      );
+
+      if (!response.data || !response.data.data) {
+        throw new Error('Invalid response structure');
+      }
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message ||
+        'Failed to fetch donations'
+      );
+    }
   }
-})
+);
 // Get donation history of donor and admin : for donor get form token for admin send from req.query.userId
 export const fetchDonerDonations = createAsyncThunk("donations/fetchDonations", async (_, { rejectWithValue }) => {
   try {
