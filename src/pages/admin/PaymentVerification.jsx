@@ -18,6 +18,8 @@ const PaymentVerification = () => {
   const [selectedMethod, setSelectedMethod] = useState('ALL')
   const [loadingStatuses, setLoadingStatuses] = useState(false)
   const [loadingMethods, setLoadingMethods] = useState(false)
+  const [selectedPaymentStatusForVerify, setSelectedPaymentStatusForVerify] = useState('')
+  const [dropdownError, setDropdownError] = useState('');
 
   useEffect(() => {
     fetchPaymentStatusesMasterData();
@@ -85,9 +87,16 @@ const PaymentVerification = () => {
 
 
   const handleVerify = () => {
+    if (!selectedPaymentStatusForVerify) {
+      setDropdownError('Please select a payment status');
+      return;
+    }
+    setDropdownError('');
+
+
     if (selectedDonation) {
-      console.log("in jsx", selectedDonation.donationId, selectedDonation.amount, selectedStatus)
-      dispatch(verifyDonation({ paymentStatus: selectedStatus, donationId: selectedDonation.donationId, amount: selectedDonation.amount }))
+      console.log("in jsx", selectedDonation.donationId, selectedDonation.amount, selectedPaymentStatusForVerify)
+      dispatch(verifyDonation({ paymentStatus: selectedPaymentStatusForVerify, donationId: selectedDonation.donationId, amount: selectedDonation.amount }))
         .unwrap()
         .then(() => {
           showSuccessToast('Donation verified successfully!');
@@ -297,8 +306,8 @@ const PaymentVerification = () => {
                     <div className="animate-pulse h-10 w-32 bg-gray-200 rounded"></div>
                   ) : (
                     <select
-                      value={selectedStatus}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      value={selectedPaymentStatusForVerify}
+                      onChange={(e) => (setSelectedPaymentStatusForVerify(e.target.value), setDropdownError(''))}
                       className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                       required
                     >
@@ -311,9 +320,9 @@ const PaymentVerification = () => {
                           </option>
                         ))
                       }
-
                     </select>
                   )}
+
                   <button
                     type="button"
                     onClick={handleVerify}
@@ -323,6 +332,9 @@ const PaymentVerification = () => {
                     Verify Payment
                   </button>
                 </div>
+                {dropdownError && (
+                  <p className="text-center mt-1 text-sm text-red-600">{dropdownError}</p>
+                )}
               </div>
             ) : (
               <div className="mt-5 flex items-center justify-center h-64">
