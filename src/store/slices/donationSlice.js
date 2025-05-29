@@ -40,7 +40,7 @@ export const onlineGuestDonationEazyBuzz = createAsyncThunk(
   "donations/guestDonationEazyBuzz",
   async (donationData, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post("/donations/guest-donation-online", {
+      const response = await axiosInstance.post("/donations/eazybuzz-donation-online", {
         ...donationData,
         // successUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/success`,
         // failureUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/failed`
