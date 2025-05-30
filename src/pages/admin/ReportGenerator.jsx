@@ -5,11 +5,37 @@ import { useDispatch, useSelector } from "react-redux"
 import { generateReport } from "../../store/slices/donationSlice"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
+import axiosInstance from "../../utils/axiosInterceptor"
+
+
+
 
 const ReportGenerator = () => {
   const dispatch = useDispatch()
   const { report, loading, error } = useSelector((state) => state.donations)
   const [reportType, setReportType] = useState("10BD")
+
+
+  const reportTypes = [
+    { value: "10BD", label: "10BD Report" },
+    { value: "monthly", label: "Monthly Report" },
+    { value: "quarterly", label: "Quarterly Report" },
+    { value: "yearly", label: "Annual Report" }
+  ]
+
+  const handleGenerate10DBReport = async () => {
+    //donwad the csv file from the server
+    const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/from10DB`)
+    const csv = response.data
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.setAttribute("download", "10BD-report.csv")
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
 
   const handleGenerateReport = () => {
     dispatch(generateReport(reportType))
@@ -68,22 +94,36 @@ const ReportGenerator = () => {
                   onChange={(e) => setReportType(e.target.value)}
                   className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                 >
-                  <option value="10BD">10BD Report</option>
-                  <option value="monthly">Monthly Report</option>
-                  <option value="quarterly">Quarterly Report</option>
-                  <option value="annual">Annual Report</option>
+                  {reportTypes?.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>)
+                  )}
                 </select>
               </div>
             </div>
             <div className="mt-5">
-              <button
-                type="button"
-                onClick={handleGenerateReport}
-                disabled={loading}
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {loading ? "Generating..." : "Generate Report"}
-              </button>
+              {reportType === "10BD" ?
+                <div className="mt-5">
+                  <button
+                    type="button"
+                    onClick={handleGenerate10DBReport}
+                    disabled={loading}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  >Download {reportType}</button>
+                </div>
+
+                :
+
+                <button
+                  type="button"
+                  onClick={handleGenerateReport}
+                  disabled={loading}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  {loading ? "Generating..." : <span className="capitalize">Generate {reportType} Report</span>}
+                </button>
+              }
             </div>
           </div>
         </div>
@@ -112,11 +152,11 @@ const ReportGenerator = () => {
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Total Amount</dt>
-                  <dd className="mt-1 text-sm text-gray-900">${report.totalAmount?.toFixed(2)}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">₹{report.totalAmount?.toFixed(2)}</dd>
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Average Donation</dt>
-                  <dd className="mt-1 text-sm text-gray-900">${report.averageDonation?.toFixed(2)}</dd>
+                  <dd className="mt-1 text-sm text-gray-900">₹{report.averageDonation?.toFixed(2)}</dd>
                 </div>
                 <div className="sm:col-span-1">
                   <dt className="text-sm font-medium text-gray-500">Period</dt>
@@ -168,7 +208,7 @@ const ReportGenerator = () => {
                                 <div className="text-sm text-gray-500">{donation.donorEmail}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">${donation.amount?.toFixed(2)}</div>
+                                <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <div className="text-sm text-gray-900">
@@ -177,9 +217,8 @@ const ReportGenerator = () => {
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span
-                                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                    donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                                  }`}
+                                  className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                                    }`}
                                 >
                                   {donation.verified ? "Verified" : "Pending"}
                                 </span>

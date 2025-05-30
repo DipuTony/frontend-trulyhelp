@@ -83,8 +83,8 @@ export const verifyDonation = createAsyncThunk(
 // Generate report
 export const generateReport = createAsyncThunk("donations/generateReport", async (reportType, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.get(`/donations/report?type=${reportType}`)
-    return response.data
+    const response = await axiosInstance.get(`/report/generate?type=${reportType}`)
+    return response.data.data
   } catch (error) {
     return rejectWithValue(error.response.data)
   }
