@@ -270,6 +270,7 @@ const PaymentVerification = () => {
                     <dt className="text-sm font-medium text-gray-500">Donor Email</dt>
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorEmail}</dd>
                   </div>
+
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Amount</dt>
                     <dd className="mt-1 text-sm text-gray-900">₹{selectedDonation.amount?.toFixed(2)}</dd>
@@ -283,6 +284,10 @@ const PaymentVerification = () => {
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
                     <dd className="mt-1 text-sm text-gray-900">{selectedDonation.method || "N/A"}</dd>
+                  </div>
+                  <div className="sm:col-span-1">
+                    <dt className="text-sm font-medium text-gray-500 capitalize">Payment Ref No</dt>
+                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation?.offlinePaymentRefNo || "N/A"}</dd>
                   </div>
                   {selectedDonation?.checkIssueDate &&
                     <div className="sm:col-span-1">

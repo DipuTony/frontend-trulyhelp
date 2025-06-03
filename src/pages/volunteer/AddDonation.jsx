@@ -29,6 +29,7 @@ const AddDonation = ({ usedFor }) => {
     donorPhone: "",
     donorDob: "",
     donationCause: "",
+    paymentReferenceNo: "",
     donorPan: "",
     donorAddress: "",
     amount: "",
@@ -128,6 +129,7 @@ const AddDonation = ({ usedFor }) => {
       aadharNo: donationData.aadharNo,
       email: donationData.donorEmail,
       donationCause: donationData.donationCause,
+      paymentReferenceNo: donationData.paymentReferenceNo,
       phone: donationData.donorPhone,
       dob: donationData.donorDob,
       pan: donationData.donorPan,
@@ -153,6 +155,7 @@ const AddDonation = ({ usedFor }) => {
           donorPhone: "",
           donorDob: "",
           donorPan: "",
+          paymentReferenceNo:"",
           donationType: "",
           donorAddress: "",
           amount: "",
@@ -503,6 +506,19 @@ const AddDonation = ({ usedFor }) => {
                         ))}
                       </select>
                     )}
+
+                    {donationData.method &&
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mt-3">Reference No <span className="text-xs text-gray-400">(optional eg:UPI txn, RNN)</span></label>
+                        <input
+                          type="text"
+                          name="paymentReferenceNo"
+                          value={donationData.paymentReferenceNo}
+                          onChange={handleChange}
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                      </div>
+                    }
 
                     {(donationData.method === "CHEQUE" || donationData.method === "DD") && (
                       <div className="space-y-4 mt-4">

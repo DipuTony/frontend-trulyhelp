@@ -1,27 +1,32 @@
 "use client"
 
-import { useEffect } from "react"
-import { useSelector, useDispatch } from "react-redux"
-import { fetchDonations, fetchDonerDonations } from "../../store/slices/donationSlice"
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { useSelector } from "react-redux"
 import { Link } from "react-router-dom"
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
 import 'animate.css'
+import axiosInstance from "../../utils/axiosInterceptor"
 
 const DonorDashboard = () => {
-  const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
-  const { donations, loading } = useSelector((state) => state.donations)
+  const [dashboardData, setDashboardData] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    dispatch(fetchDonerDonations())
-  }, [dispatch])
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/donor-dashboard`)
+        setDashboardData(response.data.data)
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const pendingDonations = donations.filter((d) => !d.verified)
-  const verifiedDonations = donations.filter((d) => d.verified)
-
-  const totalCollected = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const pendingAmount = pendingDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const verifiedAmount = verifiedDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
+    fetchDashboardData()
+  }, [])
 
   if (loading) {
     return (
@@ -30,6 +35,10 @@ const DonorDashboard = () => {
       </div>
     )
   }
+
+  console.log("dashboardData", dashboardData)
+
+  if (!dashboardData) return <div>No data available</div>
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
@@ -58,20 +67,9 @@ const DonorDashboard = () => {
               <i className="fas fa-hand-holding-usd text-2xl"></i>
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-500 font-medium">Total Donations</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{totalCollected.toFixed(2)}</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-md p-6 transform hover:scale-105 transition-transform duration-200">
-          <div className="flex items-center">
-            <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
-              <i className="fas fa-clock text-2xl"></i>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm text-gray-500 font-medium">Pending Verification</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{pendingAmount.toFixed(2)}</h3>
+              <p className="text-sm text-gray-500 font-medium">Total Donation</p>
+              <h3 className="text-2xl font-bold text-gray-900">₹{dashboardData?.donationSummary
+?.totalAmountDonated.toFixed(2)}</h3>
             </div>
           </div>
         </div>
@@ -82,8 +80,21 @@ const DonorDashboard = () => {
               <i className="fas fa-check-circle text-2xl"></i>
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-500 font-medium">Verified Donations</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{verifiedAmount.toFixed(2)}</h3>
+              <p className="text-sm text-gray-500 font-medium">Completed Donations</p>
+              <h3 className="text-2xl font-bold text-gray-900">{dashboardData?.donationSummary
+?.totalCompletedDonations}</h3>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 transform hover:scale-105 transition-transform duration-200">
+          <div className="flex items-center">
+            <div className="p-3 rounded-full bg-blue-100 text-blue-600">
+              <i className="fas fa-percentage text-2xl"></i>
+            </div>
+            <div className="ml-4">
+              <p className="text-sm text-gray-500 font-medium">Completion Rate</p>
+              <h3 className="text-2xl font-bold text-gray-900">{dashboardData?.performanceMetrics?.completionRate}</h3>
             </div>
           </div>
         </div>
@@ -94,13 +105,6 @@ const DonorDashboard = () => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Recent Donations</h2>
-            <Link 
-              to="/donor/history" 
-              className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
-            >
-              View all
-              <i className="fas fa-arrow-right ml-2"></i>
-            </Link>
           </div>
         </div>
         <div className="overflow-x-auto">
@@ -108,33 +112,40 @@ const DonorDashboard = () => {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
+                Donation Id
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Amount
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
+                Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Method
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Date
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {donations?.slice(0, 5).map((donation) => (
+              {dashboardData?.recentDonations?.map((donation) => (
                 <tr key={donation.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{formatDateShort(donation.date)}</div>
+                    <div className="text-sm font-medium text-gray-900">{donation.donationId}</div>
+                    <div className="text-sm text-gray-500">{donation.donorPhone}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</div>
+                    <div className="text-sm font-semibold text-gray-900">₹{donation.amount.toFixed(2)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                      ${donation.verified 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-yellow-100 text-yellow-800"}`}
-                    >
-                      {donation.verified ? "Verified" : "Pending"}
-                    </span>
+                    <div className="text-sm text-gray-900">{donation.paymentStatus}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{donation.method}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm text-gray-900">{formatDateShort(donation.createdAt)}</div>
                   </td>
                 </tr>
               ))}
@@ -143,37 +154,21 @@ const DonorDashboard = () => {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl shadow-md p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold">Make a New Donation</h3>
-              <p className="mt-1 text-purple-100">Support our cause with a new contribution</p>
-            </div>
-            <Link
-              to="/donor/donate"
-              className="inline-flex items-center px-4 py-2 rounded-md bg-white text-purple-600 hover:bg-purple-50 transition-colors duration-200"
-            >
-              <i className="fas fa-plus mr-2"></i>
-              Donate
-            </Link>
+      {/* ICard Status */}
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Volunteer Card</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Status</p>
+            <p className="text-lg font-semibold">{dashboardData?.iCard?.status}</p>
           </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl shadow-md p-6 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold">View Donation History</h3>
-              <p className="mt-1 text-blue-100">Check all your past contributions</p>
-            </div>
-            <Link
-              to="/donor/history"
-              className="inline-flex items-center px-4 py-2 rounded-md bg-white text-blue-600 hover:bg-blue-50 transition-colors duration-200"
-            >
-              <i className="fas fa-history mr-2"></i>
-              History
-            </Link>
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Assigned On</p>
+            <p className="text-lg font-semibold">{formatDateShort(dashboardData?.iCard?.assignDate)}</p>
+          </div>
+          <div>
+            <p className="text-sm text-gray-500 font-medium">Expires On</p>
+            <p className="text-lg font-semibold">{formatDateShort(dashboardData?.iCard?.expiryDate)}</p>
           </div>
         </div>
       </div>

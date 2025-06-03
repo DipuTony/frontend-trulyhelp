@@ -318,11 +318,11 @@ const HomePage = ({ onDonateClick }) => {
                                                 <span className="font-bold" style={{ color: currentColors.text }}>
                                                     ₹{amount.toLocaleString('en-IN')}
                                                 </span>
-                                                {selectedAmount === index && (
+                                                {/* {selectedAmount === index && (
                                                     <span className="text-xs mt-2 text-center text-gray-600">
                                                         {donationOptions[activeCause].options[donationFrequency].messages[index]}
                                                     </span>
-                                                )}
+                                                )} */}
                                                 {selectedAmount === index && (
                                                     <div
                                                         className="absolute top-0 left-0 w-full h-1"
