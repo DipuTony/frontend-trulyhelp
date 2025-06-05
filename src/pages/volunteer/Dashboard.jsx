@@ -1,32 +1,46 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useSelector, useDispatch } from "react-redux"
 import { fetchDonations } from "../../store/slices/donationSlice"
 import { Link } from "react-router-dom"
 import { formatDateShort } from "../../components/common/DateFormatFunctions"
 import 'animate.css'
+import axiosInstance from "../../utils/axiosInterceptor"
+
+import { format } from 'date-fns';
 
 const VolunteerDashboard = () => {
-  const dispatch = useDispatch()
   const { user } = useSelector((state) => state.auth)
-  const { donations, loading } = useSelector((state) => state.donations)
+  const [dashboardData, setDashboardData] = useState({
+    iCard: {},
+    donations: [],
+    performanceMetrics: {}
+  })
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    dispatch(fetchDonations())
-  }, [dispatch])
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/volunteer-dashboard`)
+        setDashboardData(response.data.data)
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  // Filter donations collected by this volunteer
-  // const myDonations = donations.filter((d) => d.collectedBy === user?.id)
-  const pendingDonations = donations.filter((d) => !d.verified)
-  const verifiedDonations = donations.filter((d) => d.verified)
-  
-  console.log("myDonations",donations)
+    fetchDashboardData()
+  }, [])
+
+
+  console.log("dashboardData", dashboardData)
+
+
 
   // Calculate statistics
-  const totalCollected = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const pendingAmount = pendingDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const verifiedAmount = verifiedDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
+  const { iCard, donations, performanceMetrics } = dashboardData
 
   if (loading) {
     return (
@@ -38,6 +52,57 @@ const VolunteerDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      {/* iCard Section - Add this before your stats grid */}
+      <Link 
+        to="/volunteer/iCard"
+        className="block mb-8 group"
+      >
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-xl overflow-hidden transform group-hover:scale-[1.02] transition-transform duration-300">
+          <div className="p-6 text-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Volunteer ID Card</h2>
+                <div className="flex items-center mb-1">
+                  <span className={`inline-block w-3 h-3 rounded-full mr-2 ${iCard?.status === 'ACTIVE' ? 'bg-green-400' : 'bg-red-400'}`}></span>
+                  <span className="text-sm font-medium">
+                    Status: {iCard?.status || 'N/A'}
+                  </span>
+                </div>
+              </div>
+              <div className="bg-white/20 rounded-full p-3">
+                <i className="fas fa-id-card text-2xl"></i>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm">
+              <div>
+                <p className="text-blue-100">Request Date</p>
+                <p className="font-medium">
+                  {iCard?.requestDate ? format(new Date(iCard.requestDate), 'PP') : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-blue-100">Assigned Date</p>
+                <p className="font-medium">
+                  {iCard?.assignDate ? format(new Date(iCard.assignDate), 'PP') : 'N/A'}
+                </p>
+              </div>
+              <div>
+                <p className="text-blue-100">Expiry Date</p>
+                <p className="font-medium">
+                  {iCard?.expiryDate ? format(new Date(iCard.expiryDate), 'PP') : 'N/A'}
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-4 flex justify-end">
+              <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                View Details <i className="fas fa-chevron-right ml-1"></i>
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
       {/* Header Section */}
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
@@ -64,7 +129,10 @@ const VolunteerDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-500 font-medium">Total Collected</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{totalCollected.toFixed(2)}</h3>
+              <h3 className="text-2xl font-bold text-gray-900">₹{performanceMetrics?.total?.amount?.toFixed(2) || 0}</h3>
+              <p className="text-sm text-gray-500">
+                {performanceMetrics?.total?.count || 0} donations
+              </p>
             </div>
           </div>
         </div>
@@ -75,8 +143,11 @@ const VolunteerDashboard = () => {
               <i className="fas fa-clock text-2xl"></i>
             </div>
             <div className="ml-4">
-              <p className="text-sm text-gray-500 font-medium">Pending Verification</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{pendingAmount.toFixed(2)}</h3>
+              <p className="text-sm text-gray-500 font-medium">Pending</p>
+              <h3 className="text-2xl font-bold text-gray-900">{performanceMetrics?.pending?.amount || '0'}</h3>
+              <p className="text-sm text-gray-500">
+                {performanceMetrics?.pending?.count || 0} donations
+              </p>
             </div>
           </div>
         </div>
@@ -88,7 +159,12 @@ const VolunteerDashboard = () => {
             </div>
             <div className="ml-4">
               <p className="text-sm text-gray-500 font-medium">Verified Donations</p>
-              <h3 className="text-2xl font-bold text-gray-900">₹{verifiedAmount.toFixed(2)}</h3>
+              <h3 className="text-2xl font-bold text-gray-900">
+                ₹{performanceMetrics?.completed?.amount?.toFixed(2) || 0}
+              </h3>
+              <p className="text-sm text-gray-500">
+              {performanceMetrics?.completed?.count || 0} donation
+              </p>
             </div>
           </div>
         </div>
@@ -99,8 +175,8 @@ const VolunteerDashboard = () => {
         <div className="p-6 border-b border-gray-200">
           <div className="flex justify-between items-center">
             <h2 className="text-xl font-semibold text-gray-800">Recent Donations</h2>
-            <Link 
-              to="/volunteer/donation-history" 
+            <Link
+              to="/volunteer/donation-history"
               className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
             >
               View all
@@ -112,8 +188,10 @@ const VolunteerDashboard = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donation Id      </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donor</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
@@ -122,20 +200,26 @@ const VolunteerDashboard = () => {
               {donations?.slice(0, 5).map((donation) => (
                 <tr key={donation.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-semibold text-gray-900">₹{donation?.donationId}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{donation.donorName || 'Anonymous'}</div>
-                    <div className="text-sm text-gray-500">{donation.donorEmail || '-'}</div>
+                    <div className="text-sm text-gray-500">{donation.donorPhone || '-'}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="text-sm font-semibold text-gray-900">₹{donation?.method}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900">{formatDateShort(donation.date)}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                      ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
+                      ${donation.paymentStatus == "COMPLETED" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}`}
                     >
-                      {donation.verified ? "Verified" : "Pending"}
+                      {donation.paymentStatus}
                     </span>
                   </td>
                 </tr>
