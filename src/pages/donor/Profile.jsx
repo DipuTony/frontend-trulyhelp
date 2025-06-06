@@ -265,7 +265,13 @@ function Profile() {
                         {/* Account Information */}
                         <div className="mt-8 pt-6 border-t border-gray-200">
                             <h3 className="text-lg font-medium text-gray-900 mb-4">Account Information</h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="grid grid-cols-3 gap-4 text-sm">
+                                <div>
+                                    <p className="text-gray-500">User ID</p>
+                                    <p className="font-medium text-gray-900">
+                                        {user?.userId}
+                                    </p>
+                                </div>
                                 <div>
                                     <p className="text-gray-500">Member Since</p>
                                     <p className="font-medium text-gray-900">

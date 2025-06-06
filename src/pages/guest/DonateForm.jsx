@@ -7,6 +7,7 @@ import { Link } from "react-router-dom"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import 'animate.css'
+import countryList from  '../../DATA/CountryList.json'
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Full name is required'),
@@ -21,12 +22,17 @@ const validationSchema = Yup.object({
     .required('Pincode is required'),
   state: Yup.string().required('State is required'),
   panNumber: Yup.string()
-    .required('PAN number is required'),
+    .required('This field is required'),
 
   donationType: Yup
     .string()
     .required('Please select a donation type')
     .oneOf(['Individual', 'Organization'], 'Invalid donation type selected'),
+
+  donorType: Yup
+    .string()
+    .required('Please select a donor type')
+    .oneOf(['indian', 'foreign'], 'Invalid donor type selected'),
 
   //  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid PAN number format'),
   dateOfBirth: Yup.date()
@@ -52,9 +58,10 @@ const DonateForm = ({ donationData, onBackClick }) => {
       city: "",
       state: "",
       pincode: "",
-      country: "INDIA",
+      country: "",
       panNumber: "",
       donationType: "",
+      donorType: "",
       amount: donationData?.amount?.toString() || "",
       category: donationData?.cause || "general",
       receiveG80Certificate: false,
@@ -69,10 +76,14 @@ const DonateForm = ({ donationData, onBackClick }) => {
         dob: values.dateOfBirth,
         pan: values.panNumber,
         donationType: values.donationType,
+        country: formik.values.donorType === "indian" ? "India" : values.country,
+        donorType: values.donorType,
         address: values.address,
         donationAmount: Number.parseFloat(donationData?.amount?.toString()),
       }
       // dispatch(onlineGuestDonationEazyBuzz(newDonation))
+// console.log(newDonation)
+      // return
       handleSubmit(newDonation)
     },
   })
@@ -93,8 +104,6 @@ const DonateForm = ({ donationData, onBackClick }) => {
       // Update button state here
     }
   };
-
-  console.log("error", error)
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white py-5 sm:px-6 lg:px-8">
@@ -224,80 +233,6 @@ const DonateForm = ({ donationData, onBackClick }) => {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
-                      <textarea
-                        name="address"
-                        value={formik.values.address}
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        rows={2}
-                        className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                      {formik.touched.address && formik.errors.address ? (
-                        <div className="mt-1 text-sm text-red-600">{formik.errors.address}</div>
-                      ) : null}
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                        <input
-                          type="text"
-                          name="city"
-                          value={formik.values.city}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                        {formik.touched.city && formik.errors.city ? (
-                          <div className="mt-1 text-sm text-red-600">{formik.errors.city}</div>
-                        ) : null}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
-                        <input
-                          type="text"
-                          name="pincode"
-                          value={formik.values.pincode}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                        {formik.touched.pincode && formik.errors.pincode ? (
-                          <div className="mt-1 text-sm text-red-600">{formik.errors.pincode}</div>
-                        ) : null}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">State*</label>
-                        <input
-                          type="text"
-                          name="state"
-                          value={formik.values.state}
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                        />
-                        {formik.touched.state && formik.errors.state ? (
-                          <div className="mt-1 text-sm text-red-600">{formik.errors.state}</div>
-                        ) : null}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
-                        <input
-                          type="text"
-                          name="country"
-                          value={formik.values.country}
-                          onChange={formik.handleChange}
-                          readOnly
-                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
-                        />
-                      </div>
-                    </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">Donation Type*</label>
@@ -317,8 +252,55 @@ const DonateForm = ({ donationData, onBackClick }) => {
                         ) : null}
                       </div>
                       <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Donor Type*</label>
+                        <select
+                          name="donorType"
+                          value={formik.values.donorType}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
+                        >
+                          <option value="">Select</option>
+                          <option value="indian">Indian</option>
+                          <option value="foreign">Foreign / NRI</option>
+                        </select>
+                        {formik.touched.donorType && formik.errors.donorType ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.donorType}</div>
+                        ) : null}
+                      </div>
+                    </div>
 
-                        <label className="block text-sm font-medium text-gray-700 mb-2">PAN Number*</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                        {formik.values.donorType === 'foreign' ? (
+                          <select
+                            name="country"
+                            value={formik.values.country}
+                            onChange={formik.handleChange}
+                            className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
+                          >
+                            <option value="">Select Country</option>
+                            {countryList.map((country) => (
+                              <option key={country.name} value={country.name}>
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            name="country"
+                            value="INDIA"
+                            readOnly
+                            className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
+                          />
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          {formik.values.donorType === 'foreign' ? "Passport No" : "PAN Number"}*</label>
                         <input
                           type="text"
                           name="panNumber"
@@ -331,7 +313,70 @@ const DonateForm = ({ donationData, onBackClick }) => {
                           <div className="mt-1 text-sm text-red-600">{formik.errors.panNumber}</div>
                         ) : null}
                       </div>
+
                     </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                      <textarea
+                        name="address"
+                        value={formik.values.address}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        rows={2}
+                        className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                      />
+                      {formik.touched.address && formik.errors.address ? (
+                        <div className="mt-1 text-sm text-red-600">{formik.errors.address}</div>
+                      ) : null}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                        <input
+                          type="text"
+                          name="city"
+                          value={formik.values.city}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        {formik.touched.city && formik.errors.city ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.city}</div>
+                        ) : null}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">State*</label>
+                        <input
+                          type="text"
+                          name="state"
+                          value={formik.values.state}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        {formik.touched.state && formik.errors.state ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.state}</div>
+                        ) : null}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                        <input
+                          type="number"
+                          name="pincode"
+                          value={formik.values.pincode}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        {formik.touched.pincode && formik.errors.pincode ? (
+                          <div className="mt-1 text-sm text-red-600">{formik.errors.pincode}</div>
+                        ) : null}
+                      </div>
+                    </div>
+
+
 
                     <div className="flex items-start">
                       <input

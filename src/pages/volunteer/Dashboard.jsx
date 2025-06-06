@@ -53,7 +53,7 @@ const VolunteerDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
       {/* iCard Section - Add this before your stats grid */}
-      <Link 
+      {/* <Link 
         to="/volunteer/iCard"
         className="block mb-8 group"
       >
@@ -102,7 +102,7 @@ const VolunteerDashboard = () => {
             </div>
           </div>
         </div>
-      </Link>
+      </Link> */}
       {/* Header Section */}
       <div className="bg-gradient-to-r from-indigo-600 to-indigo-800 rounded-lg shadow-lg p-6 mb-8">
         <div className="flex flex-col md:flex-row justify-between items-center">
@@ -200,7 +200,7 @@ const VolunteerDashboard = () => {
               {donations?.slice(0, 5).map((donation) => (
                 <tr key={donation.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-semibold text-gray-900">₹{donation?.donationId}</div>
+                    <div className="text-sm font-semibold text-gray-900">{donation?.donationId}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">{donation.donorName || 'Anonymous'}</div>

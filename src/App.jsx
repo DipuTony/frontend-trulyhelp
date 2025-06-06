@@ -26,7 +26,6 @@ import VolunteerUploadSettlement from "./pages/volunteer/VolunteerUploadSettleme
 // Donor Pages
 import DonateNow from "./pages/donor/DonateNow"
 import DonorDonationHistory from "./pages/donor/DonorDonationHistory"
-import DonorDashboard from "./pages/donor/Dashboard"
 
 
 // Layout Components
@@ -153,8 +152,8 @@ function App() {
               </ErrorBoundary>
             }
           >
-            <Route index element={<DonorDashboard />} />
-            <Route path="history" element={<DonorDonationHistory />} />
+            <Route index element={<DonorDonationHistory />} />
+            {/* <Route path="history" element={<DonorDonationHistory />} /> */}
             <Route path="donate" element={<DonateNow />} />
             <Route path="profile" element={<Profile />} />
           </Route>
