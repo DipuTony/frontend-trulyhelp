@@ -6,6 +6,7 @@ import { addDonation } from "../../store/slices/donationSlice"
 import { searchVolunteers } from "../../store/slices/volunteerSlice"
 import axios from 'axios';
 import { useEffect } from 'react';
+import countryList from '../../DATA/CountryList.json'
 
 const AddDonation = ({ usedFor }) => {
   const dispatch = useDispatch()
@@ -37,7 +38,9 @@ const AddDonation = ({ usedFor }) => {
     method: "",
     chequeNo: "",
     issueDate: "",
-    expiryDate: ""
+    expiryDate: "",
+    donorType: "",
+    country: ""
   })
 
   const [success, setSuccess] = useState(false)
@@ -141,6 +144,8 @@ const AddDonation = ({ usedFor }) => {
       checkIssueDate: donationData.issueDate,
       checkExpiryDate: donationData.expiryDate,
       volunteerUserId: usedFor === "admin" ? selectedVolunteer?.userId : user?.userId,
+      donorType: donationData.donorType,
+      country: donationData.donorType === "indian" ? "India" : donationData.country,
     }
 
     dispatch(addDonation(newDonation))
@@ -155,7 +160,7 @@ const AddDonation = ({ usedFor }) => {
           donorPhone: "",
           donorDob: "",
           donorPan: "",
-          paymentReferenceNo:"",
+          paymentReferenceNo: "",
           donationType: "",
           donorAddress: "",
           amount: "",
@@ -163,6 +168,8 @@ const AddDonation = ({ usedFor }) => {
           chequeNo: "",
           issueDate: "",
           expiryDate: "",
+          donorType: "",
+          country: ""
         })
         setTimeout(() => setSuccess(false), 3000)
       })
@@ -331,7 +338,6 @@ const AddDonation = ({ usedFor }) => {
                     />
                   </div>
 
-
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700">Email*</label>
@@ -360,6 +366,51 @@ const AddDonation = ({ usedFor }) => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
+                      <label className="block text-sm font-medium text-gray-700">Donor Type*</label>
+                      <select
+                        name="donorType"
+                        value={donationData.donorType}
+                        onChange={handleChange}
+                        required
+                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                      >
+                        <option value="">Select</option>
+                        <option value="indian">Indian</option>
+                        <option value="foreign">Foreign / NRI</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Country</label>
+                      {donationData.donorType === 'foreign' ? (
+                        <select
+                          name="country"
+                          value={donationData.country}
+                          onChange={handleChange}
+                          required
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                          <option value="">Select Country</option>
+                          {countryList.map((country) => (
+                            <option key={country.name} value={country.name}>
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name="country"
+                          value="INDIA"
+                          readOnly
+                          className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-50"
+                        />
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
                       <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
                       <input
                         type="date"
@@ -371,7 +422,9 @@ const AddDonation = ({ usedFor }) => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">PAN Number</label>
+                      <label className="block text-sm font-medium text-gray-700">
+                        {donationData.donorType === 'foreign' ? "Passport" : "PAN"} Number
+                      </label>
                       <input
                         type="text"
                         name="donorPan"
@@ -404,6 +457,8 @@ const AddDonation = ({ usedFor }) => {
                       className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     />
                   </div>
+
+
                 </div>
               </div>
 

@@ -19,6 +19,7 @@ const DonationDetails = ({ donationData, goBack }) => {
 
     const [showOldDonations, setShowOldDonations] = useState(false);
     const [donation, setDonation] = useState(donationData);
+    const [showVolunteerDetails, setShowVolunteerDetails] = useState(false);
 
     // Scroll to top when donation changes
     useEffect(() => {
@@ -170,26 +171,83 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         <p className="font-medium">{donation?.gateway || "OFFLINE"}</p>
                                     </div>
                                     <div>
+                                        <p className="text-sm text-gray-500">Donation By</p>
+                                        <p className="font-medium">{donation?.donationBy || "N/A"}</p>
+                                    </div>
+                                    {donation?.volunteer && (
+                                        <div className="mt-4">
+                                            <div 
+                                                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100"
+                                                onClick={() => setShowVolunteerDetails(!showVolunteerDetails)}
+                                            >
+                                                <div className="p-4 flex items-center justify-between cursor-pointer">
+                                                    <div className="flex items-center space-x-3">
+                                                        <div className="bg-indigo-100 p-2 rounded-full">
+                                                            <svg 
+                                                                className="w-5 h-5 text-indigo-600" 
+                                                                fill="none" 
+                                                                stroke="currentColor" 
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path 
+                                                                    strokeLinecap="round" 
+                                                                    strokeLinejoin="round" 
+                                                                    strokeWidth={2} 
+                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                                                />
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="text-sm font-semibold text-gray-900">Volunteer Details</h3>
+                                                            <p className="text-xs text-gray-500">Click to {showVolunteerDetails ? 'hide' : 'view'} information</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className={`transform transition-transform duration-200 ${showVolunteerDetails ? 'rotate-180' : ''}`}>
+                                                        <svg 
+                                                            className="w-5 h-5 text-gray-500" 
+                                                            fill="none" 
+                                                            stroke="currentColor" 
+                                                            viewBox="0 0 24 24"
+                                                        >
+                                                            <path 
+                                                                strokeLinecap="round" 
+                                                                strokeLinejoin="round" 
+                                                                strokeWidth={2} 
+                                                                d="M19 9l-7 7-7-7" 
+                                                            />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showVolunteerDetails ? 'max-h-96' : 'max-h-0'}`}>
+                                                    <div className="p-4 bg-gray-50 border-t border-gray-100">
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="space-y-1">
+                                                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Name</p>
+                                                                <p className="text-sm font-medium text-gray-900">{donation?.volunteer?.name || "N/A"}</p>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</p>
+                                                                <p className="text-sm font-medium text-gray-900">{donation?.volunteer?.userId || "N/A"}</p>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</p>
+                                                                <p className="text-sm font-medium text-gray-900">{donation?.volunteer?.phone || "N/A"}</p>
+                                                            </div>
+                                                            <div className="space-y-1">
+                                                                <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Email</p>
+                                                                <p className="text-sm font-medium text-gray-900">{donation?.volunteer?.email || "N/A"}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div>
                                         <p className="text-sm text-gray-500">Payment Method</p>
                                         <p className="font-medium">{donation?.method || "N/A"}</p>
-                                    </div>
-
-                                    <div className='md:flex md:justify-between'>
-                                        {donation?.checkIssueDate &&
-                                            (<div>
-                                                <p className="text-sm text-gray-500">Check Issue On</p>
-                                                <p className="font-medium">{formatDateDMY(donation?.checkIssueDate) || "N/A"}</p>
-                                            </div>)}
-                                        {
-                                            donation?.checkExpiryDate && (
-                                                <div>
-                                                    <p className="text-sm text-gray-500">Check Expiry On</p>
-                                                    <p className="font-medium">{formatDateDMY(donation?.checkExpiryDate) || "N/A"}
-                                                        <span className='text-red-500 px-3'>({formatRelativeTime(donation?.checkExpiryDate)})</span>
-                                                    </p>
-
-                                                </div>
-                                            )}
                                     </div>
 
                                     <div>

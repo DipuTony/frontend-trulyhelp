@@ -79,10 +79,11 @@ const DonateForm = ({ donationData, onBackClick }) => {
         country: formik.values.donorType === "indian" ? "India" : values.country,
         donorType: values.donorType,
         address: values.address,
+        cause:donationData?.cause,
         donationAmount: Number.parseFloat(donationData?.amount?.toString()),
       }
-      // dispatch(onlineGuestDonationEazyBuzz(newDonation))
-// console.log(newDonation)
+
+console.log(newDonation)
       // return
       handleSubmit(newDonation)
     },
