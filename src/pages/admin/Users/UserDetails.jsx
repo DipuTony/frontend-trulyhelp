@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axiosInstance from '../../../utils/axiosInterceptor';
 import { formatDateFull } from '../../../components/common/DateFormatFunctions';
 
@@ -9,6 +9,8 @@ const UserDetails = () => {
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -124,6 +126,13 @@ const UserDetails = () => {
             <div className="text-sm font-medium text-gray-500 bg-gray-100 px-4 py-2 rounded-full">
               ID: {userData.userId}
             </div>
+
+
+            <button onClick={()=>navigate(`/admin/donate/${userData.userId}`)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition transform hover:-translate-y-1 duration-200 shadow-lg hover:shadow-red-200">
+              Donate Now ❤️
+            </button>
+
+
           </div>
         </div>
       </div>
@@ -146,11 +155,10 @@ const UserDetails = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500 block mb-1">Email Verification</label>
-                  <p className={`text-sm px-4 py-2 rounded-lg ${
-                    userData.emailVerifyStatus 
-                      ? 'bg-green-50 text-green-700' 
-                      : 'bg-red-50 text-red-700'
-                  }`}>
+                  <p className={`text-sm px-4 py-2 rounded-lg ${userData.emailVerifyStatus
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-red-50 text-red-700'
+                    }`}>
                     {userData.emailVerifyStatus ? 'Verified' : 'Not Verified'}
                   </p>
                 </div>
@@ -315,8 +323,8 @@ const UserDetails = () => {
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                           <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${donation.paymentStatus === 'COMPLETED' 
-                              ? 'bg-gradient-to-r from-green-400 to-green-500 text-white' 
+                            ${donation.paymentStatus === 'COMPLETED'
+                              ? 'bg-gradient-to-r from-green-400 to-green-500 text-white'
                               : 'bg-gradient-to-r from-yellow-400 to-yellow-500 text-white'}`}>
                             {donation.paymentStatus}
                           </span>
