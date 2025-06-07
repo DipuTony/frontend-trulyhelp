@@ -27,27 +27,66 @@ const AdminLayout = () => {
   }
 
   const navigation = [
-    { name: "Dashboard", href: "/admin", icon: "chart-pie" },
+    { 
+      name: "Dashboard", 
+      href: "/admin", 
+      icon: "chart-pie",
+      description: "Overview of your system"
+    },
     { 
       name: "Users", 
       icon: "users",
+      description: "Manage system users",
       subItems: [
-        { name: "Doners", href: "/admin/users/donor", icon: "hand-holding-dollar" },
-        { name: "Volunteers", href: "/admin/users/volunteer", icon: "user-group" },
-        { name: "Admins", href: "/admin/users/admin", icon: "user-shield" }
+        { name: "iCard", href: "/admin/id-card", icon: "id-card", description: "Manage identity cards" },
+        { name: "Volunteers", href: "/admin/users/volunteer", icon: "user-group", description: "Manage volunteers" },
+        { name: "Admins", href: "/admin/users/admin", icon: "user-shield", description: "Manage administrators" }
       ]
     },
-    { name: "View Donations", href: "/admin/donations", icon: "chart-pie" },
-    { name: "Add Donation", href: "/admin/add-donation", icon: "rupee" },
-    { name: "Donor Registration", href: "/admin/donor-registration", icon: "user" },
-    { name: "Payment Verification", href: "/admin/payment-verification", icon: "check-circle" },
-    { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
-    { name: "Notifications", href: "/admin/notifications", icon: "bell" },
-    { name: "Donation Setting", href: "/admin/donation-setting", icon: "bell" },
-    { name: "iCard", href: "/admin/id-card", icon: "icard" },
+    { 
+      name: "Donors", 
+      icon: "hand-holding-dollar",
+      description: "Manage donor information",
+      subItems: [
+        { name: "Donor Registration", href: "/admin/donor-registration", icon: "user-plus", description: "Register new donors" },
+        { name: "Donor List", href: "/admin/donor-list", icon: "list", description: "View all donors" },
+      ]
+    },
+    { 
+      name: "Donations", 
+      icon: "rupee",
+      description: "Manage donations",
+      subItems: [
+        { name: "View Donations", href: "/admin/donations", icon: "chart-pie", description: "View all donations" },
+        { name: "Add Donation", href: "/admin/add-donation", icon: "plus-circle", description: "Add new donation" },
+      ]
+    },
+    { 
+      name: "Payment Verification", 
+      href: "/admin/payment-verification", 
+      icon: "check-circle",
+      description: "Verify payment transactions"
+    },
+    { 
+      name: "Reports", 
+      href: "/admin/reports", 
+      icon: "chart-bar",
+      description: "View system reports"
+    },
+    { 
+      name: "Notifications", 
+      href: "/admin/notifications", 
+      icon: "bell",
+      description: "Manage notifications"
+    },
+    { 
+      name: "Settings", 
+      href: "/admin/donation-setting", 
+      icon: "cog",
+      description: "System settings"
+    },
   ]
 
-  // Automatically open submenu if current route matches any subitem
   useEffect(() => {
     navigation.forEach(item => {
       if (item.subItems && item.subItems.some(subItem => isActive(subItem.href))) {
@@ -56,46 +95,52 @@ const AdminLayout = () => {
     })
   }, [location.pathname])
 
-  // Update the getLinkClasses function
-  const getLinkClasses = (path) => {
-    const baseClasses = "group flex items-center px-2 py-2 font-medium rounded-md transition-all duration-200"
+  const getLinkClasses = (path, isSubItem = false) => {
+    const baseClasses = "group flex items-center px-3 py-2.5 font-medium rounded-lg transition-all duration-200"
     const mobileClasses = "text-base"
     const desktopClasses = "text-sm"
     
     return `${baseClasses} ${
       isActive(path)
-        ? "bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600"
+        ? "bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-600 border-l-4 border-indigo-600"
         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-    } ${sidebarOpen ? mobileClasses : desktopClasses}`
+    } ${sidebarOpen ? mobileClasses : desktopClasses} ${isSubItem ? 'pl-10' : ''}`
   }
 
   const getIconClasses = (path) => {
-    return `${isActive(path) ? "text-indigo-600" : "text-gray-500"}`
+    return `${isActive(path) ? "text-indigo-600" : "text-gray-500"} transition-colors duration-200`
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Mobile sidebar */}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Mobile sidebar backdrop */}
       <div
-        className={`fixed inset-0 z-40 lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
+        className={`fixed inset-0 z-40 lg:hidden transition-opacity duration-300 ${
+          sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        }`}
         role="dialog"
         aria-modal="true"
       >
         <div
-          className="fixed inset-0 bg-gray-600 bg-opacity-75"
+          className="fixed inset-0 bg-gray-600 bg-opacity-75 backdrop-blur-sm"
           aria-hidden="true"
           onClick={() => setSidebarOpen(false)}
         ></div>
 
-        <div className="fixed inset-y-0 left-0 flex max-w-xs w-full bg-white">
+        {/* Mobile sidebar */}
+        <div className={`fixed inset-y-0 left-0 flex max-w-xs w-full bg-white transform transition-transform duration-300 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        }`}>
           <div className="h-full flex flex-col flex-grow overflow-y-auto">
-            <div className="flex items-center justify-between h-16 px-4">
+            <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold text-gray-900">Donation ERP</h1>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+                  Donation ERP
+                </h1>
               </div>
               <button
                 type="button"
-                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
                 onClick={() => setSidebarOpen(false)}
               >
                 <span className="sr-only">Close sidebar</span>
@@ -105,7 +150,6 @@ const AdminLayout = () => {
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  aria-hidden="true"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -120,22 +164,24 @@ const AdminLayout = () => {
                       <div>
                         <button
                           onClick={() => toggleSubMenu(item.name)}
-                          className={`group w-full flex items-center px-2 py-2 text-base font-medium rounded-md ${
+                          className={`group w-full flex items-center px-3 py-2.5 text-base font-medium rounded-lg transition-all duration-200 ${
                             openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
-                              ? 'bg-gray-100 text-gray-900' 
+                              ? 'bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-600' 
                               : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`}
                         >
-                          <span className={`mr-4 h-6 w-6 ${
+                          <span className={`mr-4 h-6 w-6 transition-colors duration-200 ${
                             openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
-                              ? 'text-gray-500' 
-                              : 'text-gray-400'
+                              ? 'text-indigo-600' 
+                              : 'text-gray-500'
                           }`}>
                             <i className={`fas fa-${item.icon}`}></i>
                           </span>
                           {item.name}
                           <svg
-                            className={`ml-2 h-4 w-4 transform ${openSubMenu === item.name ? 'rotate-90' : ''}`}
+                            className={`ml-auto h-4 w-4 transform transition-transform duration-200 ${
+                              openSubMenu === item.name ? 'rotate-90' : ''
+                            }`}
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 20 20"
                             fill="currentColor"
@@ -147,31 +193,32 @@ const AdminLayout = () => {
                             />
                           </svg>
                         </button>
-                        {(openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href))) && (
-                          <div className="pl-8 space-y-1">
+                        <div className={`overflow-hidden transition-all duration-200 ${
+                          openSubMenu === item.name ? 'max-h-96' : 'max-h-0'
+                        }`}>
+                          <div className="mt-1 space-y-1">
                             {item.subItems.map((subItem) => (
                               <Link
                                 key={subItem.name}
                                 to={subItem.href}
-                                className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
-                                  isActive(subItem.href) 
-                                    ? 'bg-gray-100 text-gray-900' 
+                                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                  isActive(subItem.href)
+                                    ? 'bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-600 border-l-4 border-indigo-600'
                                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                                }`}
+                                } pl-10`}
                                 onClick={() => setSidebarOpen(false)}
                               >
-                                <span className={`mr-4 h-6 w-6 ${
-                                  isActive(subItem.href) 
-                                    ? 'text-gray-500' 
-                                    : 'text-gray-400'
-                                }`}>
+                                <span className={`mr-3 h-5 w-5 ${getIconClasses(subItem.href)}`}>
                                   <i className={`fas fa-${subItem.icon}`}></i>
                                 </span>
-                                {subItem.name}
+                                <div className="flex flex-col">
+                                  <span>{subItem.name}</span>
+                                  <span className="text-xs text-gray-500">{subItem.description}</span>
+                                </div>
                               </Link>
                             ))}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ) : (
                       <Link
@@ -192,11 +239,16 @@ const AdminLayout = () => {
 
             <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
               <div className="flex items-center">
-                <div>
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                    {user?.name?.charAt(0) || "A"}
+                  </div>
+                </div>
+                <div className="ml-3">
                   <div className="text-base font-medium text-gray-700">{user?.name || "Admin User"}</div>
                   <button 
                     onClick={handleLogout} 
-                    className="text-sm font-medium text-red-500 hover:text-red-700"
+                    className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors duration-200"
                   >
                     Logout
                   </button>
@@ -212,7 +264,9 @@ const AdminLayout = () => {
         <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold text-gray-900">Donation ERP</h1>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
+                Donation ERP
+              </h1>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => (
@@ -221,13 +275,13 @@ const AdminLayout = () => {
                     <div>
                       <button
                         onClick={() => toggleSubMenu(item.name)}
-                        className={`group w-full flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                        className={`group w-full flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                           openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
-                            ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                            ? 'bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-600' 
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
-                        <span className={`mr-3 h-6 w-6 ${
+                        <span className={`mr-3 h-6 w-6 transition-colors duration-200 ${
                           openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href)) 
                             ? 'text-indigo-600' 
                             : 'text-gray-500'
@@ -236,7 +290,9 @@ const AdminLayout = () => {
                         </span>
                         {item.name}
                         <svg
-                          className={`ml-2 h-4 w-4 transform ${openSubMenu === item.name ? 'rotate-90' : ''}`}
+                          className={`ml-auto h-4 w-4 transform transition-transform duration-200 ${
+                            openSubMenu === item.name ? 'rotate-90' : ''
+                          }`}
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
@@ -248,27 +304,31 @@ const AdminLayout = () => {
                           />
                         </svg>
                       </button>
-                      {(openSubMenu === item.name || item.subItems.some(subItem => isActive(subItem.href))) && (
-                        <div className="pl-8 space-y-1">
+                      <div className={`overflow-hidden transition-all duration-200 ${
+                        openSubMenu === item.name ? 'max-h-96' : 'max-h-0'
+                      }`}>
+                        <div className="mt-1 space-y-1">
                           {item.subItems.map((subItem) => (
                             <Link
                               key={subItem.name}
                               to={subItem.href}
-                              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
-                                isActive(subItem.href) 
-                                  ? 'bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600' 
+                              className={`group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                                isActive(subItem.href)
+                                  ? 'bg-gradient-to-r from-indigo-50 to-indigo-100 text-indigo-600 border-l-4 border-indigo-600'
                                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                              }`}
-                              onClick={() => setSidebarOpen(false)}
+                              } pl-10`}
                             >
-                              <span className={`mr-3 h-6 w-6 ${getIconClasses(subItem.href)}`}>
+                              <span className={`mr-3 h-5 w-5 ${getIconClasses(subItem.href)}`}>
                                 <i className={`fas fa-${subItem.icon}`}></i>
                               </span>
-                              {subItem.name}
+                              <div className="flex flex-col">
+                                <span>{subItem.name}</span>
+                                <span className="text-xs text-gray-500">{subItem.description}</span>
+                              </div>
                             </Link>
                           ))}
                         </div>
-                      )}
+                      </div>
                     </div>
                   ) : (
                     <Link
@@ -287,11 +347,16 @@ const AdminLayout = () => {
           </div>
           <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
             <div className="flex items-center">
-              <div>
+              <div className="flex-shrink-0">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-indigo-500 to-blue-500 flex items-center justify-center text-white font-bold">
+                  {user?.name?.charAt(0) || "A"}
+                </div>
+              </div>
+              <div className="ml-3">
                 <div className="text-sm font-medium text-gray-700">{user?.name || "Admin User"}</div>
                 <button 
                   onClick={handleLogout} 
-                  className="text-sm font-medium text-red-500 hover:text-red-700"
+                  className="text-sm font-medium text-red-500 hover:text-red-700 transition-colors duration-200"
                 >
                   Logout
                 </button>
@@ -303,7 +368,7 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <div className="lg:pl-64 flex flex-col">
-        <div className="sticky top-0 z-10 lg:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white">
+        <div className="sticky top-0 z-10 lg:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white shadow-sm">
           <button
             type="button"
             className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
@@ -316,7 +381,6 @@ const AdminLayout = () => {
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              aria-hidden="true"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>

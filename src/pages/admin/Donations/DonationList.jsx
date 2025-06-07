@@ -79,7 +79,7 @@ const DonationList = () => {
     //     >
     //       <p>{row.original.donorPhone}</p>
     //       <p>{row.original.donorEmail}</p>
-          
+
     //     </div>
     //   )
     // },
@@ -131,7 +131,9 @@ const DonationList = () => {
             A list of all donations including their donor, amount, date, and verification status.
           </p>
         </div>
+        <button onClick={() => navigate("/admin/add-donation")} className="bg-indigo-600 text-white px-4 py-2 rounded-md">Add New Donation</button>
       </div>
+
 
       {/* Tab code start here */}
       <div className="flex border-b border-gray-200">
