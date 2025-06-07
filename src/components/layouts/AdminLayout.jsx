@@ -39,6 +39,7 @@ const AdminLayout = () => {
     },
     { name: "View Donations", href: "/admin/donations", icon: "chart-pie" },
     { name: "Add Donation", href: "/admin/add-donation", icon: "rupee" },
+    { name: "Donor Registration", href: "/admin/donor-registration", icon: "user" },
     { name: "Payment Verification", href: "/admin/payment-verification", icon: "check-circle" },
     { name: "Reports", href: "/admin/reports", icon: "chart-pie" },
     { name: "Notifications", href: "/admin/notifications", icon: "bell" },

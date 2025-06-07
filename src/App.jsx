@@ -51,6 +51,7 @@ import DonationSettings from "./pages/admin/DonationSettings/DonationSettings"
 import UserDetails from "./pages/admin/Users/UserDetails"
 import IdCardList from "./pages/admin/IdCard/IdCardList"
 import ICardVolunteer from "./pages/volunteer/ICardVolunteer"
+import DonorRegistration from "./pages/admin/Donors/DonorRegistration"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -103,6 +104,7 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="donations" element={<DonationList />} /> {/* used for admin and volunteer */}
+            <Route path="donor-registration" element={<DonorRegistration />} /> {/* used for admin and volunteer */}
             <Route path="users/:role?" element={<UserManagement />} />
             <Route path="UserDetails/:userId?" element={<UserDetails />} />
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
@@ -133,6 +135,7 @@ function App() {
             <Route path="add-donation" element={<AddDonation usedFor="volunteer" />} />
             {/* <Route path="donation-history" element={<VolunteerDonationHistory />} /> */}
             <Route path="donation-history" element={<DonationList />} /> {/* user for admin and volunteer */}
+            <Route path="donor-registration" element={<DonorRegistration />} /> {/* used for admin and volunteer */}
             <Route path="iCard" element={<ICardVolunteer />} />
             <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
             <Route path="profile" element={<Profile />} />
