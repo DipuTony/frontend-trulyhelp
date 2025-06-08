@@ -54,6 +54,7 @@ import ICardVolunteer from "./pages/volunteer/ICardVolunteer"
 import DonorRegistration from "./pages/admin/Donors/DonorRegistration"
 import DonorList from "./pages/admin/Donors/DonorList"
 import DonateNowOffline from "./pages/admin/Donations/DonateNowOffline"
+import SearchDonor from "./pages/volunteer/SearchDonor"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -106,9 +107,9 @@ function App() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="donations" element={<DonationList />} /> {/* used for admin and volunteer */}
-            <Route path="donor-registration"  element={<DonorRegistration usedFor="ADMIN" />} /> {/* used for admin and volunteer */}
-            <Route path="donate/:userId?" element={<DonateNowOffline usedFor="ADMIN"/>} /> {/* used for admin and volunteer */}
-            <Route path="donor-list" element={<DonorList />} /> 
+            <Route path="donor-registration" element={<DonorRegistration usedFor="ADMIN" />} /> {/* used for admin and volunteer */}
+            <Route path="donate/:userId?" element={<DonateNowOffline usedFor="ADMIN" />} /> {/* used for admin and volunteer */}
+            <Route path="donor-list" element={<DonorList />} />
             <Route path="users/:role?" element={<UserManagement />} />
             <Route path="UserDetails/:userId?" element={<UserDetails />} />
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
@@ -118,7 +119,7 @@ function App() {
             <Route path="profile" element={<Profile />} />
             <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
-            <Route path="id-card" element={<IdCardList/>} />
+            <Route path="id-card" element={<IdCardList />} />
           </Route>
 
           {/* Volunteer Routes */}
@@ -140,7 +141,9 @@ function App() {
             {/* <Route path="donation-history" element={<VolunteerDonationHistory />} /> */}
             <Route path="donation-history" element={<DonationList />} /> {/* user for admin and volunteer */}
             <Route path="donor-registration" element={<DonorRegistration usedFor="VOLUNTEER" />} /> {/* used for admin and volunteer */}
-            <Route path="donate/:userId?" element={<DonateNowOffline usedFor="VOLUNTEER"/>} /> {/* used for admin and volunteer */}
+            <Route path="donate/:userId?" element={<DonateNowOffline usedFor="VOLUNTEER" />} /> {/* used for admin and volunteer */}
+            <Route path="search-donor" element={<SearchDonor />} />
+
             <Route path="iCard" element={<ICardVolunteer />} />
             <Route path="upload-settlement" element={<VolunteerUploadSettlement />} />
             <Route path="profile" element={<Profile />} />

@@ -23,6 +23,7 @@ const VolunteerLayout = () => {
     { name: "Donation History", href: "/volunteer/donation-history", icon: "clock" },
     // { name: "Upload Settlement", href: "/volunteer/upload-settlement", icon: "file-upload" },
     { name: "Donor Registration", href: "/volunteer/donor-registration", icon: "user" },
+    { name: "Search Donor", href: "/volunteer/search-donor", icon: "user" },
     { name: "iCard", href: "/volunteer/iCard", icon: "user" },
     { name: "Profile", href: "/volunteer/profile", icon: "user" },
   ]

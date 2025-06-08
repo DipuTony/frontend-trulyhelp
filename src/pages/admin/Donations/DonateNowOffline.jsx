@@ -41,7 +41,6 @@ const DonateNowOffline = ({ usedFor }) => {
                 const response = await axiosInstance.get(`/user/view-basic-details?userId=${userId}`);
                 if (response.data.status) {
                     setUserData(response.data.data);
-                    // Pre-fill donation form with user data
                     setDonationData(prev => ({
                         ...prev,
                         donorName: response.data.data.name || "",
@@ -131,7 +130,6 @@ const DonateNowOffline = ({ usedFor }) => {
 
             if (response.data.status) {
                 toast.success('Donation added successfully');
-                // Reset form
                 setDonationData({
                     donorName: "",
                     aadharNo: "",
@@ -160,33 +158,40 @@ const DonateNowOffline = ({ usedFor }) => {
     if (loading) {
         return (
             <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
 
     return (
-        <div className="bg-gray-50 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 py-6">
-                <div className="bg-white shadow rounded-lg">
-                    {/* User Info Section */}
-                    <div className="p-4 border-b border-gray-200">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div>
-                                <p className="text-sm text-gray-500">Name</p>
-                                <p className="font-medium">{userData?.name}</p>
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Offline Donation</h1>
+                    <p className="mt-2 text-lg text-gray-600">Support our cause with your generous contribution</p>
+                </div>
+
+                {/* User Card */}
+                <div className="bg-white rounded-xl shadow-md overflow-hidden mb-8 transition-all hover:shadow-lg">
+                    <div className="p-6">
+                        <h2 className="text-xl font-semibold text-gray-800 mb-4">Donor Information</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-500">Name</p>
+                                <p className="text-lg font-semibold text-gray-800">{userData?.name}</p>
                             </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Email</p>
-                                <p className="font-medium">{userData?.email}</p>
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-500">Email</p>
+                                <p className="text-lg font-semibold text-gray-800">{userData?.email}</p>
                             </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Phone</p>
-                                <p className="font-medium">{userData?.phone}</p>
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-500">Phone</p>
+                                <p className="text-lg font-semibold text-gray-800">{userData?.phone}</p>
                             </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Status</p>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                            <div className="space-y-1">
+                                <p className="text-sm font-medium text-gray-500">Status</p>
+                                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                                     userData?.emailVerifyStatus ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
                                     {userData?.emailVerifyStatus ? 'Verified' : 'Not Verified'}
@@ -194,222 +199,237 @@ const DonateNowOffline = ({ usedFor }) => {
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {/* Donation Form */}
-                    <form onSubmit={handleSubmit} className="p-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Donation Details */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-medium text-gray-900">Donation Details</h3>
-                                
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Donation Cause*</label>
-                                    <select
-                                        name="donationCause"
-                                        value={donationData.donationCause}
-                                        onChange={handleChange}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    >
-                                        <option value="">Select a cause</option>
-                                        {Object.keys(availableCauses).map((key) => (
-                                            <option key={key} value={key}>
-                                                {availableCauses[key].displayName}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Donation Type*</label>
-                                    <select
-                                        name="donationType"
-                                        value={donationData.donationType}
-                                        onChange={handleChange}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="Individual">Individual</option>
-                                        <option value="Organization">Organization</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Amount*</label>
-                                    <div className="mt-1 relative rounded-md shadow-sm">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span className="text-gray-500">₹</span>
-                                        </div>
-                                        <input
-                                            type="number"
-                                            name="amount"
-                                            value={donationData.amount}
-                                            onChange={handleChange}
-                                            required
-                                            min="0"
-                                            className="block w-full pl-7 pr-12 py-2 border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                                            placeholder="0.00"
-                                        />
+                {/* Donation Form */}
+                <div className="bg-white rounded-xl shadow-md overflow-hidden">
+                    <form onSubmit={handleSubmit} className="p-6">
+                        <div className="space-y-8">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                {/* Donation Details */}
+                                <div className="space-y-6">
+                                    <div className="border-b border-gray-200 pb-4">
+                                        <h3 className="text-xl font-semibold text-gray-800">Donation Details</h3>
+                                        <p className="mt-1 text-sm text-gray-500">Enter information about your donation</p>
                                     </div>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Payment Method*</label>
-                                    <select
-                                        name="method"
-                                        value={donationData.method}
-                                        onChange={handleChange}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    >
-                                        <option value="">Select Payment Method</option>
-                                        {paymentMethods.groups?.map((group) => (
-                                            <optgroup key={group.label} label={group.label}>
-                                                {group.options.map((option) => (
-                                                    <option key={option.value} value={option.value}>
-                                                        {option.label}
+                                    
+                                    <div className="space-y-5">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donation Cause*</label>
+                                            <select
+                                                name="donationCause"
+                                                value={donationData.donationCause}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            >
+                                                <option value="">Select a cause</option>
+                                                {Object.keys(availableCauses).map((key) => (
+                                                    <option key={key} value={key}>
+                                                        {availableCauses[key].displayName}
                                                     </option>
                                                 ))}
-                                            </optgroup>
-                                        ))}
-                                    </select>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donation Type*</label>
+                                            <select
+                                                name="donationType"
+                                                value={donationData.donationType}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            >
+                                                <option value="">Select</option>
+                                                <option value="Individual">Individual</option>
+                                                <option value="Organization">Organization</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Amount*</label>
+                                            <div className="relative rounded-md shadow-sm">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <span className="text-gray-500">₹</span>
+                                                </div>
+                                                <input
+                                                    type="number"
+                                                    name="amount"
+                                                    value={donationData.amount}
+                                                    onChange={handleChange}
+                                                    required
+                                                    min="0"
+                                                    className="block w-full pl-10 pr-12 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                    placeholder="0.00"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method*</label>
+                                            <select
+                                                name="method"
+                                                value={donationData.method}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            >
+                                                <option value="">Select Payment Method</option>
+                                                {paymentMethods.groups?.map((group) => (
+                                                    <optgroup key={group.label} label={group.label}>
+                                                        {group.options.map((option) => (
+                                                            <option key={option.value} value={option.value}>
+                                                                {option.label}
+                                                            </option>
+                                                        ))}
+                                                    </optgroup>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {donationData.method && (
+                                            <div>
+                                                <label className="block text-sm font-medium text-gray-700 mb-1">Reference No</label>
+                                                <input
+                                                    type="text"
+                                                    name="paymentReferenceNo"
+                                                    value={donationData.paymentReferenceNo}
+                                                    onChange={handleChange}
+                                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                />
+                                            </div>
+                                        )}
+
+                                        {(donationData.method === "CHEQUE" || donationData.method === "DD") && (
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                        {donationData.method === "CHEQUE" ? "Cheque" : "DD"} Number*
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        name="chequeNo"
+                                                        value={donationData.chequeNo}
+                                                        onChange={handleChange}
+                                                        required
+                                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Issue Date*</label>
+                                                    <input
+                                                        type="date"
+                                                        name="issueDate"
+                                                        value={donationData.issueDate}
+                                                        onChange={handleChange}
+                                                        required
+                                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
 
-                                {donationData.method && (
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">Reference No</label>
-                                        <input
-                                            type="text"
-                                            name="paymentReferenceNo"
-                                            value={donationData.paymentReferenceNo}
-                                            onChange={handleChange}
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                        />
+                                {/* Additional Information */}
+                                <div className="space-y-6">
+                                    <div className="border-b border-gray-200 pb-4">
+                                        <h3 className="text-xl font-semibold text-gray-800">Additional Information</h3>
+                                        <p className="mt-1 text-sm text-gray-500">Provide necessary details for tax purposes</p>
                                     </div>
-                                )}
-
-                                {(donationData.method === "CHEQUE" || donationData.method === "DD") && (
-                                    <div className="grid grid-cols-2 gap-4">
+                                    
+                                    <div className="space-y-5">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">
-                                                {donationData.method === "CHEQUE" ? "Cheque" : "DD"} Number*
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donor Type*</label>
+                                            <select
+                                                name="donorType"
+                                                value={donationData.donorType}
+                                                onChange={handleChange}
+                                                required
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            >
+                                                <option value="">Select</option>
+                                                <option value="indian">Indian</option>
+                                                <option value="foreign">Foreign / NRI</option>
+                                            </select>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                                            {donationData.donorType === 'foreign' ? (
+                                                <select
+                                                    name="country"
+                                                    value={donationData.country}
+                                                    onChange={handleChange}
+                                                    required
+                                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                                >
+                                                    <option value="">Select Country</option>
+                                                    {countryList.map((country) => (
+                                                        <option key={country.name} value={country.name}>
+                                                            {country.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    name="country"
+                                                    value="INDIA"
+                                                    readOnly
+                                                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-gray-50"
+                                                />
+                                            )}
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                                {donationData.donorType === 'foreign' ? "Passport" : "PAN"} Number
                                             </label>
                                             <input
                                                 type="text"
-                                                name="chequeNo"
-                                                value={donationData.chequeNo}
+                                                name="donorPan"
+                                                value={donationData.donorPan}
                                                 onChange={handleChange}
-                                                required
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                             />
                                         </div>
+
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700">Issue Date*</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Aadhar No</label>
                                             <input
-                                                type="date"
-                                                name="issueDate"
-                                                value={donationData.issueDate}
+                                                type="number"
+                                                name="aadharNo"
+                                                value={donationData.aadharNo}
                                                 onChange={handleChange}
-                                                required
-                                                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                            <textarea
+                                                name="donorAddress"
+                                                rows={3}
+                                                value={donationData.donorAddress}
+                                                onChange={handleChange}
+                                                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
                                             />
                                         </div>
                                     </div>
-                                )}
-                            </div>
-
-                            {/* Additional Information */}
-                            <div className="space-y-4">
-                                <h3 className="text-lg font-medium text-gray-900">Additional Information</h3>
-                                
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Donor Type*</label>
-                                    <select
-                                        name="donorType"
-                                        value={donationData.donorType}
-                                        onChange={handleChange}
-                                        required
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="indian">Indian</option>
-                                        <option value="foreign">Foreign / NRI</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Country</label>
-                                    {donationData.donorType === 'foreign' ? (
-                                        <select
-                                            name="country"
-                                            value={donationData.country}
-                                            onChange={handleChange}
-                                            required
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                        >
-                                            <option value="">Select Country</option>
-                                            {countryList.map((country) => (
-                                                <option key={country.name} value={country.name}>
-                                                    {country.name}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            name="country"
-                                            value="INDIA"
-                                            readOnly
-                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-gray-50"
-                                        />
-                                    )}
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">
-                                        {donationData.donorType === 'foreign' ? "Passport" : "PAN"} Number
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="donorPan"
-                                        value={donationData.donorPan}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Aadhar No</label>
-                                    <input
-                                        type="number"
-                                        name="aadharNo"
-                                        value={donationData.aadharNo}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700">Address</label>
-                                    <textarea
-                                        name="donorAddress"
-                                        rows={3}
-                                        value={donationData.donorAddress}
-                                        onChange={handleChange}
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:ring-indigo-500 focus:border-indigo-500"
-                                    />
                                 </div>
                             </div>
-                        </div>
 
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                type="submit"
-                                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                            >
-                                Submit Donation
-                            </button>
+                            {/* Submit Button */}
+                            <div className="flex justify-end pt-4">
+                                <button
+                                    type="submit"
+                                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                >
+                                    Submit Donation
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
