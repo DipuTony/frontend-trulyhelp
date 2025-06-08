@@ -88,10 +88,16 @@ const AdminLayout = () => {
       description: "Manage notifications"
     },
     { 
-      name: "Settings", 
+      name: "Donation Settings", 
       href: "/admin/donation-setting", 
       icon: "cog",
       description: "System settings"
+    },
+    { 
+      name: "Profile", 
+      href: "/admin/profile", 
+      icon: "user",
+      description: "User Profile"
     },
   ]
 

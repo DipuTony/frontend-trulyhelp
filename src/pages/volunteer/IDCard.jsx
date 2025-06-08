@@ -133,11 +133,11 @@ export default function IDCard({ cardData }) {
                                 alt="Profile"
                                 className="w-20 h-20 rounded object-cover"
                             />
-                            <img
+                            {/* <img
                                 src={qrImage}
                                 alt="QR Code"
                                 className="w-20 h-20"
-                            />
+                            /> */}
                         </div>
                         <p className="text-red-600 font-bold mt-2">{cardData?.name || 'Name'}</p>
                         <p className="text-red-600">{cardData?.role || 'Role'}</p>
@@ -179,7 +179,15 @@ export default function IDCard({ cardData }) {
                         <h2 className="text-xl font-bold text-gray-800 mb-4">
                             {orgName}
                         </h2>
-                        <h3 className="text-green-700 font-bold text-lg mb-2">TERMS & CONDITIONS</h3>
+                        <div className="flex justify-center items-center mt-4 gap-4">
+
+                            <img
+                                src={qrImage}
+                                alt="QR Code"
+                                className="w-20 h-20"
+                            />
+                        </div>
+                        <h3 className="text-green-700 font-bold text-lg mb-2 mt-5">TERMS & CONDITIONS</h3>
                         <div className="text-left text-sm space-y-3">
                             <p>
                                 <strong>Identification:</strong> Carry the ID card at all times during
