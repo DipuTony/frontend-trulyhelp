@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchICard, requestICard } from '../../store/slices/volunteerSlice';
 import { FiDownload, FiUser, FiClock, FiCheckCircle, FiSend } from 'react-icons/fi';
-// import { toast } from '../../utils/toast';
+import IDCard from './IDCard';
+import html2canvas from 'html2canvas';
+import { toast } from 'sonner';
 
 const ICardVolunteer = () => {
   const [apiError, setApiError] = useState(null);
   const dispatch = useDispatch();
   const { iCardData, iCardRequested, loading, error } = useSelector((state) => state.volunteers);
+  const idCardRef = useRef(null);
 
   console.log(iCardData)
 
@@ -29,6 +32,8 @@ const ICardVolunteer = () => {
     }
   };
 
+
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
@@ -38,6 +43,7 @@ const ICardVolunteer = () => {
             Your official identification as a volunteer
           </p>
         </div>
+
 
         {/* Status Indicator */}
         <div className="mb-8">
@@ -68,58 +74,15 @@ const ICardVolunteer = () => {
           </>)}
         </div>
 
-        {/* iCard Display */}
+        {/* Display iCard */}
         {iCardData?.iCardStatus === 'ACTIVE' && (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-200">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-2xl font-bold">{iCardData?.name}</h2>
-                  <p className="text-blue-100">{iCardData?.role}</p>
-                </div>
-                <div className="bg-white p-1 rounded-lg">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${iCardData?.userId}`}
-                    alt="QR Code"
-                    className="h-16 w-16"
-                  />
-                </div>
-              </div>
+          <>
+            <div ref={idCardRef}>
+              <IDCard />
             </div>
-
-            <div className="p-6">
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div>
-                  <p className="text-sm text-gray-500">Volunteer ID</p>
-                  <p className="font-medium">{iCardData?.userId}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Issue Date</p>
-                  <p className="font-medium">{iCardData?.iCardAssignDate}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Expiry Date</p>
-                  <p className="font-medium">{iCardData?.iCardExpiryDate}</p>
-                </div>
-              </div>
-
-              <div className="border-t border-gray-200 pt-4">
-                <p className="text-xs text-gray-500">
-                  This card identifies you as an authorized volunteer. Please present it when required.
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-gray-50 px-6 py-4 flex justify-end">
-              <button
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                <FiDownload className="mr-2 h-4 w-4" />
-                Download iCard
-              </button>
-            </div>
-          </div>
+          </>
         )}
+
 
         {/* Actions based on status */}
         {iCardData?.iCardStatus === 'UNASSIGN' && (
@@ -171,6 +134,8 @@ const ICardVolunteer = () => {
             </button>
           </div>
         )}
+
+
       </div>
       {/* Add this below the status indicator */}
       {apiError && (

@@ -38,7 +38,6 @@ const AdminLayout = () => {
       icon: "users",
       description: "Manage system users",
       subItems: [
-        { name: "iCard", href: "/admin/id-card", icon: "id-card", description: "Manage identity cards" },
         { name: "Volunteers", href: "/admin/users/volunteer", icon: "user-group", description: "Manage volunteers" },
         { name: "Admins", href: "/admin/users/admin", icon: "user-shield", description: "Manage administrators" }
       ]
@@ -59,6 +58,15 @@ const AdminLayout = () => {
       subItems: [
         { name: "View Donations", href: "/admin/donations", icon: "chart-pie", description: "View all donations" },
         { name: "Add Donation", href: "/admin/add-donation", icon: "plus-circle", description: "Add new donation" },
+      ]
+    },
+    { 
+      name: "HR Admin", 
+      icon: "rupee",
+      description: "Manage donations",
+      subItems: [
+        { name: "iCard", href: "/admin/id-card", icon: "id-card", description: "Manage identity cards" },
+        { name: "Offer Later", href: "#", icon: "message", description: "Send Offer later" },
       ]
     },
     { 

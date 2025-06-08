@@ -4,6 +4,8 @@ import { fetchICardList } from '../../../store/slices/volunteerSlice';
 import DataTable from '../../../components/common/DataTable/DataTable';
 import { formatDateShort } from '../../../components/common/DateFormatFunctions';
 import axiosInstance from '../../../utils/axiosInterceptor';
+import IDCard from '../../../pages/volunteer/IDCard';
+import { FiX } from 'react-icons/fi';
 
 const IdCardList = () => {
     const dispatch = useDispatch();
@@ -31,7 +33,7 @@ const IdCardList = () => {
             setSelectedCard(card);
             if (type === 'edit') {
                 setFormData({
-                    userId: card.userId, // this is volunteer user id
+                    userId: card.userId, //this is volunter user id
                     name: card.name,
                     email: card.email,
                     status: card.iCardStatus,
@@ -107,8 +109,8 @@ const IdCardList = () => {
     const statusCounts = iCardList.counts || {};
     const totalCards = iCardList.total || 0;
 
-    const filteredData = activeFilter === 'ALL' 
-        ? iCardList.data 
+    const filteredData = activeFilter === 'ALL'
+        ? iCardList.data
         : iCardList.data.filter(card => card.iCardStatus === activeFilter);
 
     return (
@@ -117,33 +119,33 @@ const IdCardList = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800 mb-2">ID Card Management</h1>
-                    
+
                     {/* Tab Filter */}
                     <div className="flex flex-wrap gap-2 mt-4">
                         <button
                             onClick={() => setActiveFilter('ALL')}
-                            className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === 'ALL' 
-                                ? 'bg-blue-100 text-blue-800 border border-blue-200' 
+                            className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === 'ALL'
+                                ? 'bg-blue-100 text-blue-800 border border-blue-200'
                                 : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
                         >
                             <span className={`inline-block w-2 h-2 rounded-full mr-2 ${activeFilter === 'ALL' ? 'bg-blue-500' : 'bg-gray-400'}`}></span>
                             <span className="text-sm font-medium">All ({totalCards})</span>
                         </button>
-                        
+
                         {Object.entries(statusCounts).map(([status, count]) => (
                             <button
                                 key={status}
                                 onClick={() => setActiveFilter(status)}
-                                className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === status 
-                                    ? `${status === 'ACTIVE' ? 'bg-green-100 text-green-800 border border-green-200' : 
-                                       status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' : 
-                                       status === 'DISABLED' ? 'bg-red-100 text-red-800 border border-red-200' : 
-                                       'bg-gray-100 text-gray-800 border border-gray-200'}` 
+                                className={`flex items-center px-3 py-1 rounded-full transition-colors ${activeFilter === status
+                                    ? `${status === 'ACTIVE' ? 'bg-green-100 text-green-800 border border-green-200' :
+                                        status === 'PENDING' ? 'bg-yellow-100 text-yellow-800 border border-yellow-200' :
+                                            status === 'DISABLED' ? 'bg-red-100 text-red-800 border border-red-200' :
+                                                'bg-gray-100 text-gray-800 border border-gray-200'}`
                                     : 'bg-gray-50 text-gray-700 hover:bg-gray-100'}`}
                             >
                                 <span className={`inline-block w-2 h-2 rounded-full mr-2 ${status === 'ACTIVE' ? 'bg-green-500' :
                                     status === 'PENDING' ? 'bg-yellow-500' :
-                                    status === 'DISABLED' ? 'bg-red-500' : 'bg-gray-500'}`}></span>
+                                        status === 'DISABLED' ? 'bg-red-500' : 'bg-gray-500'}`}></span>
                                 <span className="text-sm font-medium">{status} ({count})</span>
                             </button>
                         ))}
@@ -163,16 +165,28 @@ const IdCardList = () => {
             {/* Modal */}
             {openModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
-                    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                        <div className="p-6 border-b">
+                    <div className={`bg-white rounded-xl shadow-xl w-full ${modalType === 'iCard' ? 'max-w-4xl' : 'max-w-2xl'} max-h-[90vh] overflow-y-auto relative`}>
+                        <div className="p-6 border-b flex justify-between items-center">
                             <h2 className="text-xl font-semibold text-gray-800">
                                 {modalType === 'assign' ? 'Assign New ID Card' :
-                                    modalType === 'edit' ? 'Edit ID Card' : 'ID Card Details'}
+                                    modalType === 'edit' ? 'Edit ID Card' : 
+                                    modalType === 'iCard' ? 'ID Card Preview' : 'ID Card Details'}
                             </h2>
+                            <button
+                                onClick={handleModalClose}
+                                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                                aria-label="Close modal"
+                            >
+                                <FiX className="w-5 h-5 text-gray-500" />
+                            </button>
                         </div>
 
                         <div className="p-6">
-                            {modalType === 'view' ? (
+                            {modalType === 'iCard' ? (
+                                <div className="flex justify-center">
+                                    <IDCard cardData={selectedCard} />
+                                </div>
+                            ) : modalType === 'view' ? (
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
@@ -288,14 +302,16 @@ const IdCardList = () => {
                         </div>
 
                         <div className="p-4 border-t flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={handleModalClose}
-                                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            {modalType !== 'view' && (
+                            {modalType !== 'iCard' && (
+                                <button
+                                    type="button"
+                                    onClick={handleModalClose}
+                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            )}
+                            {modalType !== 'view' && modalType !== 'iCard' && (
                                 <button
                                     type="button"
                                     onClick={modalType === 'assign' ? handleAssignCard : handleUpdateCard}
@@ -374,12 +390,20 @@ const COLUMNS = (handleModalOpen) => [
     {
         Header: 'Actions',
         Cell: ({ row }) => (
-            <button
-                onClick={() => handleModalOpen('edit', row.original)}
-                className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm font-medium"
-            >
-                Edit
-            </button>
+            <div className='space-x-3'>
+                <button
+                    onClick={() => handleModalOpen('edit', row.original)}
+                    className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm font-medium"
+                >
+                    Edit
+                </button>
+                <button
+                    onClick={() => handleModalOpen('iCard', row.original)}
+                    className="text-indigo-600 hover:text-indigo-800 hover:underline text-sm font-medium"
+                >
+                    View
+                </button>
+            </div>
         )
     }
 ];

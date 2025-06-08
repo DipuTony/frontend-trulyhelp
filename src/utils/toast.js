@@ -1,5 +1,8 @@
 import { toast } from 'sonner';
 
+// Export the toast object directly
+export { toast };
+
 export const showSuccessToast = (message) => {
   toast.success(message);
 };
