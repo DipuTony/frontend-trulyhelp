@@ -83,7 +83,7 @@ export default function IDCard({ cardData }) {
                 link.click();
                 document.body.removeChild(link);
                 window.URL.revokeObjectURL(url);
-                
+
                 toast.dismiss(loadingToast);
                 toast.success('ID Card downloaded successfully!');
             }, 'image/png', 1.0);
@@ -100,6 +100,9 @@ export default function IDCard({ cardData }) {
     const orgName = "Truly Help Org"
     const webSite = "trulyhelp.org"
     const orgRegNo = "MH/2021/XXXXX"
+    const orgPhone = "xxxx989652"
+    const orgEmail = "info@trulyhelp.org"
+    const orgAddress = "demo address, noida, UP - 123456"
 
     return (
         <div className="relative">
@@ -151,13 +154,13 @@ export default function IDCard({ cardData }) {
                     </div>
                     <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
                         <div>
-                            <p>📞 +91 85648 53303</p>
+                            <p>📞 {orgPhone}</p>
                         </div>
                         <div>
-                            <p>✉ info@shriramnavyugtrust.org</p>
+                            <p>✉ {orgEmail}</p>
                         </div>
                         <div>
-                            <p>📍 Ekta Nagar PGI Lucknow</p>
+                            <p>📍 {orgEmail}</p>
                         </div>
                     </div>
                 </div>
@@ -194,18 +197,18 @@ export default function IDCard({ cardData }) {
                     </div>
                     <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
                         <div>
-                            <p>📞 +91 85648 53303</p>
+                            <p>📞 {orgPhone}</p>
                         </div>
                         <div>
-                            <p>✉ info@shriramnavyugtrust.org</p>
+                            <p>✉ {orgEmail}</p>
                         </div>
                         <div>
-                            <p>📍 Ekta Nagar PGI Lucknow</p>
+                            <p>📍 {orgEmail}</p>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             {/* Single Download Button */}
             <div className="flex justify-center mt-6">
                 <button
