@@ -78,7 +78,7 @@ const ICardVolunteer = () => {
         {iCardData?.iCardStatus === 'ACTIVE' && (
           <>
             <div ref={idCardRef}>
-              <IDCard />
+              <IDCard cardData={iCardData} />
             </div>
           </>
         )}

@@ -184,7 +184,7 @@ const IdCardList = () => {
                         <div className="p-6">
                             {modalType === 'iCard' ? (
                                 <div className="flex justify-center">
-                                    <IDCard cardData={selectedCard} />
+                                    <IDCard adminSelectedCard={selectedCard} />
                                 </div>
                             ) : modalType === 'view' ? (
                                 <div className="space-y-4">

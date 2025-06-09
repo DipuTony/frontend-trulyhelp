@@ -55,9 +55,13 @@ export const searchVolunteers = createAsyncThunk(
 
 export const fetchICard = createAsyncThunk(
   "volunteers/fetchICard",
-  async (_, { rejectWithValue }) => {
+  async (userId, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get("/user/view-icard");
+      let url = "/user/view-icard";
+      if (userId) {
+        url += `?userId=${userId}`;
+      }
+      const response = await axiosInstance.get(url);
       return response.data.data || response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);

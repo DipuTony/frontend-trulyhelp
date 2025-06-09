@@ -1,10 +1,55 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiDownload } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 import { toast } from 'sonner';
+import { formatDateFull } from "../../components/common/DateFormatFunctions";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchICard } from "../../store/slices/volunteerSlice";
+import axiosInstance from '../../utils/axiosInterceptor';
 
-export default function IDCard({ cardData }) {
+export default function IDCard({ cardData, adminSelectedCard }) {
     const cardContainerRef = useRef(null);
+    const [fetchedData, setFetchedData] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const userId = adminSelectedCard?.userId;
+
+    console.log("cardData, userId",cardData, userId)
+
+    useEffect(() => {
+        // Only fetch if cardData is not provided
+        if (!cardData) {
+            const fetchICardData = async () => {
+                setLoading(true);
+                setError(null);
+                try {
+                    let url = "/user/view-icard";
+                    if (userId) {
+                        url += `?userId=${userId}`;
+                    }
+                    const res = await axiosInstance.get(url);
+                    const data = res.data;
+                    if (data.status) {
+                        setFetchedData(data.data);
+                    } else {
+                        setError(data.message || 'Failed to fetch iCard data');
+                    }
+                } catch (err) {
+                    setError(err.message || 'Failed to fetch iCard data');
+                } finally {
+                    setLoading(false);
+                }
+            };
+            fetchICardData();
+        }
+    }, [cardData, userId]);
+
+    const displayData = cardData || fetchedData;
+    console.log(displayData);
+    if (loading) return <div className="text-center py-10">Loading ID Card...</div>;
+    if (error) return <div className="text-center py-10 text-red-600">{error}</div>;
+    if (!displayData) return null;
 
     const handleDownload = async () => {
         if (!cardContainerRef.current) return;
@@ -78,7 +123,7 @@ export default function IDCard({ cardData }) {
                 const url = window.URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = `id-card-${cardData?.name || 'card'}.png`;
+                link.download = `id-card-${displayData?.name || 'card'}.png`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -96,13 +141,13 @@ export default function IDCard({ cardData }) {
     // Use provided data or fallback to static data
     const logo = 'https://trulyhelp.org/wp-content/uploads/2024/12/Logo7.png';
     const userImage = 'https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg';
-    const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${cardData?.userId || 'default'}`;
+    const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${displayData?.userId || 'default'}`;
     const orgName = "Truly Help Org"
     const webSite = "trulyhelp.org"
     const orgRegNo = "MH/2021/XXXXX"
     const orgPhone = "xxxx989652"
     const orgEmail = "info@trulyhelp.org"
-    const orgAddress = "demo address, noida, UP - 123456"
+    const orgAddress = "noida, UP"
 
     return (
         <div className="relative">
@@ -129,7 +174,7 @@ export default function IDCard({ cardData }) {
                         </a>
                         <div className="flex justify-center items-center mt-4 gap-4">
                             <img
-                                src={userImage}
+                                src={displayData?.profileImageUrl}
                                 alt="Profile"
                                 className="w-20 h-20 rounded object-cover"
                             />
@@ -139,13 +184,13 @@ export default function IDCard({ cardData }) {
                                 className="w-20 h-20"
                             /> */}
                         </div>
-                        <p className="text-red-600 font-bold mt-2">{cardData?.name || 'Name'}</p>
-                        <p className="text-red-600">{cardData?.role || 'Role'}</p>
+                        <p className="text-red-600 font-bold mt-2">{displayData?.name || 'Name'}</p>
+                        <p className="text-red-600">{displayData?.role || 'Role'}</p>
                         <div className="text-sm text-left mt-4 space-y-1">
-                            <p><strong>ID No:</strong> {cardData?.userId || 'N/A'}</p>
-                            <p><strong>Mob No:</strong> {cardData?.phone || 'N/A'}</p>
-                            <p><strong>Email:</strong> {cardData?.email || 'N/A'}</p>
-                            <p><strong>City:</strong> {cardData?.city || 'N/A'}</p>
+                            <p><strong>ID No:</strong> {displayData?.userId || 'N/A'}</p>
+                            <p><strong>Mob No:</strong> {displayData?.phone || 'N/A'}</p>
+                            <p><strong>Email:</strong> {displayData?.email || 'N/A'}</p>
+                            <p><strong>City:</strong> {displayData?.city || 'N/A'}</p>
                         </div>
                         <div className="mt-4 text-left">
                             <p className="text-xs">Rajkumar Maurya Maurya</p>
@@ -160,7 +205,7 @@ export default function IDCard({ cardData }) {
                             <p>✉ {orgEmail}</p>
                         </div>
                         <div>
-                            <p>📍 {orgEmail}</p>
+                            <p>📍 {orgAddress}</p>
                         </div>
                     </div>
                 </div>
@@ -199,8 +244,8 @@ export default function IDCard({ cardData }) {
                             </p>
                         </div>
                         <div className="mt-6 text-sm font-semibold text-left space-y-1">
-                            <p>Joining: {cardData?.iCardAssignDate || 'N/A'}</p>
-                            <p>Validity: {cardData?.iCardExpiryDate || 'N/A'}</p>
+                            <p>Joining: {formatDateFull(displayData?.iCardAssignDate) || 'N/A'}</p>
+                            <p>Validity: {formatDateFull(displayData?.iCardExpiryDate) || 'N/A'}</p>
                         </div>
                     </div>
                     <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
@@ -211,7 +256,7 @@ export default function IDCard({ cardData }) {
                             <p>✉ {orgEmail}</p>
                         </div>
                         <div>
-                            <p>📍 {orgEmail}</p>
+                            <p>📍 {orgAddress}</p>
                         </div>
                     </div>
                 </div>
