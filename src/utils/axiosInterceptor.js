@@ -1,6 +1,7 @@
 import axios from 'axios';
 // import { store } from '../store'; // Remove this import
 import { logout } from '../store/slices/authSlice';
+import { setMessage } from "../store/slices/notificationSlice"; // Import the setMessage action
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://donation.toolvid.in/",
@@ -42,9 +43,10 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      // Dispatch the logout action
+      // Dispatch the logout action and show message
       if (dispatchRef) {
         dispatchRef(logout());
+        dispatchRef(setMessage("Your session has expired. Please log in again.")); // Dispatch the message
       }
 
       if (navigateRef) {

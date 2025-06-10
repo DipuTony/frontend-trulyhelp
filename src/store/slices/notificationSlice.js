@@ -21,8 +21,16 @@ const notificationSlice = createSlice({
     clearNotifications: (state) => {
       state.notifications = []
     },
+    setMessage: (state, action) => {
+      state.notifications.push({
+        id: Date.now(),
+        type: 'info',
+        message: action.payload,
+        sentAt: new Date().toISOString(),
+      });
+    },
   },
 })
 
-export const { sendNotification, clearNotifications } = notificationSlice.actions
+export const { sendNotification, clearNotifications, setMessage } = notificationSlice.actions
 export default notificationSlice.reducer
