@@ -13,8 +13,9 @@ const DonorDonationHistory = () => {
   const { user } = useSelector((state) => state.auth)
   const { donations, loading, error } = useSelector((state) => state.donations)
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(5)
-  const [generatingReceipt, setGeneratingReceipt] = useState(false)
+  const [itemsPerPage, setItemsPerPage] = useState(5)
+  const [generatingReceipt, setGeneratingReceipt] = useState({})
+  const [searchTerm, setSearchTerm] = useState('')
 
   useEffect(() => {
     dispatch(fetchDonerDonations())
@@ -24,17 +25,37 @@ const DonorDonationHistory = () => {
   const verifiedDonations = donations.filter((d) => d.verified)
   const pendingDonations = donations.filter((d) => !d.verified)
 
+  // Filter donations based on search term
+  const filteredDonations = donations.filter(
+    (donation) =>
+      donation.donationId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      formatDateShort(donation.createdAt).toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donation.amount.toString().includes(searchTerm.toLowerCase()) ||
+      donation.method.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      donation.paymentStatus.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage
   const indexOfFirstItem = indexOfLastItem - itemsPerPage
-  const currentDonations = donations.slice(indexOfFirstItem, indexOfLastItem)
-  const totalPages = Math.ceil(donations.length / itemsPerPage)
+  const currentDonations = filteredDonations.slice(indexOfFirstItem, indexOfLastItem)
+  const totalPages = Math.ceil(filteredDonations.length / itemsPerPage)
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1) // Reset to first page on search
+  }
+
+  const handleItemsPerPageChange = (e) => {
+    setItemsPerPage(Number(e.target.value))
+    setCurrentPage(1) // Reset to first page when items per page changes
+  }
+
   const handleDownloadReceipt = async (donationId) => {
     try {
-      setGeneratingReceipt(true);
+      setGeneratingReceipt(prev => ({...prev, [donationId]: true}));
       const response = await axios.get(`${import.meta.env.VITE_API_URL}donations/receipt/${donationId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -67,7 +88,7 @@ const DonorDonationHistory = () => {
       alert('Failed to download receipt. Please try again.');
     }
     finally {
-      setGeneratingReceipt(false);
+      setGeneratingReceipt(prev => ({...prev, [donationId]: false}));
     }
   };
 
@@ -186,11 +207,36 @@ const DonorDonationHistory = () => {
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-200">
           <h3 className="text-xl font-semibold text-gray-900">Donation History</h3>
+          <div className="mt-4 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <input
+              type="text"
+              placeholder="Search donations..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="p-2 border border-gray-300 rounded-md w-full sm:w-1/3"
+            />
+            <div className="flex items-center space-x-2">
+              <label htmlFor="itemsPerPage" className="text-sm text-gray-700">Show:</label>
+              <select
+                id="itemsPerPage"
+                value={itemsPerPage}
+                onChange={handleItemsPerPageChange}
+                className="p-2 border border-gray-300 rounded-md"
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </select>
+              <span className="text-sm text-gray-700">entries</span>
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
+                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction No</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Donation Id</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
@@ -219,6 +265,9 @@ const DonorDonationHistory = () => {
                 currentDonations.map((donation) => (
                   <tr key={donation.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {donation?.transactionId}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       {donation?.donationId}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -243,14 +292,14 @@ const DonorDonationHistory = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => handleDownloadReceipt(donation?.donationId)}
-                        disabled={generatingReceipt || donation.paymentStatus !== "COMPLETED"}
+                        disabled={generatingReceipt[donation?.donationId] || donation.paymentStatus !== "COMPLETED"}
                         className={`inline-flex items-center px-4 py-2 border rounded-xl shadow-sm text-sm font-medium disabled:opacity-50 transition-all duration-200
                           ${!donation.verified
                             ? 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
                             : 'border-gray-200 text-gray-400 bg-gray-100 cursor-not-allowed'}`}
                       >
                         {donation.paymentStatus === "COMPLETED" && <i className="fas fa-download mr-2"></i>}
-                        {generatingReceipt ? "Generating..." : donation.paymentStatus === "COMPLETED" ? 'Download Tax Receipt' : `Not Available`}
+                        {generatingReceipt[donation?.donationId] ? "Generating..." : donation.paymentStatus === "COMPLETED" ? 'Download Tax Receipt' : `Not Available`}
                       </button>
                     </td>
                   </tr>
@@ -261,11 +310,11 @@ const DonorDonationHistory = () => {
         </div>
 
         {/* Pagination */}
-        {donations.length > itemsPerPage && (
+        {filteredDonations.length > itemsPerPage && (
           <div className="px-6 py-4 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="text-sm text-gray-500">
-                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, donations.length)} of {donations.length} entries
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredDonations.length)} of {filteredDonations.length} entries
               </div>
               <div className="flex space-x-2">
                 <button
