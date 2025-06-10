@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom"
-import { Provider } from "react-redux"
-import { store } from "./store"
+import { useDispatch } from "react-redux"
 import { ErrorBoundary } from "react-error-boundary"
 import ErrorFallback from "./components/common/ErrorBoundary"
 
@@ -43,7 +42,7 @@ import ForgotPassword from "./pages/auth/ForgotPassword"
 import ResetPassword from "./pages/auth/ResetPassword"
 import ToastNotification from "./components/common/ToastNotification"
 import { useEffect } from "react"
-import { setAxiosNavigate } from "./utils/axiosInterceptor"
+import { setAxiosNavigate, setAxiosDispatch } from "./utils/axiosInterceptor"
 
 // Guest Pages
 import GuestIndex from "./pages/guest/GuestIndex"
@@ -60,13 +59,15 @@ import SearchDonor from "./pages/volunteer/SearchDonor"
 function App() {
 
   const navigate = useNavigate();
+  const dispatch = useDispatch(); // Get the dispatch function
 
   useEffect(() => {
-    setAxiosNavigate(navigate); // Pass navigate to axios
-  }, [navigate]);
+    setAxiosNavigate(navigate);
+    setAxiosDispatch(dispatch);
+  }, [navigate, dispatch]);
 
   return (
-    <Provider store={store}>
+    <>
       <ToastNotification />
       <ErrorBoundary
         FallbackComponent={({ error, resetErrorBoundary }) => (
@@ -188,7 +189,7 @@ function App() {
           {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
         </Routes>
       </ErrorBoundary>
-    </Provider>
+    </>
   )
 }
 

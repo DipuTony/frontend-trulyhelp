@@ -1,4 +1,6 @@
 import axios from 'axios';
+// import { store } from '../store'; // Remove this import
+import { logout } from '../store/slices/authSlice';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "https://donation.toolvid.in/",
@@ -9,10 +11,16 @@ const axiosInstance = axios.create({
 
 // Store a reference to the navigate function (to be set later)
 let navigateRef = null;
+let dispatchRef = null;
 
 // Function to set navigate (to be called from a React component)
 export const setAxiosNavigate = (navigate) => {
   navigateRef = navigate;
+};
+
+// New: Function to set dispatch (to be called from a React component)
+export const setAxiosDispatch = (dispatch) => {
+  dispatchRef = dispatch;
 };
 
 // Request interceptor (adds token)
@@ -34,6 +42,10 @@ axiosInstance.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      // Dispatch the logout action
+      if (dispatchRef) {
+        dispatchRef(logout());
+      }
 
       if (navigateRef) {
         navigateRef('/login'); // Use React Router navigation (no reload)

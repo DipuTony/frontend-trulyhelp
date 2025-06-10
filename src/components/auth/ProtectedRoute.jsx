@@ -7,9 +7,7 @@ const ProtectedRoute = ({ children, role }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
-  console.log("ProtectedRoute User:", user)
-
-  // Check if user has the required role
+  // Only check role if authenticated to prevent issues with stale user data after logout
   if (role && user.role.toLowerCase() !== role.toLowerCase()) {
     // Redirect based on actual user role
     const actualRole = user.role.toLowerCase()
@@ -23,10 +21,6 @@ const ProtectedRoute = ({ children, role }) => {
       return <Navigate to="/" replace />
     }
   }
-
-
-
-
   return children
 }
 
