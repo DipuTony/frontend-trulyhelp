@@ -8,6 +8,7 @@ import { PencilIcon, PlusIcon } from "@heroicons/react/24/outline"
 import { formatDateShort } from "../../../components/common/DateFormatFunctions"
 import DonationDetails from "./DonationDetails";
 import UploadEvidenceForm from "./UploadEvidenceForm";
+import UploadImageModal from "./UploadImageModal";
 
 const DonationList = () => {
   const dispatch = useDispatch()
@@ -16,9 +17,10 @@ const DonationList = () => {
   const isAdmin = user?.role === 'ADMIN'
   const [filter, setFilter] = useState("ALL") // ALL, PENDING, COMPLETED, FAILED, REFUNDED
   const navigate = useNavigate();
-  const [view, setView] = useState("DATA") // DATA, DETAILS, UPLOAD_IMAGE
+  const [view, setView] = useState("DATA") // DATA, DETAILS
   const [selectedData, setSelectedData] = useState("");// Selected data for view details
-  const [uploadingImageForDonationId, setUploadingImageForDonationId] = useState(null); // State to hold donationId for image upload
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // State for modal visibility
+  const [selectedDonationForUpload, setSelectedDonationForUpload] = useState(null); // State to hold donation data for image upload
 
 
   // Single useEffect to handle data fetching
@@ -34,6 +36,20 @@ const DonationList = () => {
   const handleViewDonation = (donationId) => {
     navigate(`/admin/UserDetails/${donationId}`);
   }
+
+  const handleOpenUploadModal = (donation) => {
+    setSelectedDonationForUpload(donation);
+    setIsUploadModalOpen(true);
+  };
+
+  const handleCloseUploadModal = () => {
+    setIsUploadModalOpen(false);
+    setSelectedDonationForUpload(null);
+  };
+
+  const handleImageUploadSuccess = () => {
+    dispatch(fetchDonations(filter)); // Refetch donations after successful upload
+  };
 
   if (loading) {
     return (
@@ -121,15 +137,14 @@ const DonationList = () => {
           >
             View Details
           </button>
-          <button
-            onClick={() => {
-              setView("UPLOAD_IMAGE");
-              setUploadingImageForDonationId(row.original.donationId);
-            }}
-            className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
-          >
-            Upload Image
-          </button>
+          {!(row.original.paymentStatus === 'COMPLETED' || row.original.method === 'ONLINE') && (
+            <button
+              onClick={() => handleOpenUploadModal(row.original)}
+              className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
+            >
+              Upload Image
+            </button>
+          )}
         </div>
       )
     }
@@ -151,7 +166,7 @@ const DonationList = () => {
       {/* Tab code start here */}
       <div className="flex border-b border-gray-200">
         <button
-          onClick={() => (setView("DATA"), setSelectedData(""), setUploadingImageForDonationId(null))}
+          onClick={() => (setView("DATA"), setSelectedData(""))}
           className={`px-4 py-2 font-medium text-sm focus:outline-none ${view === "DATA"
             ? "border-b-2 border-blue-500 text-blue-600"
             : "text-gray-500 hover:text-gray-700"
@@ -160,22 +175,13 @@ const DonationList = () => {
           Donations
         </button>
         <button
-          onClick={() => (setView("DETAILS"), setUploadingImageForDonationId(null))}
+          onClick={() => setView("DETAILS")}
           className={`px-4 py-2 font-medium text-sm focus:outline-none ${view === "DETAILS"
             ? "border-b-2 border-blue-500 text-blue-600"
             : "text-gray-500 hover:text-gray-700"
             }`}
         >
           Details
-        </button>
-        <button
-          onClick={() => setView("UPLOAD_IMAGE")}
-          className={`px-4 py-2 font-medium text-sm focus:outline-none ${view === "UPLOAD_IMAGE"
-            ? "border-b-2 border-blue-500 text-blue-600"
-            : "text-gray-500 hover:text-gray-700"
-            }`}
-        >
-          Upload Image
         </button>
       </div>
 
@@ -224,15 +230,12 @@ const DonationList = () => {
         )
       }
 
-      {view === "UPLOAD_IMAGE" && (
-        uploadingImageForDonationId ? (
-          <UploadEvidenceForm
-            donationId={uploadingImageForDonationId}
-            goBack={() => (setUploadingImageForDonationId(null), setView("DATA"))}
-          />
-        ) : (
-          "Please select a donation to upload an image for."
-        )
+      {isUploadModalOpen && (
+        <UploadImageModal
+          donationData={selectedDonationForUpload}
+          onClose={handleCloseUploadModal}
+          onUploadSuccess={handleImageUploadSuccess}
+        />
       )}
     </div>
   )
