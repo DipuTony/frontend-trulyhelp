@@ -6,6 +6,7 @@ import { fetchDonations, verifyDonation } from "../../store/slices/donationSlice
 import { formatDateShort, formatRelativeTime } from "../../components/common/DateFormatFunctions"
 import { showErrorToast, showSuccessToast } from '../../utils/toast';
 import axios from "axios"
+import ImageViewerModal from "../admin/Donations/ImageViewerModal";
 
 const PaymentVerification = () => {
   const dispatch = useDispatch()
@@ -20,6 +21,8 @@ const PaymentVerification = () => {
   const [loadingMethods, setLoadingMethods] = useState(false)
   const [selectedPaymentStatusForVerify, setSelectedPaymentStatusForVerify] = useState('')
   const [dropdownError, setDropdownError] = useState('');
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false);
+  const [imageToView, setImageToView] = useState(null);
 
   useEffect(() => {
     fetchPaymentStatusesMasterData();
@@ -107,6 +110,16 @@ const PaymentVerification = () => {
           showErrorToast(error?.message || 'Failed to verify donation');
         });
     }
+  };
+
+  const handleOpenImageViewer = (imageUrl) => {
+    setImageToView(imageUrl);
+    setIsImageViewerOpen(true);
+  };
+
+  const handleCloseImageViewer = () => {
+    setImageToView(null);
+    setIsImageViewerOpen(false);
   };
 
   if (loading) {
@@ -221,6 +234,11 @@ const PaymentVerification = () => {
                           <p className="text-sm font-medium text-gray-900 truncate">{donation.donorName}</p>
                           <p className="text-sm text-gray-500 truncate">{donation.donorEmail}</p>
                           <p className="text-sm text-gray-500 truncate">{donation.donorPhone}</p>
+                          {donation.paymentEvidencePath ? (
+                            <p className="text-xs text-green-600">Image Available</p>
+                          ) : (
+                            <p className="text-xs text-red-600">No Image</p>
+                          )}
                         </div>
                         <div>
                           <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
@@ -305,6 +323,26 @@ const PaymentVerification = () => {
                       </dd>
                     </div>
                   }
+                  {selectedDonation?.paymentEvidencePath && (
+                    <div className="sm:col-span-2">
+                      <dt className="text-sm font-medium text-gray-500">Payment Evidence</dt>
+                      <dd className="mt-1 text-sm text-gray-900 flex items-center space-x-2">
+                        <img
+                          src={selectedDonation.paymentEvidencePath}
+                          alt="Payment Evidence"
+                          className="w-24 h-24 object-cover rounded-md border border-gray-300 cursor-pointer"
+                          onClick={() => handleOpenImageViewer(selectedDonation.paymentEvidencePath)}
+                        />
+                        {selectedDonation.paymentEvidenceUploadedAt && (
+                          <span className="text-gray-500 text-xs">
+                            Uploaded: {formatDateShort(selectedDonation.paymentEvidenceUploadedAt)}
+                            <br />
+                            ({formatRelativeTime(selectedDonation.paymentEvidenceUploadedAt)})
+                          </span>
+                        )}
+                      </dd>
+                    </div>
+                  )}
                 </dl>
                 <div className="mt-6 flex justify-end space-x-4">
                   {loadingStatuses ? (
@@ -349,6 +387,12 @@ const PaymentVerification = () => {
           </div>
         </div>
       </div>
+      {isImageViewerOpen && (
+        <ImageViewerModal
+          imageUrl={imageToView}
+          onClose={handleCloseImageViewer}
+        />
+      )}
     </div>
   )
 }

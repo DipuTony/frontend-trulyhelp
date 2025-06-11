@@ -148,7 +148,7 @@ const DonationList = () => {
           <img
             src={row.original.paymentEvidencePath}
             alt="Evidence"
-            className="w-12 h-12 object-cover rounded-md border border-gray-300 cursor-pointer"
+            className="w-12 h-12 object-cover rounded-md border border-blue-400 hover:shadow-lg shadow-xl cursor-pointer"
             onClick={() => handleOpenImageViewer(row.original.paymentEvidencePath)}
           />
         ) : (
@@ -167,13 +167,13 @@ const DonationList = () => {
             View Details
           </button>
           {!(row.original.paymentStatus === 'COMPLETED' || row.original.method === 'ONLINE') && (
+           user?.role === "VOLUNTEER" &&
             <button
               onClick={() => handleOpenUploadModal(row.original)}
-              className={`${
-                row.original.paymentEvidencePath
+              className={`${row.original.paymentEvidencePath
                   ? "bg-yellow-500 hover:bg-yellow-600"
                   : "bg-green-500 hover:bg-green-600"
-              } inline-flex items-center text-white border border-transparent rounded-md px-2 py-1`}
+                } inline-flex items-center text-white border border-transparent rounded-md px-2 py-1`}
             >
               {row.original.paymentEvidencePath ? "ReUpload Image" : "Upload Image"}
             </button>
