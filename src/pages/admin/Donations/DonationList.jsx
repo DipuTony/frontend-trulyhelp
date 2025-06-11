@@ -9,6 +9,7 @@ import { formatDateShort } from "../../../components/common/DateFormatFunctions"
 import DonationDetails from "./DonationDetails";
 import UploadEvidenceForm from "./UploadEvidenceForm";
 import UploadImageModal from "./UploadImageModal";
+import ImageViewerModal from "./ImageViewerModal";
 
 const DonationList = () => {
   const dispatch = useDispatch()
@@ -21,6 +22,8 @@ const DonationList = () => {
   const [selectedData, setSelectedData] = useState("");// Selected data for view details
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false); // State for modal visibility
   const [selectedDonationForUpload, setSelectedDonationForUpload] = useState(null); // State to hold donation data for image upload
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); // State for image viewer modal visibility
+  const [imageToView, setImageToView] = useState(null); // State to hold the URL of the image to display
 
 
   // Single useEffect to handle data fetching
@@ -49,6 +52,17 @@ const DonationList = () => {
 
   const handleImageUploadSuccess = () => {
     dispatch(fetchDonations(filter)); // Refetch donations after successful upload
+    handleCloseUploadModal(); // Close the upload modal after success
+  };
+
+  const handleOpenImageViewer = (imageUrl) => {
+    setImageToView(imageUrl);
+    setIsImageViewerOpen(true);
+  };
+
+  const handleCloseImageViewer = () => {
+    setImageToView(null);
+    setIsImageViewerOpen(false);
   };
 
   if (loading) {
@@ -128,21 +142,40 @@ const DonationList = () => {
       Cell: ({ value }) => formatDateShort(value)
     },
     {
+      Header: 'Image',
+      Cell: ({ row }) => (
+        row.original.paymentEvidencePath ? (
+          <img
+            src={row.original.paymentEvidencePath}
+            alt="Evidence"
+            className="w-12 h-12 object-cover rounded-md border border-gray-300 cursor-pointer"
+            onClick={() => handleOpenImageViewer(row.original.paymentEvidencePath)}
+          />
+        ) : (
+          <span className="text-gray-400">No Image</span>
+        )
+      )
+    },
+    {
       Header: 'Actions',
       Cell: ({ row }) => (
-        <div>
+        <div className="flex flex-col space-y-2">
           <button
             onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
-            className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
+            className="inline-flex items-center text-white bg-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-700"
           >
             View Details
           </button>
           {!(row.original.paymentStatus === 'COMPLETED' || row.original.method === 'ONLINE') && (
             <button
               onClick={() => handleOpenUploadModal(row.original)}
-              className="inline-flex items-center text-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-600 hover:text-white"
+              className={`${
+                row.original.paymentEvidencePath
+                  ? "bg-yellow-500 hover:bg-yellow-600"
+                  : "bg-green-500 hover:bg-green-600"
+              } inline-flex items-center text-white border border-transparent rounded-md px-2 py-1`}
             >
-              Upload Image
+              {row.original.paymentEvidencePath ? "ReUpload Image" : "Upload Image"}
             </button>
           )}
         </div>
@@ -235,6 +268,13 @@ const DonationList = () => {
           donationData={selectedDonationForUpload}
           onClose={handleCloseUploadModal}
           onUploadSuccess={handleImageUploadSuccess}
+        />
+      )}
+
+      {isImageViewerOpen && (
+        <ImageViewerModal
+          imageUrl={imageToView}
+          onClose={handleCloseImageViewer}
         />
       )}
     </div>
