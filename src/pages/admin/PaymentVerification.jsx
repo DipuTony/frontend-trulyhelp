@@ -88,14 +88,12 @@ const PaymentVerification = () => {
     }
   };
 
-
   const handleVerify = () => {
     if (!selectedPaymentStatusForVerify) {
       setDropdownError('Please select a payment status');
       return;
     }
     setDropdownError('');
-
 
     if (selectedDonation) {
       console.log("in jsx", selectedDonation.donationId, selectedDonation.amount, selectedPaymentStatusForVerify)
@@ -131,120 +129,131 @@ const PaymentVerification = () => {
   }
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Payment Verification</h1>
-          <p className="mt-2 text-sm text-gray-700">
-            Verify pending donation payments done by volunteers which is offline.
-          </p>
-        </div>
+      
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Payment Verification</h1>
+        <p className="mt-2 text-lg text-gray-600">
+          Verify pending donation payments from volunteers
+        </p>
       </div>
 
-      {/* Payment Filter */}
-      <div className="flex space-x-4 mb-4">
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
-          {loadingStatuses ? (
-            <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
-          ) : (
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      {/* Filters Section */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Status</label>
+            {loadingStatuses ? (
+              <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+            ) : (
+              <select
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {paymentStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
+            {loadingMethods ? (
+              <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+            ) : (
+              <select
+                value={selectedMethod}
+                onChange={(e) => setSelectedMethod(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option value="ALL">All Methods</option>
+                {paymentMethods.map((method) => (
+                  <option key={method.id} value={method.id}>
+                    {method.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={() => fetchDonationsByMethod()}
+              className="w-full h-10 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              {paymentStatuses.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          )}
+              Apply Filters
+            </button>
+          </div>
         </div>
 
-        <div className="flex-1">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-          {loadingMethods ? (
-            <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
-          ) : (
-            <select
-              value={selectedMethod}
-              onChange={(e) => setSelectedMethod(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              <option value="ALL">All Methods</option>
-              {paymentMethods.map((method) => (
-                <option key={method.id} value={method.id}>
-                  {method.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        <div className="flex items-end">
-          <button
-            onClick={() => fetchDonationsByMethod()}
-            className="h-10 px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-          >
-            Apply Filters
-          </button>
+        {/* Search Bar */}
+        <div className="mt-6">
+          <input
+            type="text"
+            placeholder="Search by name, phone, or transaction ID"
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-
-      {/* Search Bar */}
-      <div className="mt-4">
-        <input
-          type="text"
-          placeholder="Search by name, phone, or transaction ID"
-          className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
-      <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-        <div className="sm:col-span-3">
-          <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-            <h3 className="text-lg font-medium leading-6 text-gray-900">Pending Donations</h3>
-            <div className="mt-2 max-h-96 overflow-y-auto ">
+      {/* Main Content */}
+      <div className="flex flex-col lg:flex-row gap-6">
+        {/* Donations List */}
+        <div className="lg:w-1/2">
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium text-gray-900">Pending Donations</h3>
+            </div>
+            <div className="max-h-[600px] overflow-y-auto">
               {donations?.length === 0 ? (
-                <p className="text-sm text-gray-500 italic">No matching donations found.</p>
+                <div className="p-6 text-center">
+                  <p className="text-gray-500 italic">No matching donations found.</p>
+                </div>
               ) : (
                 <ul className="divide-y divide-gray-200">
                   {donations?.map((donation) => (
                     <li
                       key={donation.id}
-                      className={`py-4 cursor-pointer hover:bg-gray-50 ${selectedDonation?.id === donation.id ? "bg-indigo-50" : ""}`}
+                      className={`p-4 cursor-pointer transition-colors duration-150 
+                        ${selectedDonation?.id === donation.id 
+                          ? "bg-indigo-50 border-l-4 border-indigo-500" 
+                          : "hover:bg-gray-50"}`}
                       onClick={() => setSelectedDonation(donation)}
                     >
-                      <div className="flex items-center space-x-4">
+                      <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0">
                           <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-indigo-100">
                             <i className="fas fa-user text-indigo-500"></i>
                           </span>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">{donation.donorName}</p>
-                          <p className="text-sm text-gray-500 truncate">{donation.donorEmail}</p>
-                          <p className="text-sm text-gray-500 truncate">{donation.donorPhone}</p>
-                          {donation.paymentEvidencePath ? (
-                            <p className="text-xs text-green-600">Image Available</p>
-                          ) : (
-                            <p className="text-xs text-red-600">No Image</p>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">₹{donation.amount?.toFixed(2)}</p>
-                          <p className="text-xs text-gray-500">{formatDateShort(donation.createdAt)}</p>
-                          <p className="text-xs text-gray-500">TID: {donation.transactionId}</p>
-                          <p className="text-xs text-gray-500">Method: {donation.method}</p>
+                          <div className="flex justify-between">
+                            <p className="text-sm font-medium text-gray-900 truncate">{donation.donorName}</p>
+                            <p className="text-sm font-semibold text-indigo-600">₹{donation.amount?.toFixed(2)}</p>
+                          </div>
+                          <p className="text-sm text-gray-500 mt-1">{donation.donorPhone}</p>
+                          <div className="mt-2 flex items-center space-x-2">
+                            <span className={`px-2 py-1 text-xs rounded-full 
+                              ${donation.paymentEvidencePath 
+                                ? "bg-green-100 text-green-800" 
+                                : "bg-red-100 text-red-800"}`}>
+                              {donation.paymentEvidencePath ? "Image Available" : "No Image"}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              {formatDateShort(donation.createdAt)}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -255,138 +264,166 @@ const PaymentVerification = () => {
           </div>
         </div>
 
-        <div className="sm:col-span-3">
-          <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
-            <div className="flex justify-between">
-              <h3 className="text-lg font-medium leading-6 text-gray-900">Payment Details</h3>
-              <h3>{selectedDonation?.paymentStatus && selectedDonation?.paymentStatus}</h3>
+        {/* Donation Details */}
+        <div className="lg:w-1/2">
+          <div className={`bg-white shadow rounded-lg h-full transition-all duration-300 
+            ${selectedDonation ? "opacity-100" : "opacity-70"}`}>
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+              <h3 className="text-lg font-medium text-gray-900">Payment Details</h3>
+              {selectedDonation?.paymentStatus && (
+                <span className={`px-3 py-1 rounded-full text-xs font-medium 
+                  ${selectedDonation.paymentStatus === 'PENDING' ? 'bg-yellow-100 text-yellow-800' : 
+                    selectedDonation.paymentStatus === 'VERIFIED' ? 'bg-green-100 text-green-800' : 
+                    'bg-red-100 text-red-800'}`}>
+                  {selectedDonation.paymentStatus}
+                </span>
+              )}
             </div>
+            
             {selectedDonation ? (
-              <div className="mt-5 border-t border-gray-200 pt-5">
-                <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Donation ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {selectedDonation.donationId || "N/A"}
-                    </dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Transaction ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {selectedDonation.transactionId || "N/A"}
-                    </dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Donor Name</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorName}</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Donor Phone</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorPhone}</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Donor Email</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.donorEmail}</dd>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">Donation Information</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Donation ID</p>
+                        <p className="text-sm font-medium">{selectedDonation.donationId || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Transaction ID</p>
+                        <p className="text-sm font-medium">{selectedDonation.transactionId || "N/A"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Amount</p>
+                        <p className="text-sm font-medium">₹{selectedDonation.amount?.toFixed(2)}</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Amount</dt>
-                    <dd className="mt-1 text-sm text-gray-900">₹{selectedDonation.amount?.toFixed(2)}</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Payment Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
-                      {formatDateShort(selectedDonation.createdAt)}
-                    </dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation.method || "N/A"}</dd>
-                  </div>
-                  <div className="sm:col-span-1">
-                    <dt className="text-sm font-medium text-gray-500 capitalize">Payment Ref No</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{selectedDonation?.offlinePaymentRefNo || "N/A"}</dd>
-                  </div>
-                  {selectedDonation?.checkIssueDate &&
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Check Issue Date</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{formatDateShort(selectedDonation.checkIssueDate) || "N/A"}
-                        <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkIssueDate)})</span>
-                      </dd>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">Donor Information</h4>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs text-gray-500">Name</p>
+                        <p className="text-sm font-medium">{selectedDonation.donorName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Phone</p>
+                        <p className="text-sm font-medium">{selectedDonation.donorPhone}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Email</p>
+                        <p className="text-sm font-medium">{selectedDonation.donorEmail}</p>
+                      </div>
                     </div>
-                  }
-                  {selectedDonation?.checkExpiryDate &&
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Check Expiry Date</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{formatDateShort(selectedDonation.checkExpiryDate) || "N/A"}
-                        <span className="text-gray-400 text-sm mx-2">({formatRelativeTime(selectedDonation.checkExpiryDate)})</span>
-                      </dd>
-                    </div>
-                  }
-                  {selectedDonation?.paymentEvidencePath && (
-                    <div className="sm:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">Payment Evidence</dt>
-                      <dd className="mt-1 text-sm text-gray-900 flex items-center space-x-2">
-                        <img
-                          src={selectedDonation.paymentEvidencePath}
-                          alt="Payment Evidence"
-                          className="w-24 h-24 object-cover rounded-md border border-gray-300 cursor-pointer"
-                          onClick={() => handleOpenImageViewer(selectedDonation.paymentEvidencePath)}
-                        />
-                        {selectedDonation.paymentEvidenceUploadedAt && (
-                          <span className="text-gray-500 text-xs">
-                            Uploaded: {formatDateShort(selectedDonation.paymentEvidenceUploadedAt)}
-                            <br />
-                            ({formatRelativeTime(selectedDonation.paymentEvidenceUploadedAt)})
-                          </span>
-                        )}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-                <div className="mt-6 flex justify-end space-x-4">
-                  {loadingStatuses ? (
-                    <div className="animate-pulse h-10 w-32 bg-gray-200 rounded"></div>
-                  ) : (
-                    <select
-                      value={selectedPaymentStatusForVerify}
-                      onChange={(e) => (setSelectedPaymentStatusForVerify(e.target.value), setDropdownError(''))}
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                      required
-                    >
-                      <option value="">Select</option>
-                      {paymentStatuses
-                        .filter(status => selectedDonation?.paymentStatus !== status)
-                        .map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))
-                      }
-                    </select>
-                  )}
-
-                  <button
-                    type="button"
-                    onClick={handleVerify}
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                  >
-                    <i className="fas fa-check mr-2"></i>
-                    Verify Payment
-                  </button>
+                  </div>
                 </div>
-                {dropdownError && (
-                  <p className="text-center mt-1 text-sm text-red-600">{dropdownError}</p>
+
+                <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Payment Information</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs text-gray-500">Method</p>
+                      <p className="text-sm font-medium">{selectedDonation.method || "N/A"}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Date</p>
+                      <p className="text-sm font-medium">{formatDateShort(selectedDonation.createdAt)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Ref No</p>
+                      <p className="text-sm font-medium">{selectedDonation?.offlinePaymentRefNo || "N/A"}</p>
+                    </div>
+                    {selectedDonation?.checkIssueDate && (
+                      <div>
+                        <p className="text-xs text-gray-500">Check Issue Date</p>
+                        <p className="text-sm font-medium">
+                          {formatDateShort(selectedDonation.checkIssueDate)}
+                          <span className="text-gray-400 text-xs ml-1">({formatRelativeTime(selectedDonation.checkIssueDate)})</span>
+                        </p>
+                      </div>
+                    )}
+                    {selectedDonation?.checkExpiryDate && (
+                      <div>
+                        <p className="text-xs text-gray-500">Check Expiry Date</p>
+                        <p className="text-sm font-medium">
+                          {formatDateShort(selectedDonation.checkExpiryDate)}
+                          <span className="text-gray-400 text-xs ml-1">({formatRelativeTime(selectedDonation.checkExpiryDate)})</span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedDonation?.paymentEvidencePath && (
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">Payment Evidence</h4>
+                    <div className="flex items-start space-x-4">
+                      <img
+                        src={selectedDonation.paymentEvidencePath}
+                        alt="Payment Evidence"
+                        className="w-32 h-32 object-contain rounded-md border border-gray-300 cursor-pointer hover:shadow-md transition-shadow"
+                        onClick={() => handleOpenImageViewer(selectedDonation.paymentEvidencePath)}
+                      />
+                      {selectedDonation.paymentEvidenceUploadedAt && (
+                        <div className="text-sm text-gray-500">
+                          <p>Uploaded: {formatDateShort(selectedDonation.paymentEvidenceUploadedAt)}</p>
+                          <p>({formatRelativeTime(selectedDonation.paymentEvidenceUploadedAt)})</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
+
+                <div className="mt-6">
+                  <div className="flex flex-col space-y-4">
+                    {loadingStatuses ? (
+                      <div className="animate-pulse h-10 w-full bg-gray-200 rounded"></div>
+                    ) : (
+                      <select
+                        value={selectedPaymentStatusForVerify}
+                        onChange={(e) => (setSelectedPaymentStatusForVerify(e.target.value), setDropdownError(''))}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        required
+                      >
+                        <option value="">Select new status</option>
+                        {paymentStatuses
+                          .filter(status => selectedDonation?.paymentStatus !== status)
+                          .map((status) => (
+                            <option key={status} value={status}>
+                              {status}
+                            </option>
+                          ))
+                        }
+                      </select>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleVerify}
+                      className="w-full flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      <i className="fas fa-check mr-2"></i>
+                      Verify Payment
+                    </button>
+                  </div>
+                  {dropdownError && (
+                    <p className="mt-2 text-sm text-red-600 text-center">{dropdownError}</p>
+                  )}
+                </div>
               </div>
             ) : (
-              <div className="mt-5 flex items-center justify-center h-64">
-                <p className="text-sm text-gray-500 italic">Select a donation to view payment details.</p>
+              <div className="p-6 flex flex-col items-center justify-center h-64 text-center">
+                <i className="fas fa-hand-pointer text-4xl text-gray-300 mb-4"></i>
+                <h4 className="text-lg font-medium text-gray-500">Select a donation</h4>
+                <p className="text-sm text-gray-400 mt-1">Choose a donation from the list to view details</p>
               </div>
             )}
           </div>
         </div>
       </div>
+
       {isImageViewerOpen && (
         <ImageViewerModal
           imageUrl={imageToView}

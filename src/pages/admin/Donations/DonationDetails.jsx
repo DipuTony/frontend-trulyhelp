@@ -10,7 +10,10 @@ import {
     FiCalendar,
     FiCheckCircle,
     FiClock,
-    FiXCircle
+    FiXCircle,
+    FiMessageSquare,
+    FiSmartphone,
+    FiAtSign
 } from 'react-icons/fi';
 import DonationHistory from './DonationHistory';
 import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
@@ -150,11 +153,50 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         {donation?.aadharNo || "N/A"}
                                     </p>
                                 </div>
+                                <div>
+                                    <p className="text-sm text-gray-500">Address</p>
+                                    <p className="font-medium flex items-center">
+                                        <FiFileText className="mr-2 text-gray-400" size={16} />
+                                        {donation?.donorAddress || "N/A"}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
                         {/* Payment & Address Information */}
                         <div className="space-y-6">
+                            {/* Send Receipt Section */}
+                            <div className="border rounded-lg p-4">
+                                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                                    <FiMessageSquare className="mr-2 text-blue-600" /> Send Receipt
+                                </h3>
+                                <div className="flex justify-around items-center py-4">
+                                    <a
+                                        href={`https://wa.me/${donation?.donorPhone}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex flex-col items-center text-green-500 hover:text-green-700 transition-colors duration-200"
+                                    >
+                                        <FiSmartphone size={30} />
+                                        <span className="text-xs mt-1">WhatsApp</span>
+                                    </a>
+                                    <a
+                                        href={`mailto:${donation?.donorEmail}`}
+                                        className="flex flex-col items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
+                                    >
+                                        <FiAtSign size={30} />
+                                        <span className="text-xs mt-1">Email</span>
+                                    </a>
+                                    <a
+                                        href={`sms:${donation?.donorPhone}`}
+                                        className="flex flex-col items-center text-purple-500 hover:text-purple-700 transition-colors duration-200"
+                                    >
+                                        <FiMessageSquare size={30} />
+                                        <span className="text-xs mt-1">SMS</span>
+                                    </a>
+                                </div>
+                            </div>
+
                             <div className="border rounded-lg p-4">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                                     <FiCreditCard className="mr-2 text-blue-600" /> Payment Details
@@ -279,12 +321,12 @@ const DonationDetails = ({ donationData, goBack }) => {
                                 </div>
                             </div>
 
-                            <div className="border rounded-lg p-4">
+                            {/* <div className="border rounded-lg p-4">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                                     <FiHome className="mr-2 text-blue-600" /> Address
                                 </h3>
                                 <p className="whitespace-pre-line">{donation?.donorAddress || "N/A"}</p>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
 
@@ -341,9 +383,9 @@ const DonationDetails = ({ donationData, goBack }) => {
                         </button>
                     </div>
                     <div className="px-6 py-4 flex justify-end space-x-3">
-                        <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
+                        {/* <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
                             Edit Details
-                        </button>
+                        </button> */}
                         <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Generate Receipt
                         </button>
