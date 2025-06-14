@@ -17,12 +17,14 @@ import {
 } from 'react-icons/fi';
 import DonationHistory from './DonationHistory';
 import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
+import ImageViewerModal from './ImageViewerModal';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
     const [showOldDonations, setShowOldDonations] = useState(false);
     const [donation, setDonation] = useState(donationData);
     const [showVolunteerDetails, setShowVolunteerDetails] = useState(false);
+    const [showReceiptModal, setShowReceiptModal] = useState(false);
 
     // Scroll to top when donation changes
     useEffect(() => {
@@ -166,35 +168,57 @@ const DonationDetails = ({ donationData, goBack }) => {
                         {/* Payment & Address Information */}
                         <div className="space-y-6">
                             {/* Send Receipt Section */}
-                            <div className="border rounded-lg p-4">
+                            <div className="border rounded-lg p-4 bg-white shadow-sm">
                                 <h3 className="text-lg font-semibold mb-4 flex items-center">
                                     <FiMessageSquare className="mr-2 text-blue-600" /> Send Receipt
                                 </h3>
-                                <div className="flex justify-around items-center py-4">
-                                    <a
-                                        href={`https://wa.me/${donation?.donorPhone}`}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex flex-col items-center text-green-500 hover:text-green-700 transition-colors duration-200"
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-2">
+                                    <div className="flex justify-around items-center w-full sm:w-auto gap-6">
+                                        <a
+                                            href={donation?.receiptPath ? `https://wa.me/${donation?.donorPhone}` : undefined}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-green-500 hover:text-green-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath}
+                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                        >
+                                            <FiSmartphone size={30} />
+                                            <span className="text-xs mt-1">WhatsApp</span>
+                                        </a>
+                                        <a
+                                            href={donation?.receiptPath ? `mailto:${donation?.donorEmail}` : undefined}
+                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-blue-500 hover:text-blue-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath}
+                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                        >
+                                            <FiAtSign size={30} />
+                                            <span className="text-xs mt-1">Email</span>
+                                        </a>
+                                        <a
+                                            href={donation?.receiptPath ? `sms:${donation?.donorPhone}` : undefined}
+                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-purple-500 hover:text-purple-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath}
+                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                        >
+                                            <FiMessageSquare size={30} />
+                                            <span className="text-xs mt-1">SMS</span>
+                                        </a>
+                                    </div>
+                                    <button
+                                        onClick={() => donation?.receiptPath && setShowReceiptModal(true)}
+                                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white shadow transition ${donation?.receiptPath ? 'hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                                        disabled={!donation?.receiptPath}
                                     >
-                                        <FiSmartphone size={30} />
-                                        <span className="text-xs mt-1">WhatsApp</span>
-                                    </a>
-                                    <a
-                                        href={`mailto:${donation?.donorEmail}`}
-                                        className="flex flex-col items-center text-blue-500 hover:text-blue-700 transition-colors duration-200"
-                                    >
-                                        <FiAtSign size={30} />
-                                        <span className="text-xs mt-1">Email</span>
-                                    </a>
-                                    <a
-                                        href={`sms:${donation?.donorPhone}`}
-                                        className="flex flex-col items-center text-purple-500 hover:text-purple-700 transition-colors duration-200"
-                                    >
-                                        <FiMessageSquare size={30} />
-                                        <span className="text-xs mt-1">SMS</span>
-                                    </a>
+                                        <FiFileText className="mr-2" size={16} />
+                                        View Receipt
+                                    </button>
                                 </div>
+                                {!donation?.receiptPath && (
+                                    <div className="mt-2 text-center text-sm text-red-500 font-medium">Receipt not available</div>
+                                )}
                             </div>
 
                             <div className="border rounded-lg p-4">
@@ -301,23 +325,6 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         <p className="text-sm text-gray-500">Date & Time</p>
                                         <p className="font-medium">{new Date(donation?.createdAt)?.toLocaleString() || "N/A"}</p>
                                     </div>
-
-                                    <div>
-                                        <p className="text-sm text-gray-500">Receipt</p>
-                                        {donation?.receiptPath ? (
-                                            <a
-                                                href={`${import.meta.env.VITE_API_URL}/${donation?.receiptPath}`}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 hover:underline flex items-center"
-                                            >
-                                                <FiFileText className="mr-2" size={16} />
-                                                Download Receipt
-                                            </a>
-                                        ) : (
-                                            <p className="text-gray-500">No receipt generated</p>
-                                        )}
-                                    </div>
                                 </div>
                             </div>
 
@@ -405,6 +412,14 @@ const DonationDetails = ({ donationData, goBack }) => {
 
                 <div className="mt-36 donations-container"></div>
             </div>
+
+            {/* Modal for viewing receipt */}
+            {showReceiptModal && (
+                <ImageViewerModal
+                    fileUrl={`${import.meta.env.VITE_API_URL}/${donation?.receiptPath}`}
+                    onClose={() => setShowReceiptModal(false)}
+                />
+            )}
         </div>
     );
 };
