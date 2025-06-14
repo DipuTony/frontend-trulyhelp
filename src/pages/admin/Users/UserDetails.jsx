@@ -15,7 +15,7 @@ const UserDetails = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const data = await axiosInstance.get(`${import.meta.env.VITE_API_URL}user/view-details?userId=${userId}`);
+        const data = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/user/view-details?userId=${userId}`);
         if (data.status) {
           setUserData(data?.data?.data);
         } else {

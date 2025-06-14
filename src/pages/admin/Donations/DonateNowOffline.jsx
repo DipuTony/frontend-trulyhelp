@@ -73,7 +73,7 @@ const DonateNowOffline = ({ usedFor }) => {
         const fetchDonationOptions = async () => {
             try {
                 setLoadingCauses(true);
-                const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}donation-options`);
+                const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/donation-options`);
                 if (response.data.success) {
                     setAvailableCauses(response.data.data);
                 }
@@ -87,7 +87,7 @@ const DonateNowOffline = ({ usedFor }) => {
         const fetchPaymentMethods = async () => {
             try {
                 setLoadingPaymentMethods(true);
-                const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}master/payment-methods`);
+                const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/master/payment-methods`);
                 if (response.data.status) {
                     setPaymentMethods(response.data.data);
                 }

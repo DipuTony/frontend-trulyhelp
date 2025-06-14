@@ -38,7 +38,7 @@ const DonorList = () => {
     const fetchVolunteers = async () => {
         try {
             setLoading(true);
-            const { data } = await axios.get(`${BACKEND_URL}user/view-all?role=DONOR`, header);
+            const { data } = await axios.get(`${BACKEND_URL}/user/view-all?role=DONOR`, header);
             console.log("data", data?.data)
             setVolunteers(data);
             setLoading(false);

@@ -49,13 +49,13 @@ const PaymentVerification = () => {
       setLoadingMethods(true)
 
       // Fetch payment statuses
-      const statusResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`)
+      const statusResponse = await axios.get(`${import.meta.env.VITE_API_URL}/master/payment-statuses`)
       if (statusResponse.data.status) {
         setPaymentStatuses(statusResponse.data.data)
       }
 
       //  fetch payment methods:
-      const methodResponse = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`)
+      const methodResponse = await axios.get(`${import.meta.env.VITE_API_URL}/master/payment-methods`)
       if (methodResponse.data.status) {
         // Use the same structure as VolunteerLayout's navigation
         const formattedMethods = methodResponse.data.data.groups.flatMap(group =>
@@ -77,7 +77,7 @@ const PaymentVerification = () => {
   const fetchPaymentStatusesMasterData = async () => {
     try {
       setLoadingStatuses(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-statuses`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/master/payment-statuses`);
       if (response.data.status) {
         setPaymentStatuses(response.data.data);
       }

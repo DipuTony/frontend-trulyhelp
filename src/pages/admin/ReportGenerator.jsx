@@ -25,7 +25,7 @@ const ReportGenerator = () => {
 
   const handleGenerate10DBReport = async () => {
     //donwad the csv file from the server
-    const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/from10DB`)
+    const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/report/from10DB`)
     const csv = response.data
     const blob = new Blob([csv], { type: "text/csv" })
     const url = URL.createObjectURL(blob)

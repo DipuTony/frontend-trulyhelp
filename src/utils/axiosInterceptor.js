@@ -4,7 +4,7 @@ import { logout } from '../store/slices/authSlice';
 import { setMessage } from "../store/slices/notificationSlice"; // Import the setMessage action
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://donation.toolvid.in/",
+  baseURL: import.meta.env.VITE_API_URL || "https://donation.toolvid.in",
   headers: {
     "Content-Type": "application/json",
   },

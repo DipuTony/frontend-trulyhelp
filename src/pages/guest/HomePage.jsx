@@ -15,7 +15,7 @@ const HomePage = ({ onDonateClick }) => {
         const fetchDonationOptions = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/donation-options`);
                 
                 if (response.data.success) {
                     setDonationOptions(response.data.data);

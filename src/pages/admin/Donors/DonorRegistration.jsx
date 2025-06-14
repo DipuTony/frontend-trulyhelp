@@ -117,7 +117,7 @@ const DonorRegistration = ({ usedFor }) => {
                 // Remove confirmPassword from payload
                 delete addUserPayload.confirmPassword;
 
-                const response = await axios.post(`${BACKEND_URL}user/create`, addUserPayload, header)
+                const response = await axios.post(`${BACKEND_URL}/user/create`, addUserPayload, header)
 
                 if (response.status === 201 || response.data.status) {
                     setSuccess(true)

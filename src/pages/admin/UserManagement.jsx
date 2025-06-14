@@ -95,10 +95,10 @@ const UserManagement = () => {
         // delete submitData.isEditing; // Remove isEditing from submitData
 
         if (isEditing && currentVolunteer) {
-          await axios.post(`${BACKEND_URL}user/update`, updatePayload, header);
+          await axios.post(`${BACKEND_URL}/user/update`, updatePayload, header);
           showSuccessToast("User updated successfully");
         } else {
-          await axios.post(`${BACKEND_URL}user/create`, addUserPayload, header);
+          await axios.post(`${BACKEND_URL}/user/create`, addUserPayload, header);
           showSuccessToast("User added successfully");
         }
 
@@ -122,7 +122,7 @@ const UserManagement = () => {
   const fetchVolunteers = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get(`${BACKEND_URL}user/view-all?role=${role?.toUpperCase()}`, header);
+      const { data } = await axios.get(`${BACKEND_URL}/user/view-all?role=${role?.toUpperCase()}`, header);
       console.log("data", data?.data)
       setVolunteers(data);
       setLoading(false);

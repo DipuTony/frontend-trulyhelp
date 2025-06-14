@@ -22,7 +22,7 @@ const VolunteerDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/volunteer-dashboard`)
+        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/report/volunteer-dashboard`)
         setDashboardData(response.data.data)
       } catch (error) {
         console.error('Error fetching dashboard data:', error)

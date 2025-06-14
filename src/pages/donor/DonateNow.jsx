@@ -23,7 +23,7 @@ const DonateNow = () => {
     const fetchDonationOptions = async () => {
       try {
         setIsLoading(true)
-        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}donation-options`)
+        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/donation-options`)
         if (response.data?.data) {
           setDonationOptions(response.data.data)
           const causes = Object.keys(response.data.data)

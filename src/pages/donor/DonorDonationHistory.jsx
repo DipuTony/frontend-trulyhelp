@@ -56,7 +56,7 @@ const DonorDonationHistory = () => {
   const handleDownloadReceipt = async (donationId) => {
     try {
       setGeneratingReceipt(prev => ({...prev, [donationId]: true}));
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}donations/receipt/${donationId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/donations/receipt/${donationId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },

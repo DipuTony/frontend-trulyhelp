@@ -56,7 +56,7 @@ const AddDonation = ({ usedFor }) => {
     const fetchDonationOptions = async () => {
       try {
         setLoadingCauses(true);
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/donation-options`);
 
         console.log("{response", response.data.data)
         // console.log("{key",Object.keys(response.data.data))
@@ -81,7 +81,7 @@ const AddDonation = ({ usedFor }) => {
     const fetchPaymentMethods = async () => {
       try {
         setLoadingPaymentMethods(true);
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}master/payment-methods`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/master/payment-methods`);
         if (response.data.status) {
           setPaymentMethods(response.data.data);
         } else {

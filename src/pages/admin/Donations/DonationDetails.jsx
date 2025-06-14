@@ -218,24 +218,24 @@ const DonationDetails = ({ donationData, goBack }) => {
                                     </div>
                                     {donation?.volunteer && (
                                         <div className="mt-4">
-                                            <div 
+                                            <div
                                                 className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 border border-gray-100"
                                                 onClick={() => setShowVolunteerDetails(!showVolunteerDetails)}
                                             >
                                                 <div className="p-4 flex items-center justify-between cursor-pointer">
                                                     <div className="flex items-center space-x-3">
                                                         <div className="bg-indigo-100 p-2 rounded-full">
-                                                            <svg 
-                                                                className="w-5 h-5 text-indigo-600" 
-                                                                fill="none" 
-                                                                stroke="currentColor" 
+                                                            <svg
+                                                                className="w-5 h-5 text-indigo-600"
+                                                                fill="none"
+                                                                stroke="currentColor"
                                                                 viewBox="0 0 24 24"
                                                             >
-                                                                <path 
-                                                                    strokeLinecap="round" 
-                                                                    strokeLinejoin="round" 
-                                                                    strokeWidth={2} 
-                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" 
+                                                                <path
+                                                                    strokeLinecap="round"
+                                                                    strokeLinejoin="round"
+                                                                    strokeWidth={2}
+                                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                                                                 />
                                                             </svg>
                                                         </div>
@@ -245,22 +245,22 @@ const DonationDetails = ({ donationData, goBack }) => {
                                                         </div>
                                                     </div>
                                                     <div className={`transform transition-transform duration-200 ${showVolunteerDetails ? 'rotate-180' : ''}`}>
-                                                        <svg 
-                                                            className="w-5 h-5 text-gray-500" 
-                                                            fill="none" 
-                                                            stroke="currentColor" 
+                                                        <svg
+                                                            className="w-5 h-5 text-gray-500"
+                                                            fill="none"
+                                                            stroke="currentColor"
                                                             viewBox="0 0 24 24"
                                                         >
-                                                            <path 
-                                                                strokeLinecap="round" 
-                                                                strokeLinejoin="round" 
-                                                                strokeWidth={2} 
-                                                                d="M19 9l-7 7-7-7" 
+                                                            <path
+                                                                strokeLinecap="round"
+                                                                strokeLinejoin="round"
+                                                                strokeWidth={2}
+                                                                d="M19 9l-7 7-7-7"
                                                             />
                                                         </svg>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className={`overflow-hidden transition-all duration-300 ease-in-out ${showVolunteerDetails ? 'max-h-96' : 'max-h-0'}`}>
                                                     <div className="p-4 bg-gray-50 border-t border-gray-100">
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -306,7 +306,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         <p className="text-sm text-gray-500">Receipt</p>
                                         {donation?.receiptPath ? (
                                             <a
-                                                href={donation?.receiptPath}
+                                                href={`${import.meta.env.VITE_API_URL}/${donation?.receiptPath}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="text-blue-600 hover:underline flex items-center"

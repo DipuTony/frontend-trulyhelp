@@ -34,7 +34,7 @@ const DonationSettings = () => {
   const fetchCauses = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}donation-options`);
+      const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/donation-options`);
       
       if (response.data.success) {
         // Transform the data structure to match our component needs
@@ -65,7 +65,7 @@ const DonationSettings = () => {
   const fetchCauseById = async (id) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}donation-options/${id}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/donation-options/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -150,7 +150,7 @@ const DonationSettings = () => {
     
     try {
       setLoading(true);
-      const response = await axios.delete(`${import.meta.env.VITE_API_URL}donation-options/${causeId}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/donation-options/${causeId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -250,7 +250,7 @@ const DonationSettings = () => {
       
       if (modalMode === "create") {
         response = await axios.post(
-          `${import.meta.env.VITE_API_URL}donation-options`,
+          `${import.meta.env.VITE_API_URL}/donation-options`,
           formData,
           {
             headers: {
@@ -260,7 +260,7 @@ const DonationSettings = () => {
         );
       } else {
         response = await axios.put(
-          `${import.meta.env.VITE_API_URL}donation-options/${selectedCause.causeId}`,
+          `${import.meta.env.VITE_API_URL}/donation-options/${selectedCause.causeId}`,
           formData,
           {
             headers: {
