@@ -1,8 +1,35 @@
-import { Outlet, Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { Outlet, Link, useNavigate } from "react-router-dom";
+import { logout } from "../../store/slices/authSlice";
 
 const GuestLayout = () => {
 
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+  // const isAdmin = user?.role === 'ADMIN';
+
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
   const organizationName = import.meta.env.VITE_ORG_NAME;
+
+  // Determine profile path based on user role
+  const getProfilePath = (role) => {
+    switch ((role || '').toUpperCase()) {
+      case 'ADMIN':
+        return '/admin';
+      case 'VOLUNTEER':
+        return '/volunteer';
+      case 'DONOR':
+        return '/donor';
+      default:
+        return '/profile';
+    }
+  };
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate("/login")
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
@@ -32,37 +59,73 @@ const GuestLayout = () => {
               </h1>
             </div>
             <div className="flex space-x-4">
-              <Link
-                to="/login"
-                className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
-              >
-                <span className="mr-1">👋</span> Login
-              </Link>
-              <Link
-                to="/signup"
-                className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-indigo-600 bg-white border-2 border-indigo-200 hover:border-indigo-300 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
-              >
-                <span className="mr-1">✨</span> Sign Up
-              </Link>
+              {isAuthenticated ?
+                <div className="flex items-center space-x-6 bg-white/70 px-4 py-2 rounded-xl shadow-sm border border-gray-100">
+                  {/* Avatar or Initials */}
+                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-lg shadow">
+                    {user?.name ? user.name[0] : user?.email[0]}
+                  </div>
+                  {/* Greeting and Role */}
+                  <div className="flex flex-col">
+                    <span className="text-gray-800 font-semibold">
+                      Hello, {user?.name || user?.email}
+                    </span>
+                    <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium shadow">
+                      {user?.role}
+                    </span>
+                  </div>
+                  {/* Actions */}
+                  <div className="flex space-x-2">
+                    <Link
+                      to={getProfilePath(user?.role)}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
+                    >
+                      <span className="mr-1">👤</span> Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
+                    >
+                      <span className="mr-1">🚪</span> Logout
+                    </button>
+                  </div>
+                </div>
+                :
+                <>
+                  <Link
+                    to="/login"
+                    className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                  >
+                    <span className="mr-1">👋</span> Login
+                  </Link>
+                  <Link
+                    to="/signup"
+                    className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-indigo-600 bg-white border-2 border-indigo-200 hover:border-indigo-300 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
+                  >
+                    <span className="mr-1">✨</span> Sign Up
+                  </Link>
+                </>
+              }
             </div>
+
           </div>
         </div>
-      </header>
+      </header >
 
       {/* Main Content */}
-      <main className="relative">
+      < main className="relative" >
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-72 bg-gradient-to-r from-indigo-50 to-purple-50 opacity-30 -z-0"></div>
-        
+        <div className="absolute top-0 left-0 w-full h-72 bg-gradient-to-r from-indigo-50 to-purple-50 opacity-30 -z-0" ></div >
+
         <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
             <Outlet />
           </div>
         </div>
-      </main>
+      </main >
 
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white">
+      <footer className="bg-gradient-to-r from-gray-900 to-gray-800 text-white" >
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
@@ -105,8 +168,8 @@ const GuestLayout = () => {
             </p>
           </div>
         </div>
-      </footer>
-    </div>
+      </footer >
+    </div >
   );
 };
 

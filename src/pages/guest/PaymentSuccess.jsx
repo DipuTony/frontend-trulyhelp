@@ -1,11 +1,15 @@
 import React from 'react'
 import { useLocation, Link } from 'react-router-dom'
 import { FaCheckCircle } from 'react-icons/fa'
+import { useSelector } from 'react-redux'
 
 const PaymentSuccess = () => {
   const location = useLocation()
   const searchParams = new URLSearchParams(location.search)
-  
+
+  const { isAuthenticated, user } = useSelector((state) => state.auth)
+  const isAdmin = user?.role === 'ADMIN';
+
   // Extract key payment details
   const paymentDetails = {
     Name: searchParams.get('name'),
@@ -76,25 +80,34 @@ const PaymentSuccess = () => {
                 <span className="absolute right-0 w-8 h-32 -mt-12 transition-all duration-1000 transform translate-x-12 bg-white opacity-10 rotate-12 group-hover:-translate-x-40 ease"></span>
                 <span>Donate Again</span>
               </Link>
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center px-8 py-3 border-2 border-gray-200 text-indigo-600 font-medium rounded-xl hover:bg-gray-50 transition-colors duration-300"
-              >
-                Sign In
-              </Link>
+              {isAuthenticated ?
+                <Link
+                  to="/donor"
+                  className="inline-flex items-center justify-center px-8 py-3 border-2 border-gray-200 text-indigo-600 font-medium rounded-xl hover:bg-gray-50 transition-colors duration-300"
+                >
+                 Download Receipt
+                </Link>
+                :
+                <Link
+                  to="/login"
+                  className="inline-flex items-center justify-center px-8 py-3 border-2 border-gray-200 text-indigo-600 font-medium rounded-xl hover:bg-gray-50 transition-colors duration-300"
+                >
+                  Sign In
+                </Link>
+              }
             </div>
           </div>
         </div>
 
         {/* Download Receipt Button */}
-        <div className="text-center mt-6">
+        {/* <div className="text-center mt-6">
           <button className="inline-flex items-center text-gray-600 hover:text-gray-900">
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
             Download Receipt
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   )

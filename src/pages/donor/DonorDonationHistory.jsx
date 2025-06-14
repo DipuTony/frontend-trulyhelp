@@ -22,8 +22,8 @@ const DonorDonationHistory = () => {
   }, [dispatch])
 
   const totalDonated = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-  const verifiedDonations = donations.filter((d) => d.verified)
-  const pendingDonations = donations.filter((d) => !d.verified)
+  const verifiedDonations = donations.filter((d) => d.paymentStatus==="COMPLETED")
+  const pendingDonations = donations.filter((d) => !d.paymentStatus==="PENDING") || 0
 
   // Filter donations based on search term
   const filteredDonations = donations.filter(

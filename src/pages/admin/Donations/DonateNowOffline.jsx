@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom'
 import axiosInstance from '../../../utils/axiosInterceptor'
 import { toast } from 'sonner'
 import countryList from '../../../DATA/CountryList.json'
+import { useSelector } from 'react-redux'
+import { maskEmail, maskPhone } from '../../../components/common/maskUtils'
 
 const DonateNowOffline = ({ usedFor }) => {
     const { userId } = useParams();
@@ -13,6 +15,9 @@ const DonateNowOffline = ({ usedFor }) => {
     const [loadingCauses, setLoadingCauses] = useState(false);
     const [paymentMethods, setPaymentMethods] = useState({ groups: [] });
     const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
+
+    const { user } = useSelector((state) => state.auth)
+    const isAdmin = user?.role === 'ADMIN'
 
     const [donationData, setDonationData] = useState({
         donorName: "",
@@ -149,9 +154,22 @@ const DonateNowOffline = ({ usedFor }) => {
                     donorType: "",
                     country: ""
                 });
+            } else {
+                // Show all validation errors if present
+                if (response.data.errors && Array.isArray(response.data.errors)) {
+                    response.data.errors.forEach(errMsg => toast.error(errMsg));
+                } else {
+                    toast.error(response.data.message || 'Failed to add donation');
+                }
             }
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to add donation');
+            // Show all validation errors if present in error response
+            const errors = err.response?.data?.errors;
+            if (errors && Array.isArray(errors)) {
+                errors.forEach(errMsg => toast.error(errMsg));
+            } else {
+                toast.error(err.response?.data?.message || err.message || 'Failed to add donation');
+            }
         }
     };
 
@@ -183,11 +201,11 @@ const DonateNowOffline = ({ usedFor }) => {
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm font-medium text-gray-500">Email</p>
-                                <p className="text-lg font-semibold text-gray-800">{userData?.email}</p>
+                                <p className="text-lg font-semibold text-gray-800">{maskEmail(userData?.email)}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm font-medium text-gray-500">Phone</p>
-                                <p className="text-lg font-semibold text-gray-800">{userData?.phone}</p>
+                                <p className="text-lg font-semibold text-gray-800">{maskPhone(userData?.phone)}</p>
                             </div>
                             <div className="space-y-1">
                                 <p className="text-sm font-medium text-gray-500">Status</p>
@@ -383,7 +401,7 @@ const DonateNowOffline = ({ usedFor }) => {
                                             )}
                                         </div>
 
-                                        <div>
+                                        <div className={`${!isAdmin && 'hidden' }`}>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                                 {donationData.donorType === 'foreign' ? "Passport" : "PAN"} Number
                                             </label>
@@ -396,7 +414,7 @@ const DonateNowOffline = ({ usedFor }) => {
                                             />
                                         </div>
 
-                                        <div>
+                                        <div className={`${!isAdmin && 'hidden' }`}>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Aadhar No</label>
                                             <input
                                                 type="number"
