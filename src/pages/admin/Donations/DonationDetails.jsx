@@ -18,6 +18,7 @@ import {
 import DonationHistory from './DonationHistory';
 import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
 import ImageViewerModal from './ImageViewerModal';
+import PDFViewerModal from './PDFViewerModal';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
@@ -415,7 +416,7 @@ const DonationDetails = ({ donationData, goBack }) => {
 
             {/* Modal for viewing receipt */}
             {showReceiptModal && (
-                <ImageViewerModal
+                <PDFViewerModal
                     fileUrl={`${import.meta.env.VITE_API_URL}/${donation?.receiptPath}`}
                     onClose={() => setShowReceiptModal(false)}
                 />

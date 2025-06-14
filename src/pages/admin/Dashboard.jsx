@@ -18,7 +18,7 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true)
-        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}report/dashboard`)
+        const response = await axiosInstance.get(`${import.meta.env.VITE_API_URL}/report/dashboard`)
         if (response.data?.status) {
           setDashboardData(response.data.data)
         }
