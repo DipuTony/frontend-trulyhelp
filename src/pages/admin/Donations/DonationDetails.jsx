@@ -64,9 +64,14 @@ const DonationDetails = ({ donationData, goBack }) => {
                 type,
                 donationId
             });
-            dispatch(setMessage(res.data?.message || 'Receipt sent successfully!'));
+            if (res.data?.error) {
+                dispatch(setMessage(res.data.error));
+            } else {
+                dispatch(setMessage(res.data?.message || 'Receipt sent successfully!'));
+            }
         } catch (error) {
-            dispatch(setMessage(error.response?.data?.message || 'Failed to send receipt.'));
+            const errMsg = error.response?.data?.error || error.response?.data?.message || 'Failed to send receipt.';
+            dispatch(setMessage(errMsg));
         } finally {
             setSendingReceipt(false);
         }
