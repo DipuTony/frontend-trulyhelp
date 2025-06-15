@@ -19,6 +19,9 @@ import DonationHistory from './DonationHistory';
 import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
 import ImageViewerModal from './ImageViewerModal';
 import PDFViewerModal from './PDFViewerModal';
+import axiosInstance from '../../../utils/axiosInterceptor';
+import { setMessage } from '../../../store/slices/notificationSlice';
+import { useDispatch } from 'react-redux';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
@@ -26,6 +29,8 @@ const DonationDetails = ({ donationData, goBack }) => {
     const [donation, setDonation] = useState(donationData);
     const [showVolunteerDetails, setShowVolunteerDetails] = useState(false);
     const [showReceiptModal, setShowReceiptModal] = useState(false);
+    const [sendingReceipt, setSendingReceipt] = useState(false);
+    const dispatch = useDispatch();
 
     // Scroll to top when donation changes
     useEffect(() => {
@@ -49,6 +54,21 @@ const DonationDetails = ({ donationData, goBack }) => {
                 return 'bg-red-100 text-red-800';
             default:
                 return 'bg-gray-100 text-gray-800';
+        }
+    };
+
+    const handleSendReceipt = async (donationId, type) => {
+        setSendingReceipt(true);
+        try {
+            const res = await axiosInstance.post('/notification/send-receipt', {
+                type,
+                donationId
+            });
+            dispatch(setMessage(res.data?.message || 'Receipt sent successfully!'));
+        } catch (error) {
+            dispatch(setMessage(error.response?.data?.message || 'Failed to send receipt.'));
+        } finally {
+            setSendingReceipt(false);
         }
     };
 
@@ -176,33 +196,42 @@ const DonationDetails = ({ donationData, goBack }) => {
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-2">
                                     <div className="flex justify-around items-center w-full sm:w-auto gap-6">
                                         <a
-                                            href={donation?.receiptPath ? `https://wa.me/${donation?.donorPhone}` : undefined}
+                                            href={donation?.receiptPath}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-green-500 hover:text-green-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
-                                            tabIndex={donation?.receiptPath ? 0 : -1}
-                                            aria-disabled={!donation?.receiptPath}
-                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                            className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-green-500 hover:text-green-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath && !sendingReceipt ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath || sendingReceipt}
+                                            onClick={e => {
+                                                e.preventDefault();
+                                                if (donation?.receiptPath && !sendingReceipt) handleSendReceipt(donation?.donationId, 'WHATSAPP');
+                                            }}
                                         >
                                             <FiSmartphone size={30} />
                                             <span className="text-xs mt-1">WhatsApp</span>
                                         </a>
                                         <a
-                                            href={donation?.receiptPath ? `mailto:${donation?.donorEmail}` : undefined}
-                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-blue-500 hover:text-blue-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
-                                            tabIndex={donation?.receiptPath ? 0 : -1}
-                                            aria-disabled={!donation?.receiptPath}
-                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                            href={donation?.receiptPath}
+                                            className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-blue-500 hover:text-blue-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath && !sendingReceipt ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath || sendingReceipt}
+                                            onClick={e => {
+                                                e.preventDefault();
+                                                if (donation?.receiptPath && !sendingReceipt) handleSendReceipt(donation?.donationId, 'EMAIL');
+                                            }}
                                         >
                                             <FiAtSign size={30} />
                                             <span className="text-xs mt-1">Email</span>
                                         </a>
                                         <a
-                                            href={donation?.receiptPath ? `sms:${donation?.donorPhone}` : undefined}
-                                            className={`flex flex-col items-center ${donation?.receiptPath ? 'text-purple-500 hover:text-purple-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
-                                            tabIndex={donation?.receiptPath ? 0 : -1}
-                                            aria-disabled={!donation?.receiptPath}
-                                            onClick={e => { if (!donation?.receiptPath) e.preventDefault(); }}
+                                            href={donation?.receiptPath}
+                                            className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-purple-500 hover:text-purple-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
+                                            tabIndex={donation?.receiptPath && !sendingReceipt ? 0 : -1}
+                                            aria-disabled={!donation?.receiptPath || sendingReceipt}
+                                            onClick={e => {
+                                                e.preventDefault();
+                                                if (donation?.receiptPath && !sendingReceipt) handleSendReceipt(donation?.donationId, 'SMS');
+                                            }}
                                         >
                                             <FiMessageSquare size={30} />
                                             <span className="text-xs mt-1">SMS</span>
@@ -217,8 +246,8 @@ const DonationDetails = ({ donationData, goBack }) => {
                                         View Receipt
                                     </button>
                                 </div>
-                                {!donation?.receiptPath && (
-                                    <div className="mt-2 text-center text-sm text-red-500 font-medium">Receipt not available</div>
+                                {sendingReceipt && (
+                                    <div className="mt-2 text-center text-sm text-blue-500 font-medium animate-pulse">Sending...</div>
                                 )}
                             </div>
 
