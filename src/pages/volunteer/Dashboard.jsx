@@ -230,7 +230,7 @@ const VolunteerDashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gradient-to-br from-purple-600 to-indigo-600 rounded-xl shadow-md p-6 text-white">
           <div className="flex items-center justify-between">
             <div>
@@ -262,7 +262,7 @@ const VolunteerDashboard = () => {
             </Link>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

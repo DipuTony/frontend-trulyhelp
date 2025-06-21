@@ -21,7 +21,7 @@ import ImageViewerModal from './ImageViewerModal';
 import PDFViewerModal from './PDFViewerModal';
 import axiosInstance from '../../../utils/axiosInterceptor';
 import { setMessage } from '../../../store/slices/notificationSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
@@ -31,6 +31,9 @@ const DonationDetails = ({ donationData, goBack }) => {
     const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [sendingReceipt, setSendingReceipt] = useState(false);
     const dispatch = useDispatch();
+
+    const { isAuthenticated, user } = useSelector((state) => state.auth)
+    const isAdmin = user?.role === 'ADMIN';
 
     // Scroll to top when donation changes
     useEffect(() => {
@@ -201,7 +204,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-4 py-2">
                                     <div className="flex justify-around items-center w-full sm:w-auto gap-6">
                                         <a
-                                            href={donation?.receiptPath}
+                                            // href={donation?.receiptPath}
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-green-500 hover:text-green-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
@@ -216,7 +219,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                                             <span className="text-xs mt-1">WhatsApp</span>
                                         </a>
                                         <a
-                                            href={donation?.receiptPath}
+                                            // href={donation?.receiptPath}
                                             className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-blue-500 hover:text-blue-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
                                             tabIndex={donation?.receiptPath && !sendingReceipt ? 0 : -1}
                                             aria-disabled={!donation?.receiptPath || sendingReceipt}
@@ -229,7 +232,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                                             <span className="text-xs mt-1">Email</span>
                                         </a>
                                         <a
-                                            href={donation?.receiptPath}
+                                            // href={donation?.receiptPath}
                                             className={`flex flex-col items-center ${donation?.receiptPath && !sendingReceipt ? 'text-purple-500 hover:text-purple-700 cursor-pointer' : 'text-gray-400 cursor-not-allowed'} transition-colors duration-200`}
                                             tabIndex={donation?.receiptPath && !sendingReceipt ? 0 : -1}
                                             aria-disabled={!donation?.receiptPath || sendingReceipt}
@@ -242,14 +245,17 @@ const DonationDetails = ({ donationData, goBack }) => {
                                             <span className="text-xs mt-1">SMS</span>
                                         </a>
                                     </div>
-                                    <button
-                                        onClick={() => donation?.receiptPath && setShowReceiptModal(true)}
-                                        className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white shadow transition ${donation?.receiptPath ? 'hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                                        disabled={!donation?.receiptPath}
-                                    >
-                                        <FiFileText className="mr-2" size={16} />
-                                        View Receipt
-                                    </button>
+                                    {isAdmin &&
+
+                                        <button
+                                            onClick={() => donation?.receiptPath && setShowReceiptModal(true)}
+                                            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white shadow transition ${donation?.receiptPath ? 'hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
+                                            disabled={!donation?.receiptPath}
+                                        >
+                                            <FiFileText className="mr-2" size={16} />
+                                            View Receipt
+                                        </button>
+                                    }
                                 </div>
                                 {sendingReceipt && (
                                     <div className="mt-2 text-center text-sm text-blue-500 font-medium animate-pulse">Sending...</div>
@@ -428,9 +434,9 @@ const DonationDetails = ({ donationData, goBack }) => {
                         {/* <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
                             Edit Details
                         </button> */}
-                        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        {/* <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                             Generate Receipt
-                        </button>
+                        </button> */}
                         <button onClick={() => goBack()} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
                             Back
                         </button>
