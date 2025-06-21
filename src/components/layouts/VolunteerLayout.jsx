@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../../store/slices/authSlice"
+import organizationLogo from '../../images/Logo1.png';
 
 const VolunteerLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -67,14 +68,9 @@ const VolunteerLayout = () => {
 
             <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
               <div className="flex-shrink-0 flex items-center px-6">
-                <div className="flex items-center">
-                  <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center">
-                    <i className="fas fa-hand-holding-heart text-white text-xl"></i>
-                  </div>
-                  <h1 className="ml-3 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                    TrulyHelp
-                  </h1>
-                </div>
+                <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                  <img className="h-14 w-auto" src={organizationLogo} alt="TrulyHelp" />
+                </a>
               </div>
 
               <nav className="mt-8 flex-1 px-4 space-y-2">
@@ -119,14 +115,9 @@ const VolunteerLayout = () => {
         <div className="flex-1 flex flex-col min-h-0 bg-white shadow-xl">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex-shrink-0 flex items-center px-6">
-              <div className="flex items-center">
-                <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center">
-                  <i className="fas fa-hand-holding-heart text-white text-xl"></i>
-                </div>
-                <h1 className="ml-3 text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  TrulyHelp
-                </h1>
-              </div>
+              <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                <img className="h-10 w-auto" src={organizationLogo} alt="TrulyHelp" />
+              </a>
             </div>
 
             <nav className="mt-8 flex-1 px-4 space-y-2">

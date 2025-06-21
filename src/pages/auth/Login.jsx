@@ -7,8 +7,8 @@ import { login, clearError } from "../../store/slices/authSlice"
 import 'animate.css';
 
 const Login = () => {
-  const [email, setEmail] = useState("v@gmail.com")
-  const [password, setPassword] = useState("123456")
+  const [email, setEmail] = useState()
+  const [password, setPassword] = useState()
   const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth)
 
   const dispatch = useDispatch()

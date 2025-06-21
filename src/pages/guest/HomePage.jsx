@@ -1,5 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import qrCode from '../../images/qr_trulyhelp.png';
+
+const testimonials = [
+    {
+        name: 'Aarav Sharma',
+        amount: 2500,
+        message: 'It feels great to contribute to a cause that provides education to children. TrulyHelp makes it so easy.',
+        avatar: 'https://i.pravatar.cc/150?u=aaron'
+    },
+    {
+        name: 'Diya Patel',
+        amount: 1500,
+        message: 'I\'m happy to know my donation is helping someone regain their sight. Wonderful work by the team!',
+        avatar: 'https://i.pravatar.cc/150?u=diya'
+    },
+    {
+        name: 'Rohan Gupta',
+        amount: 5000,
+        message: 'The monthly donation option is fantastic. It allows me to make a sustained impact effortlessly.',
+        avatar: 'https://i.pravatar.cc/150?u=rohan'
+    },
+    {
+        name: 'Priya Singh',
+        amount: 1000,
+        message: 'Volunteering with TrulyHelp has been a life-changing experience. The transparency is commendable.',
+        avatar: 'https://i.pravatar.cc/150?u=priya'
+    },
+    {
+        name: 'Vikram Kumar',
+        amount: 3000,
+        message: 'Donating was simple and secure. Seeing the impact stories makes it all the more worthwhile.',
+        avatar: 'https://i.pravatar.cc/150?u=vikram'
+    },
+    {
+        name: 'Anika Reddy',
+        amount: 2000,
+        message: 'The work you do for women empowerment is inspiring. Proud to be a supporter.',
+        avatar: 'https://i.pravatar.cc/150?u=anika'
+    },
+    {
+        name: 'Siddharth Joshi',
+        amount: 7500,
+        message: 'I trust TrulyHelp with my contributions. Their financial transparency is a big reason why.',
+        avatar: 'https://i.pravatar.cc/150?u=sid'
+    },
+    {
+        name: 'Ishaan Verma',
+        amount: 1200,
+        message: 'Every child deserves a chance. Happy to support the child education programs.',
+        avatar: 'https://i.pravatar.cc/150?u=ishaan'
+    },
+    {
+        name: 'Sneha Mehta',
+        amount: 4000,
+        message: 'The regular updates on how my donation is being used are very reassuring. Keep up the amazing work!',
+        avatar: 'https://i.pravatar.cc/150?u=sneha'
+    },
+    {
+        name: 'Arjun Nair',
+        amount: 10000,
+        message: 'Supporting the humanitarian relief efforts was a no-brainer. Quick and effective response from TrulyHelp.',
+        avatar: 'https://i.pravatar.cc/150?u=arjun'
+    }
+];
 
 const HomePage = ({ onDonateClick }) => {
     const [donationOptions, setDonationOptions] = useState({});
@@ -9,6 +73,14 @@ const HomePage = ({ onDonateClick }) => {
     const [selectedAmount, setSelectedAmount] = useState(null);
     const [donationFrequency, setDonationFrequency] = useState('once');
     const [availableCauses, setAvailableCauses] = useState([]);
+    const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTestimonialIndex(prevIndex => (prevIndex + 1) % testimonials.length);
+        }, 5000); // Slide every 5 seconds
+        return () => clearInterval(timer);
+    }, []);
 
     // Fetch donation options from API
     useEffect(() => {
@@ -207,38 +279,47 @@ const HomePage = ({ onDonateClick }) => {
                             );
                         })}
 
-                        {/* Impact Stats */}
+                        {/* Account Details */}
                         <div className="bg-white p-6 rounded-xl shadow-md mt-8">
-                            <h3 className="font-bold text-lg mb-4 text-gray-800">Your Impact</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                                        <span className="text-purple-600">👁️</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">1,240+</p>
-                                        <p className="text-sm text-gray-500">Surgeries funded</p>
-                                    </div>
+                            <h3 className="font-bold text-lg mb-4 text-gray-800 text-center">Direct Bank Transfer</h3>
+                            <div className="flex flex-col items-center mb-4">
+                                <div className="bg-white p-2 rounded-lg shadow-lg">
+                                    <img src={qrCode} alt="Donation QR Code" className="w-40 h-40" />
                                 </div>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                        <span className="text-green-600">🎓</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">850+</p>
-                                        <p className="text-sm text-gray-500">Children educated</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                                        <span className="text-amber-600">🛠️</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">620+</p>
-                                        <p className="text-sm text-gray-500">People trained</p>
-                                    </div>
-                                </div>
+                                <p className="text-sm font-semibold mt-2 text-gray-700">Scan to Donate</p>
                             </div>
+                            <dl className="space-y-2 text-xs text-gray-700">
+                                <div className="flex justify-between">
+                                    <dt className="font-semibold">Bank:</dt>
+                                    <dd className="font-mono">HDFC BANK</dd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <dt className="font-semibold">A/C Holder:</dt>
+                                    <dd className="font-mono">TRULYHELP TRUST</dd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <dt className="font-semibold">A/C No:</dt>
+                                    <dd className="font-mono">50200089949557</dd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <dt className="font-semibold">IFSC:</dt>
+                                    <dd className="font-mono">HDFC0004945</dd>
+                                </div>
+                                <div className="flex justify-between">
+                                    <dt className="font-semibold">A/C Type:</dt>
+                                    <dd className="font-mono">CURRENT</dd>
+                                </div>
+                                <div className="mt-3 pt-3 border-t">
+                                    <div className="flex justify-between">
+                                        <dt className="font-semibold">UPI ID:</dt>
+                                        <dd className="font-mono">9499159319@hdfcbank</dd>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <dt className="font-semibold">Phonepe/Gpay:</dt>
+                                        <dd className="font-mono">9499159319</dd>
+                                    </div>
+                                </div>
+                            </dl>
                         </div>
                     </div>
 
@@ -391,20 +472,25 @@ const HomePage = ({ onDonateClick }) => {
                             </div>
                         </div>
 
-                        {/* Testimonial */}
+                        {/* Testimonial Slider */}
                         <div className="mt-8 bg-white p-6 rounded-xl shadow-md">
-                            <div className="flex items-start">
-                                <div className="flex-shrink-0">
-                                    <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <span className="text-blue-600">💙</span>
+                            <h3 className="text-xl font-bold text-center text-gray-800 mb-4">Words from our Supporters</h3>
+                            <div className="relative h-40 overflow-hidden">
+                                {testimonials.map((testimonial, index) => (
+                                    <div
+                                        key={index}
+                                        className={`absolute w-full transition-opacity duration-1000 ease-in-out ${currentTestimonialIndex === index ? 'opacity-100' : 'opacity-0'}`}
+                                    >
+                                        <div className="flex flex-col items-center text-center">
+                                            <img src={testimonial.avatar} alt={testimonial.name} className="w-16 h-16 rounded-full mb-4 shadow-md" />
+                                            <p className="italic text-gray-700">"{testimonial.message}"</p>
+                                            <p className="mt-2 font-semibold text-gray-800">{testimonial.name}</p>
+                                            <p className="text-sm text-green-600 font-bold">
+                                                Donated ₹{testimonial.amount.toLocaleString('en-IN')}
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="ml-4">
-                                    <p className="italic text-gray-700">
-                                        "Thanks to generous donors, I regained my sight and can now support my family again."
-                                    </p>
-                                    <p className="mt-2 font-medium text-gray-800">- Rajesh, Surgery Recipient</p>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>

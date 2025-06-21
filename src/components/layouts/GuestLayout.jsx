@@ -1,6 +1,8 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/authSlice";
+import organizationLogo from '../../images/Logo1.png';
+import qrCode from '../../images/qr_trulyhelp.png';
 
 const GuestLayout = () => {
 
@@ -39,24 +41,13 @@ const GuestLayout = () => {
           <div className="flex justify-between h-20 items-center">
             <div className="flex items-center space-x-2">
               <div className="flex-shrink-0">
-                <svg
-                  className="w-8 h-8 text-indigo-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
+                <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                  <img className="h-12 w-auto" src={organizationLogo} alt={organizationName} />
+                </a>
               </div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 {organizationName}
-              </h1>
+              </h1> */}
             </div>
             <div className="flex space-x-4">
               {isAuthenticated ?
@@ -129,36 +120,49 @@ const GuestLayout = () => {
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
-              <svg
-                className="w-6 h-6 text-indigo-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                <img src={organizationLogo} alt={organizationName} className="h-10 w-auto" />
+              </a>
+              {/* <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 {organizationName}
-              </span>
+              </span> */}
             </div>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                Terms
+                Terms & Condition
               </a>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                Privacy
+                Privacy Policy
+              </a>
+              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                Refund Policy
               </a>
               <a href="#" className="text-gray-300 hover:text-white transition-colors">
                 Contact
               </a>
             </div>
           </div>
+          <div className="mt-8 pt-8 border-t border-gray-700 grid gap-8 text-sm text-gray-400 md:grid-cols-3">
+            <div>
+              <h4 className="font-semibold text-gray-200 mb-2">Disclaimer:</h4>
+              <p>
+                The products and services mentioned are illustrative in nature and represent the kind of support your donation can help provide to children in need. Bal Raksha Bharat allocates resources based on real-time needs and priorities on the ground to ensure maximum impact.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-200 mb-2">Data Security:</h4>
+              <p>
+                We are committed to safeguarding your personal information. Your data is never shared with third parties, and we do not store sensitive details such as credit card or bank information.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-gray-200 mb-2">Tax Benefits:</h4>
+              <p>
+                All donations made are eligible for tax exemption under Section 80G of the Income Tax Act, 1961.
+              </p>
+            </div>
+          </div>
+          
           <div className="mt-8 pt-8 border-t border-gray-700 text-center">
             <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} {organizationName} System. All rights reserved.

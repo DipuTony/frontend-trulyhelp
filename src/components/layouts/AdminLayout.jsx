@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Outlet, Link, useNavigate, useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { logout } from "../../store/slices/authSlice"
+import organizationLogo from '../../images/Logo1.png';
 
 const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -148,9 +149,9 @@ const AdminLayout = () => {
           <div className="h-full flex flex-col flex-grow overflow-y-auto">
             <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
               <div className="flex-shrink-0 flex items-center">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-                  Donation ERP
-                </h1>
+                <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                  <img className="h-10 w-auto" src={organizationLogo} alt="Donation ERP"/>
+                </a>
               </div>
               <button
                 type="button"
@@ -278,9 +279,9 @@ const AdminLayout = () => {
         <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
           <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-                Donation ERP
-              </h1>
+              <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
+                <img className="h-10 w-auto" src={organizationLogo} alt="Donation ERP"/>
+              </a>
             </div>
             <nav className="mt-5 flex-1 px-2 space-y-1">
               {navigation.map((item) => (
