@@ -22,6 +22,7 @@ const AddDonation = ({ usedFor }) => {
   const [paymentMethods, setPaymentMethods] = useState({ groups: [] });
   const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
   const [paymentMethodError, setPaymentMethodError] = useState(null);
+  const [paymentEvidence, setPaymentEvidence] = useState(null);
 
   const [donationData, setDonationData] = useState({
     donorName: "",
@@ -130,6 +131,7 @@ const AddDonation = ({ usedFor }) => {
     //   return
     // }
 
+    const formData = new FormData();
     const newDonation = {
       name: donationData.donorName,
       aadharNo: donationData.aadharNo,
@@ -154,7 +156,17 @@ const AddDonation = ({ usedFor }) => {
       pincode: donationData.pincode,
     }
 
-    dispatch(addDonation(newDonation))
+    for (const key in newDonation) {
+      if (newDonation[key] !== undefined && newDonation[key] !== null && newDonation[key] !== "") {
+        formData.append(key, newDonation[key]);
+      }
+    }
+
+    if (paymentEvidence) {
+      formData.append('paymentEvidence', paymentEvidence);
+    }
+
+    dispatch(addDonation(formData))
       .unwrap()
       .then(() => {
         setSuccess(true)
@@ -180,6 +192,7 @@ const AddDonation = ({ usedFor }) => {
           state: "",
           pincode: ""
         })
+        setPaymentEvidence(null);
         setTimeout(() => setSuccess(false), 3000)
       })
       .catch((err) => {
@@ -659,6 +672,39 @@ const AddDonation = ({ usedFor }) => {
                         </div>
                       </div>
                     )}
+
+                    {/* Payment Evidence Upload */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Payment Evidence (Image)</label>
+                      <div className="mt-2 flex items-center space-x-4">
+                        <input
+                          type="file"
+                          id="paymentEvidence"
+                          name="paymentEvidence"
+                          accept="image/*"
+                          onChange={(e) => setPaymentEvidence(e.target.files[0])}
+                          className="hidden"
+                        />
+                        <label htmlFor="paymentEvidence" className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                          Select Image
+                        </label>
+                        {paymentEvidence && (
+                          <div className="flex items-center space-x-2">
+                            <img src={URL.createObjectURL(paymentEvidence)} alt="Preview" className="h-12 w-12 rounded-md object-cover" />
+                            <span className="text-sm text-gray-500">{paymentEvidence.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => setPaymentEvidence(null)}
+                              className="text-red-600 hover:text-red-800"
+                            >
+                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

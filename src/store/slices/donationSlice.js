@@ -42,8 +42,6 @@ export const onlineGuestDonationEazyBuzz = createAsyncThunk(
     try {
       const response = await axiosInstance.post("/donations/eazybuzz-donation-online", {
         ...donationData,
-        // successUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/success`,
-        // failureUrl: `${import.meta.env.VITE_FRONTEND_URL}/payment/failed`
       })
       if (response.data.success && response.data.paymentUrl) {
         window.location.href = response.data.paymentUrl
@@ -58,7 +56,11 @@ export const onlineGuestDonationEazyBuzz = createAsyncThunk(
 // Add new donation
 export const addDonation = createAsyncThunk("donations/addDonation", async (donationData, { rejectWithValue }) => {
   try {
-    const response = await axiosInstance.post("/donations/donate", donationData)
+    const response = await axiosInstance.post("/donations/donate", donationData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data
   } catch (error) {
     return rejectWithValue(error.response.data)
