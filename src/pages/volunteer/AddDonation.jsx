@@ -675,8 +675,8 @@ const AddDonation = ({ usedFor }) => {
 
                     {/* Payment Evidence Upload */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Payment Evidence (Image)</label>
-                      <div className="mt-2 flex items-center space-x-4">
+                      <label className="block text-sm font-medium text-gray-700">Payment Evidence</label>
+                      <div className="mt-2">
                         <input
                           type="file"
                           id="paymentEvidence"
@@ -685,23 +685,39 @@ const AddDonation = ({ usedFor }) => {
                           onChange={(e) => setPaymentEvidence(e.target.files[0])}
                           className="hidden"
                         />
-                        <label htmlFor="paymentEvidence" className="cursor-pointer bg-white py-2 px-3 border border-gray-300 rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                          Select Image
-                        </label>
-                        {paymentEvidence && (
-                          <div className="flex items-center space-x-2">
-                            <img src={URL.createObjectURL(paymentEvidence)} alt="Preview" className="h-12 w-12 rounded-md object-cover" />
-                            <span className="text-sm text-gray-500">{paymentEvidence.name}</span>
-                            <button
-                              type="button"
-                              onClick={() => setPaymentEvidence(null)}
-                              className="text-red-600 hover:text-red-800"
-                            >
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
+                        {paymentEvidence ? (
+                          <div className="relative group rounded-lg overflow-hidden">
+                            <img src={URL.createObjectURL(paymentEvidence)} alt="Preview" className="w-full h-48 object-cover" />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-300 flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex space-x-4">
+                                <label htmlFor="paymentEvidence" className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-black bg-white hover:bg-gray-200">
+                                  Change
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={() => setPaymentEvidence(null)}
+                                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
                           </div>
+                        ) : (
+                          <label
+                            htmlFor="paymentEvidence"
+                            className="cursor-pointer flex justify-center items-center w-full h-48 px-6 py-5 border-2 border-gray-300 border-dashed rounded-lg bg-gray-50 hover:bg-gray-100 transition-all duration-300"
+                          >
+                            <div className="space-y-1 text-center">
+                              <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                              <p className="text-sm text-gray-600">
+                                <span className="font-semibold text-indigo-600">Click to upload</span> an image
+                              </p>
+                              <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                            </div>
+                          </label>
                         )}
                       </div>
                     </div>
