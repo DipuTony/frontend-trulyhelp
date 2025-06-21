@@ -366,7 +366,7 @@ const AddDonation = ({ usedFor }) => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Donor Type*</label>
+                      <label className="block text-sm font-medium text-gray-700">Citizenship Type*</label>
                       <select
                         name="donorType"
                         value={donationData.donorType}
@@ -475,7 +475,7 @@ const AddDonation = ({ usedFor }) => {
 
                 <div className="space-y-6">
 
-                  {/* // In the form section, add this after the Donation Type field: */}
+                  {/* // In the form section, add this after the Donor Type field: */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-gray-700">Donation Cause*</label>
                     {loadingCauses ? (
@@ -501,7 +501,7 @@ const AddDonation = ({ usedFor }) => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Donation Type*</label>
+                    <label className="block text-sm font-medium text-gray-700">Donor Type*</label>
                     <select
                       name="donationType"
                       value={donationData.donationType}

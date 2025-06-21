@@ -251,7 +251,7 @@ const DonateNowOffline = ({ usedFor }) => {
                                         </div>
 
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donation Type*</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donor Type*</label>
                                             <select
                                                 name="donationType"
                                                 value={donationData.donationType}
@@ -359,7 +359,7 @@ const DonateNowOffline = ({ usedFor }) => {
                                     
                                     <div className="space-y-5">
                                         <div>
-                                            <label className="block text-sm font-medium text-gray-700 mb-1">Donor Type*</label>
+                                            <label className="block text-sm font-medium text-gray-700 mb-1">Citizenship Type*</label>
                                             <select
                                                 name="donorType"
                                                 value={donationData.donorType}

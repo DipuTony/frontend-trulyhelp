@@ -49,8 +49,8 @@ const DonorRegistration = ({ usedFor }) => {
             .required('Please confirm your password')
             .oneOf([Yup.ref('password'), null], 'Passwords must match'),
         donorType: Yup.string()
-            .required('Donor type is required')
-            .oneOf(['indian', 'foreign'], 'Invalid donor type'),
+            .required('Citizenship type is required')
+            .oneOf(['indian', 'foreign'], 'Invalid Citizenship type'),
         country: Yup.string()
             .when('donorType', {
                 is: 'foreign',
@@ -395,13 +395,13 @@ const DonorRegistration = ({ usedFor }) => {
                                         </div>
                                     </div>
 
-                                    {/* Donor Type and Country */}
+                                    {/* Citizenship Type and Country */}
                                     <div>
-                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Donor Type</h3>
+                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Citizenship Type</h3>
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                             <div>
                                                 <label htmlFor="donorType" className="block text-sm font-medium text-gray-700">
-                                                    Donor Type*
+                                                Citizenship Type*
                                                 </label>
                                                 <select
                                                     id="donorType"

@@ -26,13 +26,13 @@ const validationSchema = Yup.object({
 
   donationType: Yup
     .string()
-    .required('Please select a donation type')
-    .oneOf(['Individual', 'Organization'], 'Invalid donation type selected'),
+    .required('Please select a Donor type')
+    .oneOf(['Individual', 'Organization'], 'Invalid Donor type selected'),
 
   donorType: Yup
     .string()
-    .required('Please select a donor type')
-    .oneOf(['indian', 'foreign'], 'Invalid donor type selected'),
+    .required('Please select a Citizenship type')
+    .oneOf(['indian', 'foreign'], 'Invalid Citizenship type selected'),
 
   //  .matches(/^[A-Z]{5}[0-9]{4}[A-Z]$/, 'Invalid PAN number format'),
   dateOfBirth: Yup.date()
@@ -236,7 +236,7 @@ console.log(newDonation)
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Donation Type*</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Donor Type*</label>
                         <select
                           name="donationType"
                           value={formik.values.donationType}
@@ -253,7 +253,7 @@ console.log(newDonation)
                         ) : null}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Donor Type*</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Citizenship Type*</label>
                         <select
                           name="donorType"
                           value={formik.values.donorType}

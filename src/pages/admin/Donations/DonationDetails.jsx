@@ -161,7 +161,7 @@ const DonationDetails = ({ donationData, goBack }) => {
                                     </p>
                                 </div>
                                 <div>
-                                    <p className="text-sm text-gray-500">Donation Type</p>
+                                    <p className="text-sm text-gray-500">Donor Type</p>
                                     <p className="font-medium flex items-center">
                                         <FiFileText className="mr-2 text-gray-400" size={16} />
                                         {donation?.donationType || "N/A"}
