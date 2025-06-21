@@ -12,8 +12,7 @@ const DonorRegistration = ({ usedFor }) => {
     const [loading, setLoading] = useState(false)
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState(null)
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
     const [registeredUser, setRegisteredUser] = useState()
 
     let urlPreFix;;
@@ -38,16 +37,6 @@ const DonorRegistration = ({ usedFor }) => {
         phone: Yup.string()
             .required('Phone number is required')
             .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
-        password: Yup.string()
-            .required('Password is required')
-            .min(8, 'Password must be at least 8 characters'),
-        //   .matches(
-        //     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-        //     'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character'
-        //   ),
-        confirmPassword: Yup.string()
-            .required('Please confirm your password')
-            .oneOf([Yup.ref('password'), null], 'Passwords must match'),
         donorType: Yup.string()
             .required('Citizenship type is required')
             .oneOf(['indian', 'foreign'], 'Invalid Citizenship type'),
@@ -72,9 +61,9 @@ const DonorRegistration = ({ usedFor }) => {
                 then: (schema) => schema.matches(/^[0-9]{12}$/, 'Aadhar number must be 12 digits'),
                 otherwise: (schema) => schema.notRequired(),
             }),
-        address: Yup.string()
-            .required('Address is required')
-            .min(10, 'Address must be at least 10 characters'),
+        // address: Yup.string()
+        //     .required('Address is required')
+        //     .min(10, 'Address must be at least 10 characters'),
     })
 
     const handleRegisterNew = () => {
@@ -88,14 +77,15 @@ const DonorRegistration = ({ usedFor }) => {
             name: '',
             email: '',
             phone: '',
-            password: '',
-            confirmPassword: '',
             donorType: '',
             country: '',
             dob: '',
             pan: '',
             aadharNo: '',
             address: '',
+            city: '',
+            state: '',
+            pincode: ''
         },
         validationSchema,
         onSubmit: async (values) => {
@@ -114,8 +104,7 @@ const DonorRegistration = ({ usedFor }) => {
                     country: values.donorType === 'indian' ? 'India' : values.country,
                 }
 
-                // Remove confirmPassword from payload
-                delete addUserPayload.confirmPassword;
+
 
                 const response = await axios.post(`${BACKEND_URL}/user/create`, addUserPayload, header)
 
@@ -321,87 +310,13 @@ const DonorRegistration = ({ usedFor }) => {
                                         </div>
                                     </div>
 
-                                    {/* Password Section */}
-                                    <div>
-                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Account Security</h3>
-                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                            <div>
-                                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                                    Password*
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        type={showPassword ? "text" : "password"}
-                                                        id="password"
-                                                        name="password"
-                                                        value={formik.values.password}
-                                                        onChange={formik.handleChange}
-                                                        onBlur={formik.handleBlur}
-                                                        className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${formik.touched.password && formik.errors.password
-                                                            ? 'border-red-300'
-                                                            : ''
-                                                            }`}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setShowPassword(!showPassword)}
-                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                    >
-                                                        {showPassword ? (
-                                                            <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                                                        ) : (
-                                                            <EyeIcon className="h-5 w-5 text-gray-400" />
-                                                        )}
-                                                    </button>
-                                                </div>
-                                                {formik.touched.password && formik.errors.password && (
-                                                    <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
-                                                )}
-                                            </div>
-
-                                            <div>
-                                                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                                                    Confirm Password*
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        type={showConfirmPassword ? "text" : "password"}
-                                                        id="confirmPassword"
-                                                        name="confirmPassword"
-                                                        value={formik.values.confirmPassword}
-                                                        onChange={formik.handleChange}
-                                                        onBlur={formik.handleBlur}
-                                                        className={`mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 ${formik.touched.confirmPassword && formik.errors.confirmPassword
-                                                            ? 'border-red-300'
-                                                            : ''
-                                                            }`}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                                    >
-                                                        {showConfirmPassword ? (
-                                                            <EyeSlashIcon className="h-5 w-5 text-gray-400" />
-                                                        ) : (
-                                                            <EyeIcon className="h-5 w-5 text-gray-400" />
-                                                        )}
-                                                    </button>
-                                                </div>
-                                                {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-                                                    <p className="mt-1 text-sm text-red-600">{formik.errors.confirmPassword}</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
                                     {/* Citizenship Type and Country */}
                                     <div>
                                         <h3 className="text-lg font-medium text-gray-900 mb-4">Citizenship Type</h3>
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                             <div>
                                                 <label htmlFor="donorType" className="block text-sm font-medium text-gray-700">
-                                                Citizenship Type*
+                                                    Citizenship Type*
                                                 </label>
                                                 <select
                                                     id="donorType"
@@ -518,7 +433,7 @@ const DonorRegistration = ({ usedFor }) => {
                                         <h3 className="text-lg font-medium text-gray-900 mb-4">Address</h3>
                                         <div>
                                             <label htmlFor="address" className="block text-sm font-medium text-gray-700">
-                                                Full Address*
+                                                Full Address
                                             </label>
                                             <textarea
                                                 id="address"
@@ -536,7 +451,56 @@ const DonorRegistration = ({ usedFor }) => {
                                                 <p className="mt-1 text-sm text-red-600">{formik.errors.address}</p>
                                             )}
                                         </div>
+                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mt-6">
+                                            <div>
+                                                <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                                                    City
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="city"
+                                                    name="city"
+                                                    value={formik.values.city}
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                                                    State
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="state"
+                                                    name="state"
+                                                    value={formik.values.state}
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="pincode" className="block text-sm font-medium text-gray-700">
+                                                    Pincode
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    id="pincode"
+                                                    name="pincode"
+                                                    value={formik.values.pincode}
+                                                    onChange={formik.handleChange}
+                                                    onBlur={formik.handleBlur}
+                                                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                                />
+                                            </div>
+                                        </div>
                                     </div>
+                                </div>
+                                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                                    <p className="text-sm text-blue-800">
+                                        <span className="font-bold">Note:</span> A system-generated password will be sent to the donor's email address upon successful registration.
+                                    </p>
                                 </div>
                             </div>
 
