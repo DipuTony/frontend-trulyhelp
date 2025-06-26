@@ -8,6 +8,7 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import 'animate.css'
 import countryList from  '../../DATA/CountryList.json'
+import { FileText, IndianRupee, Tag, Repeat, Clock, Info } from "lucide-react"
 
 const validationSchema = Yup.object({
   name: Yup.string().required('Full name is required'),
@@ -140,24 +141,50 @@ console.log(newDonation)
               <div className="sticky top-4">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Donation Summary</h2>
 
-                <div className="bg-white rounded-xl p-6 shadow-md border border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Summary</h3>
-                  <div className="space-y-3 text-base">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-indigo-100 mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                    <span className="inline-block bg-indigo-100 text-indigo-600 rounded-full p-2">
+                      <FileText className="w-5 h-5" />
+                    </span>
+                    Summary
+                  </h3>
+                  <div className="space-y-4 text-base">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Amount</span>
-                      <span className="font-semibold text-gray-900">
-                        { }
+                      <span className="flex items-center gap-2 text-gray-600">
+                        <IndianRupee className="w-5 h-5 text-green-500" />
+                        Amount
+                      </span>
+                      <span className="font-bold text-2xl text-green-600">
                         ₹ {donationData?.amount ? Number(donationData?.amount?.toString().toLocaleString()) : '0'}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Category</span>
+                      <span className="flex items-center gap-2 text-gray-600">
+                        <Tag className="w-5 h-5 text-blue-500" />
+                        Category
+                      </span>
                       <span className="text-gray-900 capitalize">{donationData?.cause}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Type</span>
+                      <span className="flex items-center gap-2 text-gray-600">
+                        {donationData?.frequency === 'monthly' ? (
+                          <Repeat className="w-5 h-5 text-purple-500" />
+                        ) : (
+                          <Clock className="w-5 h-5 text-purple-500" />
+                        )}
+                        Type
+                      </span>
                       <span className="text-gray-900 capitalize">{donationData?.frequency}</span>
                     </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 rounded-xl p-5 mt-2 shadow border border-blue-100 flex items-start gap-3">
+                  <span className="mt-1">
+                    <Info className="w-6 h-6 text-blue-400" />
+                  </span>
+                  <div className="text-sm text-blue-900">
+                    As per the Indian Income Tax Department's rules, a donor is required to add their <b>Full Name, Address and PAN number</b> in case they wish to claim tax exemption.
                   </div>
                 </div>
               </div>
