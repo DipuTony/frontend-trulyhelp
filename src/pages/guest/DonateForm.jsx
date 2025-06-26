@@ -16,14 +16,12 @@ const validationSchema = Yup.object({
   phone: Yup.string()
     .matches(/^[6-9]\d{9}$/, 'Invalid mobile number')
     .required('Phone number is required'),
-  address: Yup.string().required('Address is required'),
-  city: Yup.string().required('City is required'),
+  address: Yup.string(),
+  city: Yup.string(),
   pincode: Yup.string()
-    .matches(/^\d{6}$/, 'Pincode must be 6 digits')
-    .required('Pincode is required'),
-  state: Yup.string().required('State is required'),
-  panNumber: Yup.string()
-    .required('This field is required'),
+    .matches(/^\d{6}$/, 'Pincode must be 6 digits'),
+  state: Yup.string(),
+  panNumber: Yup.string(),
 
   donationType: Yup
     .string()
@@ -39,7 +37,12 @@ const validationSchema = Yup.object({
   dateOfBirth: Yup.date()
     .max(new Date(), 'Date of birth cannot be in the future')
     .nullable(),
-  receiveG80Certificate: Yup.boolean()
+  receiveG80Certificate: Yup.boolean(),
+  country: Yup.string().when('donorType', {
+    is: (val) => val === 'foreign',
+    then: (schema) => schema.required('Country is required'),
+    otherwise: (schema) => schema
+  }),
 })
 
 const DonateForm = ({ donationData, onBackClick }) => {
@@ -300,21 +303,28 @@ console.log(newDonation)
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Country</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Country{formik.values.donorType === 'foreign' ? ' *' : ''}
+                        </label>
                         {formik.values.donorType === 'foreign' ? (
-                          <select
-                            name="country"
-                            value={formik.values.country}
-                            onChange={formik.handleChange}
-                            className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
-                          >
-                            <option value="">Select Country</option>
-                            {countryList.map((country) => (
-                              <option key={country.name} value={country.name}>
-                                {country.name}
-                              </option>
-                            ))}
-                          </select>
+                          <>
+                            <select
+                              name="country"
+                              value={formik.values.country}
+                              onChange={formik.handleChange}
+                              className="block w-full px-4 py-3 text-base border border-gray-300 rounded-xl bg-gray-50"
+                            >
+                              <option value="">Select Country</option>
+                              {countryList.map((country) => (
+                                <option key={country.name} value={country.name}>
+                                  {country.name}
+                                </option>
+                              ))}
+                            </select>
+                            {formik.touched.country && formik.errors.country && (
+                              <div className="mt-1 text-sm text-red-600">{formik.errors.country}</div>
+                            )}
+                          </>
                         ) : (
                           <input
                             type="text"
@@ -328,7 +338,8 @@ console.log(newDonation)
 
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
-                          {formik.values.donorType === 'foreign' ? "Passport No" : "PAN Number"}*</label>
+                          {formik.values.donorType === 'foreign' ? "Passport No" : "PAN Number"}
+                        </label>
                         <input
                           type="text"
                           name="panNumber"
@@ -345,7 +356,7 @@ console.log(newDonation)
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Address *</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
                       <textarea
                         name="address"
                         value={formik.values.address}
@@ -361,7 +372,7 @@ console.log(newDonation)
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">City</label>
                         <input
                           type="text"
                           name="city"
@@ -375,7 +386,7 @@ console.log(newDonation)
                         ) : null}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">State*</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">State</label>
                         <input
                           type="text"
                           name="state"
@@ -389,7 +400,7 @@ console.log(newDonation)
                         ) : null}
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode *</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Pincode</label>
                         <input
                           type="number"
                           name="pincode"
