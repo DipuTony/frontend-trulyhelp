@@ -88,7 +88,7 @@ const HomePage = ({ onDonateClick }) => {
             try {
                 setLoading(true);
                 const response = await axios.get(`${import.meta.env.VITE_API_URL}/donation-options`);
-                
+
                 if (response.data.success) {
                     setDonationOptions(response.data.data);
                     // Set available causes from API response
@@ -114,20 +114,20 @@ const HomePage = ({ onDonateClick }) => {
 
     const handleDonate = () => {
         if (!activeCause || selectedAmount === null || !donationOptions[activeCause]?.options) return;
-        
+
         const frequency = donationFrequency;
         const options = donationOptions[activeCause].options;
-        
+
         // Find the correct amount and message based on frequency and selected index
         const frequencyOptions = options[frequency];
         if (!frequencyOptions) return;
-        
+
         const donationData = {
             amount: frequencyOptions.amounts[selectedAmount],
             frequency: donationFrequency,
             cause: activeCause
         };
-        
+
         onDonateClick(donationData);
     };
 
@@ -155,7 +155,7 @@ const HomePage = ({ onDonateClick }) => {
                 text: donationOptions[causeName].colorScheme.text || '#312e81'
             };
         }
-        
+
         // Default color schemes as fallback
         const defaultColors = {
             sight: {
@@ -177,7 +177,7 @@ const HomePage = ({ onDonateClick }) => {
                 text: '#92400e'
             }
         };
-        
+
         return defaultColors[causeName] || defaultColors.sight;
     };
 
@@ -202,8 +202,8 @@ const HomePage = ({ onDonateClick }) => {
                 <div className="bg-white p-8 rounded-xl shadow-lg max-w-md">
                     <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Donation Options</h2>
                     <p className="text-gray-700">{error}</p>
-                    <button 
-                        onClick={() => window.location.reload()} 
+                    <button
+                        onClick={() => window.location.reload()}
                         className="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                     >
                         Try Again
@@ -242,7 +242,7 @@ const HomePage = ({ onDonateClick }) => {
                     <div className="text-center px-4">
                         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Vision of a Better and Empowered India</h1>
                         <p className="text-xl text-white opacity-90 max-w-2xl mx-auto">
-                        Train, Educate, Raise Awareness, and Enable them towards a better life.
+                            Train, Educate, Raise Awareness, and Enable them towards a better life.
                         </p>
                     </div>
                 </div>
@@ -256,7 +256,7 @@ const HomePage = ({ onDonateClick }) => {
                             const isActive = activeCause === cause;
                             const colors = getCauseColors(cause);
                             const causeData = donationOptions[cause];
-                            
+
                             return (
                                 <button
                                     key={cause}
@@ -321,6 +321,50 @@ const HomePage = ({ onDonateClick }) => {
                                 </div>
                             </dl>
                         </div>
+
+                        {/* Impact Stats */}
+                        <div className="bg-white p-6 rounded-xl shadow-md mt-8">
+                            <h3 className="font-bold text-lg mb-4 text-gray-800">Your Impact</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                                        <span className="text-purple-600">👁️</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">120+</p>
+                                        <p className="text-sm text-gray-500">successful life-saving surgeries</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span className="text-green-600">🎓</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">35,850+</p>
+                                        <p className="text-sm text-gray-500">children supported through education</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span className="text-amber-600">🛠️</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">10,620+</p>
+                                        <p className="text-sm text-gray-500"> individuals trained for sustainable livelihoods</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center">
+                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span className="text-amber-600">🛠️</span>
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-800">20,250+</p>
+                                        <p className="text-sm text-gray-500">lives improved through community development initiatives</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     {/* Right Side - Donation Section */}
@@ -420,17 +464,17 @@ const HomePage = ({ onDonateClick }) => {
                                 )}
 
                                 {/* Selected Amount Message */}
-                                {selectedAmount !== null && activeCause && donationOptions[activeCause]?.options && 
-                                 donationOptions[activeCause].options[donationFrequency] && (
-                                    <div
-                                        className="p-4 rounded-lg mb-8 text-center"
-                                        style={{ backgroundColor: currentColors.light }}
-                                    >
-                                        <p style={{ color: currentColors.text }}>
-                                            {donationOptions[activeCause].options[donationFrequency].messages[selectedAmount]}
-                                        </p>
-                                    </div>
-                                )}
+                                {selectedAmount !== null && activeCause && donationOptions[activeCause]?.options &&
+                                    donationOptions[activeCause].options[donationFrequency] && (
+                                        <div
+                                            className="p-4 rounded-lg mb-8 text-center"
+                                            style={{ backgroundColor: currentColors.light }}
+                                        >
+                                            <p style={{ color: currentColors.text }}>
+                                                {donationOptions[activeCause].options[donationFrequency].messages[selectedAmount]}
+                                            </p>
+                                        </div>
+                                    )}
 
                                 {/* Custom Amount Input */}
                                 <div className="mb-8">
