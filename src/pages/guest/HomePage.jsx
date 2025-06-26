@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import qrCode from '../../images/qr_trulyhelp.png';
+import AccountDetails from './Components/AccountDetails';
+import ImpactStats from './Components/ImpactStats';
 
 const testimonials = [
     {
@@ -279,92 +280,11 @@ const HomePage = ({ onDonateClick }) => {
                             );
                         })}
 
-                        {/* Account Details */}
-                        <div className="bg-white p-6 rounded-xl shadow-md mt-8">
-                            <h3 className="font-bold text-lg mb-4 text-gray-800 text-center">Direct Bank Transfer</h3>
-                            <div className="flex flex-col items-center mb-4">
-                                <div className="bg-white p-2 rounded-lg shadow-lg">
-                                    <img src={qrCode} alt="Donation QR Code" className="w-40 h-40" />
-                                </div>
-                                <p className="text-sm font-semibold mt-2 text-gray-700">Scan to Donate</p>
-                            </div>
-                            <dl className="space-y-2 text-xs text-gray-700">
-                                <div className="flex justify-between">
-                                    <dt className="font-semibold">Bank:</dt>
-                                    <dd className="font-mono">HDFC BANK</dd>
-                                </div>
-                                <div className="flex justify-between">
-                                    <dt className="font-semibold">A/C Holder:</dt>
-                                    <dd className="font-mono">TRULYHELP TRUST</dd>
-                                </div>
-                                <div className="flex justify-between">
-                                    <dt className="font-semibold">A/C No:</dt>
-                                    <dd className="font-mono">50200089949557</dd>
-                                </div>
-                                <div className="flex justify-between">
-                                    <dt className="font-semibold">IFSC:</dt>
-                                    <dd className="font-mono">HDFC0004945</dd>
-                                </div>
-                                <div className="flex justify-between">
-                                    <dt className="font-semibold">A/C Type:</dt>
-                                    <dd className="font-mono">CURRENT</dd>
-                                </div>
-                                <div className="mt-3 pt-3 border-t">
-                                    <div className="flex justify-between">
-                                        <dt className="font-semibold">UPI ID:</dt>
-                                        <dd className="font-mono">9499159319@hdfcbank</dd>
-                                    </div>
-                                    <div className="flex justify-between">
-                                        <dt className="font-semibold">Phonepe/Gpay:</dt>
-                                        <dd className="font-mono">9499159319</dd>
-                                    </div>
-                                </div>
-                            </dl>
+                        {/* Account Details & Impact Stats for Desktop */}
+                        <div className="hidden lg:block">
+                            <AccountDetails />
+                            <ImpactStats />
                         </div>
-
-                        {/* Impact Stats */}
-                        <div className="bg-white p-6 rounded-xl shadow-md mt-8">
-                            <h3 className="font-bold text-lg mb-4 text-gray-800">Your Impact</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                                        <span className="text-purple-600">👁️</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">120+</p>
-                                        <p className="text-sm text-gray-500">successful life-saving surgeries</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                                        <span className="text-green-600">🎓</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">35,850+</p>
-                                        <p className="text-sm text-gray-500">children supported through education</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                                        <span className="text-amber-600">🛠️</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">10,620+</p>
-                                        <p className="text-sm text-gray-500"> individuals trained for sustainable livelihoods</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center">
-                                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                                        <span className="text-amber-600">🛠️</span>
-                                    </div>
-                                    <div>
-                                        <p className="font-semibold text-gray-800">20,250+</p>
-                                        <p className="text-sm text-gray-500">lives improved through community development initiatives</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
                     {/* Right Side - Donation Section */}
@@ -512,6 +432,12 @@ const HomePage = ({ onDonateClick }) => {
                                     <p className="text-xs text-gray-500 mt-3">
                                         Your donation is secure and tax-deductible
                                     </p>
+                                </div>
+
+                                {/* Account Details & Impact Stats for Mobile */}
+                                <div className="block lg:hidden mt-8 space-y-4">
+                                    <AccountDetails />
+                                    <ImpactStats />
                                 </div>
                             </div>
                         </div>
