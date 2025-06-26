@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AccountDetails from './Components/AccountDetails';
 import ImpactStats from './Components/ImpactStats';
+import HomePageSkeleton from './Components/HomePageSkeleton';
 
 const testimonials = [
     {
@@ -189,11 +190,7 @@ const HomePage = ({ onDonateClick }) => {
 
     // Show loading state
     if (loading) {
-        return (
-            <div className="min-h-screen flex justify-center items-center bg-gradient-to-br from-gray-50 to-gray-100">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-indigo-600"></div>
-            </div>
-        );
+        return <HomePageSkeleton />;
     }
 
     // Show error state
