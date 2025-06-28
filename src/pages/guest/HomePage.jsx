@@ -76,6 +76,7 @@ const HomePage = ({ onDonateClick }) => {
     const [donationFrequency, setDonationFrequency] = useState('once');
     const [availableCauses, setAvailableCauses] = useState([]);
     const [currentTestimonialIndex, setCurrentTestimonialIndex] = useState(0);
+    const [customAmount, setCustomAmount] = useState("");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -115,21 +116,26 @@ const HomePage = ({ onDonateClick }) => {
     }, []);
 
     const handleDonate = () => {
-        if (!activeCause || selectedAmount === null || !donationOptions[activeCause]?.options) return;
+        if (!activeCause || (!donationOptions[activeCause]?.options)) return;
 
         const frequency = donationFrequency;
         const options = donationOptions[activeCause].options;
-
-        // Find the correct amount and message based on frequency and selected index
         const frequencyOptions = options[frequency];
         if (!frequencyOptions) return;
 
+        let amount = null;
+        if (customAmount && !isNaN(Number(customAmount)) && Number(customAmount) > 0) {
+            amount = Number(customAmount);
+        } else if (selectedAmount !== null) {
+            amount = frequencyOptions.amounts[selectedAmount];
+        }
+        if (!amount) return;
+
         const donationData = {
-            amount: frequencyOptions.amounts[selectedAmount],
+            amount,
             frequency: donationFrequency,
             cause: activeCause
         };
-
         onDonateClick(donationData);
     };
 
@@ -140,6 +146,7 @@ const HomePage = ({ onDonateClick }) => {
 
     const handleAmountClick = (amountIndex) => {
         setSelectedAmount(amountIndex);
+        setCustomAmount(""); // Clear custom amount if preset is selected
     };
 
     const handleFrequencyChange = (frequency) => {
@@ -407,6 +414,12 @@ const HomePage = ({ onDonateClick }) => {
                                             id="custom-amount"
                                             className="block w-full pl-8 pr-12 py-3 border border-gray-300 rounded-lg text-center focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                             placeholder="Other amount"
+                                            value={customAmount}
+                                            min={1}
+                                            onChange={e => {
+                                                setCustomAmount(e.target.value);
+                                                setSelectedAmount(null); // Clear preset if custom is typed
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -415,13 +428,15 @@ const HomePage = ({ onDonateClick }) => {
                                 <div className="text-center">
                                     <button
                                         onClick={handleDonate}
-                                        disabled={selectedAmount === null}
+                                        disabled={
+                                            (!customAmount || isNaN(Number(customAmount)) || Number(customAmount) <= 0) && selectedAmount === null
+                                        }
                                         className={`py-4 px-12 rounded-full text-lg font-bold text-white shadow-lg transition-all transform hover:scale-105`}
                                         style={{
-                                            background: selectedAmount !== null
+                                            background: ((customAmount && !isNaN(Number(customAmount)) && Number(customAmount) > 0) || selectedAmount !== null)
                                                 ? `linear-gradient(135deg, ${currentColors.primary}, ${currentColors.secondary})`
                                                 : '#9ca3af',
-                                            cursor: selectedAmount !== null ? 'pointer' : 'not-allowed'
+                                            cursor: ((customAmount && !isNaN(Number(customAmount)) && Number(customAmount) > 0) || selectedAmount !== null) ? 'pointer' : 'not-allowed'
                                         }}
                                     >
                                         {donationFrequency === 'once' ? 'Donate Now' : 'Start Monthly Donation'}
