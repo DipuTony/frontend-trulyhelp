@@ -266,7 +266,7 @@ const HomePage = ({ onDonateClick }) => {
                                 <button
                                     key={cause}
                                     onClick={() => handleCauseClick(cause)}
-                                    className={`w-full p-6 rounded-xl text-left transition-all duration-300 shadow-md hover:shadow-lg`}
+                                    className={`w-full p-5 rounded-xl text-left transition-all duration-300 shadow-md hover:shadow-lg`}
                                     style={{
                                         background: isActive ? `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})` : 'white',
                                         borderLeftWidth: '4px',
@@ -441,7 +441,7 @@ const HomePage = ({ onDonateClick }) => {
                                     >
                                         {donationFrequency === 'once' ? 'Donate Now' : 'Start Monthly Donation'}
                                     </button>
-                                    <p className="text-xs text-gray-500 mt-3">
+                                    <p className="text-xs text-gray-500 mt-9">
                                         Your donation is secure and tax-deductible
                                     </p>
                                 </div>

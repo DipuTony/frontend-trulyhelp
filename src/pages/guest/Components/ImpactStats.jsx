@@ -2,9 +2,9 @@ import React from 'react'
 
 const ImpactStats = () => {
     return (
-        <div className="bg-white p-3 rounded-xl shadow-lg mt-2">
-            <h3 className="font-semibold text-base mb-2 text-gray-800">Your Impact</h3>
-            <div className="space-y-2">
+        <div className="bg-white p-3 rounded-xl shadow-lg mt-5">
+            <h3 className="font-bold text-xl mb-3 text-gray-800 text-center">Your Impact</h3>
+            <div className="space-y-2 p-2">
                 <div className="flex items-center">
                     <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
                         <span className="text-purple-600 text-base">👁️</span>
