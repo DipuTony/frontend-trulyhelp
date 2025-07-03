@@ -109,6 +109,9 @@ const PaymentSuccess = () => {
           </button>
         </div> */}
       </div>
+      <div className="text-center mt-8">
+        <p className="text-lg text-indigo-700 font-semibold">We Thank You for your generous contribution.</p>
+      </div>
     </div>
   )
 }

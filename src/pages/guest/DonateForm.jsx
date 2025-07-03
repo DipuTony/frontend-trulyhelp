@@ -37,7 +37,8 @@ const validationSchema = Yup.object({
   dateOfBirth: Yup.date()
     .max(new Date(), 'Date of birth cannot be in the future')
     .nullable(),
-  receiveG80Certificate: Yup.boolean(),
+  receiveG80Certificate: Yup.boolean()
+    .oneOf([true], 'You must accept the Terms & Conditions to proceed'),
   country: Yup.string().when('donorType', {
     is: (val) => val === 'foreign',
     then: (schema) => schema.required('Country is required'),
@@ -428,9 +429,11 @@ console.log(newDonation)
                       <label className="ml-2 block text-sm text-gray-700">
                         I accept the <span className="underline cursor-pointer text-indigo-500 hover:text-indigo-600"> Terms & Conditions </span> and also confirm that information provided above true.
                         Your donations are tax exempted under 80G of the Indian Income Tax Act.
-
                       </label>
                     </div>
+                    {formik.touched.receiveG80Certificate && formik.errors.receiveG80Certificate ? (
+                      <div className="mt-1 text-sm text-red-600">{formik.errors.receiveG80Certificate}</div>
+                    ) : null}
                   </div>
                 </div>
 

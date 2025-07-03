@@ -3,6 +3,7 @@ import axios from 'axios';
 import AccountDetails from './Components/AccountDetails';
 import ImpactStats from './Components/ImpactStats';
 import HomePageSkeleton from './Components/HomePageSkeleton';
+import bgImage from '../../images/bg_image.jpg';
 
 const testimonials = [
     {
@@ -194,8 +195,8 @@ const
         // Get current colors based on active cause
         const currentColors = activeCause ? getCauseColors(activeCause) : { primary: '#4f46e5', secondary: '#6366f1', light: '#e0e7ff', text: '#312e81' };
 
-        const bgImage = "https://img.freepik.com/free-photo/photorealistic-kid-refugee-camp_23-2151494502.jpg";
-
+        // const bgImage = "https://img.freepik.com/free-photo/photorealistic-kid-refugee-camp_23-2151494502.jpg";
+       
         // Show loading state
         if (loading) {
             return <HomePageSkeleton />;
@@ -243,7 +244,7 @@ const
                         backgroundRepeat: 'no-repeat'
                     }}
                 >
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 opacity-40"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-700 to-purple-600 opacity-50"></div>
                     <div className="relative h-full flex items-center justify-center">
                         <div className="text-center px-4">
                             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Vision of a Better and Empowered India</h1>

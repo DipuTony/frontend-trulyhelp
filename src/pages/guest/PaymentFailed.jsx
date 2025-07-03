@@ -57,22 +57,22 @@ const PaymentFailed = () => {
                 <span className="text-gray-600">Name</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.name}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-gray-600">Email</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.email}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Phone</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.phone}</span>
-              </div>
+              </div> */}
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment Method</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.paymentMethod}</span>
               </div>
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-gray-600">Payment Source</span>
                 <span className="text-gray-900 font-medium">{paymentDetails.paymentSource}</span>
-              </div>
+              </div> */}
               <div className="flex justify-between">
                 <span className="text-gray-600">Status</span>
                 <span className="text-red-600 font-medium uppercase">{paymentDetails.status}</span>
@@ -89,7 +89,9 @@ const PaymentFailed = () => {
               Try Again
             </Link>
             <a
-              href="mailto:support@trulyhelp.org"
+              href="https://trulyhelp.org/contact-us/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex justify-center items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
             >
               Contact Support
