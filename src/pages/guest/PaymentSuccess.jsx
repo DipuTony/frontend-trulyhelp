@@ -15,15 +15,15 @@ const PaymentSuccess = () => {
     Name: searchParams.get('name'),
     DonationId: searchParams.get('donationId'),
     TransactionId: searchParams.get('transactionId'),
-    Email: searchParams.get('email'),
-    Phone: searchParams.get('phone'),
+    // Email: searchParams.get('email'),
+    // Phone: searchParams.get('phone'),
     Amount: searchParams.get('amount'),
     Status: searchParams.get('status'),
-    Address: searchParams.get('address'),
-    PAN: searchParams.get('donorPan'),
-    'Payment Method': searchParams.get('paymentMethod'),
-    'Bank Name': searchParams.get('bankName'),
-    'Payment Source': searchParams.get('paymentSource'),
+    // Address: searchParams.get('address'),
+    // PAN: searchParams.get('donorPan'),
+    // 'Payment Method': searchParams.get('paymentMethod'),
+    // 'Bank Name': searchParams.get('bankName'),
+    // 'Payment Source': searchParams.get('paymentSource'),
   }
 
   return (

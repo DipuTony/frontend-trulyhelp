@@ -128,16 +128,16 @@ const GuestLayout = () => {
               </span> */}
             </div>
             <div className="flex space-x-6">
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://trulyhelp.org/terms-conditions/" className="text-gray-300 hover:text-white transition-colors">
                 Terms & Condition
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://trulyhelp.org/privacy-policy/" className="text-gray-300 hover:text-white transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://trulyhelp.org/cancellation-refund-policy/" className="text-gray-300 hover:text-white transition-colors">
                 Refund Policy
               </a>
-              <a href="#" className="text-gray-300 hover:text-white transition-colors">
+              <a href="https://trulyhelp.org/contact-us/" className="text-gray-300 hover:text-white transition-colors">
                 Contact
               </a>
             </div>

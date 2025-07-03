@@ -38,8 +38,8 @@ const DonorRegistration = ({ usedFor }) => {
             .required('Phone number is required')
             .matches(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
         donorType: Yup.string()
-            .required('Citizenship type is required')
-            .oneOf(['indian', 'foreign'], 'Invalid Citizenship type'),
+            .required('Citizenship is required')
+            .oneOf(['indian', 'foreign'], 'Invalid Citizenship'),
         country: Yup.string()
             .when('donorType', {
                 is: 'foreign',
@@ -310,13 +310,13 @@ const DonorRegistration = ({ usedFor }) => {
                                         </div>
                                     </div>
 
-                                    {/* Citizenship Type and Country */}
+                                    {/* Citizenship and Country */}
                                     <div>
-                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Citizenship Type</h3>
+                                        <h3 className="text-lg font-medium text-gray-900 mb-4">Citizenship</h3>
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                                             <div>
                                                 <label htmlFor="donorType" className="block text-sm font-medium text-gray-700">
-                                                    Citizenship Type*
+                                                    Citizenship*
                                                 </label>
                                                 <select
                                                     id="donorType"

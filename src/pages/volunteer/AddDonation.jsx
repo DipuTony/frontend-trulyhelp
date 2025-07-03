@@ -388,7 +388,7 @@ const AddDonation = ({ usedFor }) => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Citizenship Type*</label>
+                      <label className="block text-sm font-medium text-gray-700">Citizenship*</label>
                       <select
                         name="donorType"
                         value={donationData.donorType}
