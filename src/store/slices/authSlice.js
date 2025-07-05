@@ -83,6 +83,32 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
+// Resend Email Verification thunk
+export const resendEmailVerification = createAsyncThunk(
+  'auth/resendEmailVerification',
+  async (email, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/auth/resend-email-verification', { email });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to resend verification email');
+    }
+  }
+);
+
+// Verify Email thunk
+export const verifyEmail = createAsyncThunk(
+  'auth/verifyEmail',
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post('/auth/verify-email', { token });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to verify email');
+    }
+  }
+);
+
 // Add these cases to your reducer
 extraReducers: (builder) => {
   builder
@@ -204,6 +230,30 @@ const authSlice = createSlice({
         state.loading = false;
       })
       .addCase(forgotPassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(resendEmailVerification.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(resendEmailVerification.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(resendEmailVerification.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+    builder
+      .addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

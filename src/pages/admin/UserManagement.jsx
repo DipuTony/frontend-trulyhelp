@@ -48,14 +48,14 @@ const UserManagement = () => {
     email: Yup.string()
       .email('Invalid email address')
       .required('Email is required'),
-    password: Yup.string()
-      .when('isEditing', {
-        is: false,
-        then: () => Yup.string()
-          .required('Password is required for new users')
-          .min(6, 'Password must be at least 6 characters'),
-        otherwise: () => Yup.string(),
-      }),
+    // password: Yup.string()
+    //   .when('isEditing', {
+    //     is: false,
+    //     then: () => Yup.string()
+    //       .required('Password is required for new users')
+    //       .min(6, 'Password must be at least 6 characters'),
+    //     otherwise: () => Yup.string(),
+    //   }),
     phone: Yup.string()
       .matches(/^\d{10}$/, 'Phone number must be 10 digits')
       .nullable()
@@ -81,7 +81,7 @@ const UserManagement = () => {
           name: values.name,
           email: values.email,
           phone: values.phone,
-          password: values.password,
+          // password: values.password,
           role: roleName,
         }
 
@@ -348,7 +348,7 @@ const UserManagement = () => {
                             )}
                           </div>
                         )}
-                        {!isEditing && (
+                        {/* {!isEditing && (
                           <div>
                             <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                               Password
@@ -364,7 +364,7 @@ const UserManagement = () => {
                               <p className="mt-1 text-sm text-red-600">{formik.errors.password}</p>
                             )}
                           </div>
-                        )}
+                        )} */}
 
                         <div>
                           <label htmlFor="phone" className="block text-sm font-medium text-gray-700">

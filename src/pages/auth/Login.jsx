@@ -3,13 +3,16 @@
 import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { Link, useNavigate } from "react-router-dom"
-import { login, clearError } from "../../store/slices/authSlice"
+import { login, clearError, resendEmailVerification } from "../../store/slices/authSlice"
+import { showSuccessToast, showErrorToast } from "../../utils/toast"
+import LoaderType1 from "../../components/common/LoaderType1"
 import 'animate.css';
 
 const Login = () => {
   const [email, setEmail] = useState()
   const [password, setPassword] = useState()
   const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth)
+  const [resendLoading, setResendLoading] = useState(false)
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -26,13 +29,40 @@ const Login = () => {
     }
   }, [isAuthenticated, user, navigate, dispatch])
 
+  useEffect(() => {
+    if (error && typeof error === 'object' && error.status === 403 && error.emailVerifyStatus === false) {
+      showErrorToast(error.message || "Please verify your email before logging in")
+    }
+  }, [error])
+
   const handleSubmit = (e) => {
     e.preventDefault()
     dispatch(login({ email, password }))
   }
 
+  const handleResendEmailVerify = async () => {
+    if (!email) {
+      showErrorToast("Please enter your email address above first.")
+      return
+    }
+    setResendLoading(true)
+    try {
+      const resultAction = await dispatch(resendEmailVerification(email))
+      if (resendEmailVerification.fulfilled.match(resultAction)) {
+        showSuccessToast("Verification email sent. Please check your inbox.")
+      } else {
+        showErrorToast(resultAction.payload || "Failed to resend verification email.")
+      }
+    } catch (err) {
+      showErrorToast("Failed to resend verification email.")
+    } finally {
+      setResendLoading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+      {(loading || resendLoading) && <LoaderType1 />}
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 animate__animated animate__fadeIn">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
@@ -61,7 +91,7 @@ const Login = () => {
                   {typeof error === 'string' ? error : error.message || "Something went wrong"}
                 </p>
                 {error?.emailVerifyStatus === false && (
-                  <button className="mt-2 text-sm text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">
+                  <button onClick={handleResendEmailVerify} className="mt-2 text-sm text-white bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition">
                     Resend Verification Email
                   </button>
                 )}

@@ -54,6 +54,7 @@ import DonorRegistration from "./pages/admin/Donors/DonorRegistration"
 import DonorList from "./pages/admin/Donors/DonorList"
 import DonateNowOffline from "./pages/admin/Donations/DonateNowOffline"
 import SearchDonor from "./pages/volunteer/SearchDonor"
+import EmailVerification from "./pages/auth/EmailVerification"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -91,6 +92,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/emailVerification/:token" element={<EmailVerification />} />
 
           {/* Admin Routes */}
           <Route
