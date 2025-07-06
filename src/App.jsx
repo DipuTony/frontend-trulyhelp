@@ -9,7 +9,7 @@ import Signup from "./pages/auth/Signup"
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard"
-import UserManagement from "./pages/admin/UserManagement"
+// import UserManagement from "./pages/admin/UserManagement"
 import DonationList from "./pages/admin/Donations/DonationList"
 import ExpenseManagement from "./pages/admin/ExpenseManagement"
 import PaymentVerification from "./pages/admin/PaymentVerification"
@@ -55,6 +55,8 @@ import DonorList from "./pages/admin/Donors/DonorList"
 import DonateNowOffline from "./pages/admin/Donations/DonateNowOffline"
 import SearchDonor from "./pages/volunteer/SearchDonor"
 import EmailVerification from "./pages/auth/EmailVerification"
+import AdminManagement from "./pages/admin/AdminManagement"
+import VolunteerManagement from "./pages/admin/VolunteerManagement"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -113,7 +115,9 @@ function App() {
             <Route path="donor-registration" element={<DonorRegistration usedFor="ADMIN" />} /> {/* used for admin and volunteer */}
             <Route path="donate/:userId?" element={<DonateNowOffline usedFor="ADMIN" />} /> {/* used for admin and volunteer */}
             <Route path="donor-list" element={<DonorList />} />
-            <Route path="users/:role?" element={<UserManagement />} />
+            {/* <Route path="users/:role?" element={<UserManagement />} /> */}
+            <Route path="users/admin" element={<AdminManagement />} />
+            <Route path="users/volunteer" element={<VolunteerManagement />} />
             <Route path="UserDetails/:userId?" element={<UserDetails />} />
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
             <Route path="payment-verification" element={<PaymentVerification />} />

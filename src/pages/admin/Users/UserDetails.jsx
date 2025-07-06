@@ -115,11 +115,16 @@ const UserDetails = () => {
                   <span className="text-sm font-medium text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
                     {userData.role}
                   </span>
-                  {isVolunteer && (
+                  <span className={`inline-block px-4 py-2 rounded-xl text-sm font-semibold
+                    ${userData.status === 'ACTIVE' ? 'bg-green-300 text-green-800' : userData.status === 'INACTIVE' ? 'bg-red-300 text-red-800' : 'bg-gray-100 text-gray-700'}`}
+                  >
+                    {userData.status}
+                  </span>
+                  {/* {isVolunteer && (
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${getICardStatusColor(userData.iCardStatus)}`}>
                       {userData.iCardStatus}
                     </span>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
@@ -127,8 +132,7 @@ const UserDetails = () => {
               ID: {userData.userId}
             </div>
 
-
-            <button onClick={()=>navigate(`/admin/donate/${userData.userId}`)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition transform hover:-translate-y-1 duration-200 shadow-lg hover:shadow-red-200">
+            <button onClick={() => navigate(`/admin/donate/${userData.userId}`)} className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg transition transform hover:-translate-y-1 duration-200 shadow-lg hover:shadow-red-200">
               Donate Now ❤️
             </button>
 
@@ -162,6 +166,14 @@ const UserDetails = () => {
                     {userData.emailVerifyStatus ? 'Verified' : 'Not Verified'}
                   </p>
                 </div>
+                {/* <div>
+                  <label className="text-sm font-medium text-gray-500 block mb-1">Status</label>
+                  <span className={`inline-block px-4 py-2 rounded-lg text-sm font-semibold
+                    ${userData.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : userData.status === 'INACTIVE' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-700'}`}
+                  >
+                    {userData.status}
+                  </span>
+                </div> */}
                 {userData.country && (
                   <div>
                     <label className="text-sm font-medium text-gray-500 block mb-1">Country</label>
