@@ -6,6 +6,7 @@ import { generateReport } from "../../store/slices/donationSlice"
 import jsPDF from "jspdf"
 import html2canvas from "html2canvas"
 import axiosInstance from "../../utils/axiosInterceptor"
+import * as XLSX from "xlsx"
 
 
 
@@ -121,6 +122,33 @@ const ReportGenerator = () => {
 
       pdf.save(`${reportType}-report.pdf`)
     })
+  }
+
+  const handleDownloadExcel = () => {
+    if (!report || !report.donations || report.donations.length === 0) return;
+    const ws = XLSX.utils.json_to_sheet(report.donations.map(d => ({
+      "Donation ID": d.donationId,
+      "Donor Name": d.donorName,
+      "Donor Email": d.donorEmail,
+      "Donor Phone": d.donorPhone,
+      "Amount": d.amount,
+      "Date": new Date(d.date).toLocaleString(),
+      "Payment Method": d.method,
+      "Payment Status": d.paymentStatus,
+      "Donation Type": d.donationType,
+      "Donor Type": d.donorType,
+      "Cause": d.cause,
+      "City": d.city,
+      "State": d.state,
+      "Country": d.country,
+      "Transaction ID": d.transactionId,
+      "Volunteer Name": d.volunteerName,
+      "Volunteer Email": d.volunteerEmail,
+      "Receipt": d.receiptPath ? `${window.location.origin}/${d.receiptPath}` : ""
+    })));
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Report");
+    XLSX.writeFile(wb, `${reportType}-report.xlsx`);
   }
 
   const handleReportTypeChange = (e) => {
@@ -319,104 +347,113 @@ const ReportGenerator = () => {
           ) : (
             <>
               <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6" id="report-content">
-                <div className="border-b border-gray-200 pb-5">
-                  <h3 className="text-lg font-medium leading-6 text-gray-900">{reportType} Report</h3>
-                  <p className="mt-2 max-w-4xl text-sm text-gray-500">Generated on {new Date().toLocaleDateString()}</p>
+                <div className="border-b border-gray-200 pb-5 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg leading-6 text-gray-700 capitalize font-semibold">{reportType} Report</h3>
+                    <p className="mt-1 text-sm text-gray-500">Generated on {new Date().toLocaleDateString()}</p>
+                  </div>
+                  <div className="flex gap-2 mt-2 md:mt-0">
+                    <button
+                      type="button"
+                      onClick={handleDownloadPDF}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      <i className="fas fa-download mr-2"></i>
+                      Download PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleDownloadExcel}
+                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                    >
+                      <i className="fas fa-file-excel mr-2"></i>
+                      Download Excel
+                    </button>
+                  </div>
                 </div>
-
-                <div className="mt-6">
-                  <h4 className="text-md font-medium text-gray-900">Summary</h4>
-                  <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Total Donations</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{report.totalDonations}</dd>
-                    </div>
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Total Amount</dt>
-                      <dd className="mt-1 text-sm text-gray-900">₹{report.totalAmount?.toFixed(2)}</dd>
-                    </div>
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Average Donation</dt>
-                      <dd className="mt-1 text-sm text-gray-900">₹{report.averageDonation?.toFixed(2)}</dd>
-                    </div>
-                    <div className="sm:col-span-1">
-                      <dt className="text-sm font-medium text-gray-500">Period</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{report.period}</dd>
-                    </div>
-                  </dl>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center">
+                    <span className="text-xs text-gray-500">Total Donations</span>
+                    <span className="text-xl font-bold text-indigo-700">{report.totalDonations}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center">
+                    <span className="text-xs text-gray-500">Total Amount</span>
+                    <span className="text-xl font-bold text-green-700">₹{report.totalAmount?.toFixed(2)}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center">
+                    <span className="text-xs text-gray-500">Average Donation</span>
+                    <span className="text-xl font-bold text-blue-700">₹{report.averageDonation?.toFixed(2)}</span>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-4 flex flex-col items-center">
+                    <span className="text-xs text-gray-500">Period</span>
+                    <span className="text-base font-semibold text-gray-700">{report.period}</span>
+                  </div>
                 </div>
-
                 <div className="mt-6">
-                  <h4 className="text-md font-medium text-gray-900">Donation Details</h4>
-                  <div className="mt-2 flex flex-col">
-                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                      <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Donor
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Amount
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Date
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Status
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {report.donations?.map((donation) => (
-                                <tr key={donation.id}>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm font-medium text-gray-900">{donation.donorName}</div>
-                                    <div className="text-sm text-gray-500">{donation.donorEmail}</div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">₹{donation.amount?.toFixed(2)}</div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-gray-900">
-                                      {new Date(donation.date).toLocaleDateString()}
-                                    </div>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${donation.verified ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-                                        }`}
-                                    >
-                                      {donation.verified ? "Verified" : "Pending"}
-                                    </span>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
+                  <h4 className="text-md font-medium text-gray-900 mb-2">Donation Details</h4>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full text-xs md:text-sm divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Donation ID</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Txn ID</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Donor</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Email</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Phone</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Amount</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Date/Time</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Method</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Status</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Type</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Donor Type</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Cause</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">City</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">State</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Country</th>
+                          <th className="px-2 py-2 text-left font-semibold text-gray-600">Volunteer Name</th>
+                          {/* <th className="px-2 py-2 text-left font-semibold text-gray-600">Receipt</th> */}
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-100">
+                        {report.donations?.map((donation) => (
+                          <tr key={donation.id} className="hover:bg-gray-50">
+                            <td className="px-2 py-2 whitespace-nowrap font-mono text-xs">{donation.transactionId || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap font-mono text-xs text-gray-700">{donation.donationId || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.donorName || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.donorEmail || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.donorPhone || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap font-semibold text-green-700">₹{typeof donation.amount === 'number' ? donation.amount.toFixed(2) : '0.00'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.date ? new Date(donation.date).toLocaleString() : '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">
+                              <span className="inline-block px-2 py-1 rounded bg-blue-50 text-blue-700 font-medium border border-blue-100">{donation.method || '-'}</span>
+                            </td>
+                            <td className="px-2 py-2 whitespace-nowrap">
+                              <span className={`inline-block px-2 py-1 rounded font-semibold border ${donation.paymentStatus === 'COMPLETED' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}`}>{donation.paymentStatus || '-'}</span>
+                            </td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.donationType || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.donorType || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.cause || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.city || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.state || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.country || '-'}</td>
+                            <td className="px-2 py-2 whitespace-nowrap">{donation.volunteerName || '-'}</td>
+                            {/* <td className="px-2 py-2 whitespace-nowrap">
+                              {donation.receiptPath ? (
+                                <a href={donation.receiptPath} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Download</a>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td> */}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
-              {/* Only show Download PDF if there is data */}
+              {/* Only show Download PDF/Excel if there is data */}
               {report.donations && report.donations.length > 0 && (
-                <div className="mt-4 flex justify-end">
+                <div className="mt-4 flex justify-end gap-2">
                   <button
                     type="button"
                     onClick={handleDownloadPDF}
@@ -424,6 +461,14 @@ const ReportGenerator = () => {
                   >
                     <i className="fas fa-download mr-2"></i>
                     Download PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadExcel}
+                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  >
+                    <i className="fas fa-file-excel mr-2"></i>
+                    Download Excel
                   </button>
                 </div>
               )}
