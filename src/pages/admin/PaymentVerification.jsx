@@ -36,6 +36,11 @@ const PaymentVerification = () => {
     fetchDonationsByMethod();
   }, [dispatch]);
 
+  // Clear selection when donations list changes
+  useEffect(() => {
+    setSelectedDonation(null);
+  }, [donations]);
+
   const fetchDonationsByMethod = () => {
     dispatch(fetchDonations({
       selectedStatus: selectedStatus || 'PENDING',
@@ -222,15 +227,19 @@ const PaymentVerification = () => {
                 </div>
               ) : (
                 <ul className="divide-y divide-gray-200">
-                  {donations?.map((donation) => (
-                    <li
-                      key={donation.id}
-                      className={`p-4 cursor-pointer transition-colors duration-150 
-                        ${selectedDonation?.id === donation.id 
-                          ? "bg-indigo-50 border-l-4 border-indigo-500" 
-                          : "hover:bg-gray-50"}`}
-                      onClick={() => setSelectedDonation(donation)}
-                    >
+                  {donations?.map((donation) => {
+                    console.log('selectedDonation?.donationId:', selectedDonation?.donationId, typeof selectedDonation?.donationId);
+                    console.log('donation.donationId:', donation.donationId, typeof donation.donationId);
+                    const isSelected = String(selectedDonation?.donationId) === String(donation.donationId);
+                    return (
+                      <li
+                        key={donation.donationId}
+                        className={`p-4 cursor-pointer transition-colors duration-150 
+                          ${isSelected 
+                            ? "bg-blue-200 border-l-4 border-blue-600" 
+                            : "hover:bg-gray-50"}`}
+                        onClick={() => setSelectedDonation(donation)}
+                      >
                       <div className="flex items-start space-x-4">
                         <div className="flex-shrink-0">
                           <span className="inline-flex items-center justify-center h-10 w-10 rounded-full bg-indigo-100">
@@ -257,7 +266,7 @@ const PaymentVerification = () => {
                         </div>
                       </div>
                     </li>
-                  ))}
+                  )})}
                 </ul>
               )}
             </div>
