@@ -146,7 +146,7 @@ const GuestLayout = () => {
             <div>
               <h4 className="font-semibold text-gray-200 mb-2">Disclaimer:</h4>
               <p>
-                The products and services mentioned are illustrative in nature and represent the kind of support your donation can help provide to children in need. Bal Raksha Bharat allocates resources based on real-time needs and priorities on the ground to ensure maximum impact.
+                The products and services mentioned are illustrative in nature and represent the kind of support your donation can help provide to children in need. TrulyHelp allocates resources based on real-time needs and priorities on the ground to ensure maximum impact.
               </p>
             </div>
             <div>
