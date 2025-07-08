@@ -27,6 +27,7 @@ const DonationList = () => {
   const [imageToView, setImageToView] = useState(null); // State to hold the URL of the image to display
   const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
   const [receiptFileUrl, setReceiptFileUrl] = useState(null);
+  const [generatingReceiptId, setGeneratingReceiptId] = useState(null);
 
 
   // Single useEffect to handle data fetching
@@ -66,6 +67,30 @@ const DonationList = () => {
   const handleCloseImageViewer = () => {
     setImageToView(null);
     setIsImageViewerOpen(false);
+  };
+
+  const handleGenerateReceipt = async (donationId) => {
+    setGeneratingReceiptId(donationId);
+    try {
+      const token = localStorage.getItem('token'); // or get from redux if needed
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/donations/receipt/${donationId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      if (data.status && data.filePath) {
+        setReceiptFileUrl(data.filePath);
+        setIsReceiptModalOpen(true);
+        dispatch(fetchDonations(filter)); // Refresh list to update receiptPath
+      } else {
+        alert(data.message || "Failed to generate receipt");
+      }
+    } catch (err) {
+      alert("Error generating receipt");
+    }
+    setGeneratingReceiptId(null);
   };
 
   if (loading) {
@@ -164,8 +189,14 @@ const DonationList = () => {
       Cell: ({ row }) => (
         <div className="flex flex-col space-y-2">
           <div className="flex gap-x-3">
-            {user?.role === "ADMIN" &&
-              row.original.receiptPath && (
+            <button
+              onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
+              className="inline-flex items-center text-white bg-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-700"
+            >
+              View Details
+            </button>
+            {user?.role === "ADMIN" && (
+              row.original.receiptPath ? (
                 <button
                   onClick={() => {
                     setReceiptFileUrl(`${import.meta.env.VITE_API_URL}/${row.original.receiptPath}`);
@@ -175,14 +206,19 @@ const DonationList = () => {
                 >
                   Receipt
                 </button>
+              ) : (
+                row.original.paymentStatus === 'COMPLETED' && (
+                  <button
+                    onClick={() => handleGenerateReceipt(row.original.donationId)}
+                    className="inline-flex items-center text-white bg-yellow-600 border border-yellow-500 rounded-md px-2 py-1 hover:bg-yellow-700"
+                    disabled={generatingReceiptId === row.original.donationId}
+                  >
+                    {generatingReceiptId === row.original.donationId ? "Generating..." : "Generate Receipt"}
+                  </button>
+                )
               )
-            }
-            <button
-              onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
-              className="inline-flex items-center text-white bg-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-700"
-            >
-              View Details
-            </button>
+            )}
+
           </div>
           {!(row.original.paymentStatus === 'COMPLETED' || row.original.method === 'ONLINE') && (
             user?.role === "VOLUNTEER" &&
