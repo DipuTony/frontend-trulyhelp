@@ -67,7 +67,7 @@ const AdminLayout = () => {
       description: "Manage donations",
       subItems: [
         { name: "iCard", href: "/admin/id-card", icon: "id-card", description: "Manage identity cards" },
-        { name: "Offer Later", href: "#", icon: "message", description: "Send Offer later" },
+        // { name: "Offer Later", href: "#", icon: "message", description: "Send Offer later" },
       ]
     },
     { 

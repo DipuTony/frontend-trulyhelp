@@ -10,6 +10,7 @@ import DonationDetails from "./DonationDetails";
 import UploadEvidenceForm from "./UploadEvidenceForm";
 import UploadImageModal from "./UploadImageModal";
 import ImageViewerModal from "./ImageViewerModal";
+import PDFViewerModal from "./PDFViewerModal";
 
 const DonationList = () => {
   const dispatch = useDispatch()
@@ -24,6 +25,8 @@ const DonationList = () => {
   const [selectedDonationForUpload, setSelectedDonationForUpload] = useState(null); // State to hold donation data for image upload
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false); // State for image viewer modal visibility
   const [imageToView, setImageToView] = useState(null); // State to hold the URL of the image to display
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
+  const [receiptFileUrl, setReceiptFileUrl] = useState(null);
 
 
   // Single useEffect to handle data fetching
@@ -160,19 +163,34 @@ const DonationList = () => {
       Header: 'Actions',
       Cell: ({ row }) => (
         <div className="flex flex-col space-y-2">
-          <button
-            onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
-            className="inline-flex items-center text-white bg-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-700"
-          >
-            View Details
-          </button>
+          <div className="flex gap-x-3">
+            {user?.role === "ADMIN" &&
+              row.original.receiptPath && (
+                <button
+                  onClick={() => {
+                    setReceiptFileUrl(`${import.meta.env.VITE_API_URL}/${row.original.receiptPath}`);
+                    setIsReceiptModalOpen(true);
+                  }}
+                  className="inline-flex items-center text-white bg-green-600 border border-green-500 rounded-md px-2 py-1 hover:bg-green-700"
+                >
+                  Receipt
+                </button>
+              )
+            }
+            <button
+              onClick={() => (setView("DETAILS"), setSelectedData(row.original))}
+              className="inline-flex items-center text-white bg-indigo-600 border border-indigo-500 rounded-md px-2 py-1 hover:bg-indigo-700"
+            >
+              View Details
+            </button>
+          </div>
           {!(row.original.paymentStatus === 'COMPLETED' || row.original.method === 'ONLINE') && (
-           user?.role === "VOLUNTEER" &&
+            user?.role === "VOLUNTEER" &&
             <button
               onClick={() => handleOpenUploadModal(row.original)}
               className={`${row.original.paymentEvidencePath
-                  ? "bg-yellow-500 hover:bg-yellow-600"
-                  : "bg-green-500 hover:bg-green-600"
+                ? "bg-yellow-500 hover:bg-yellow-600"
+                : "bg-green-500 hover:bg-green-600"
                 } inline-flex items-center text-white border border-transparent rounded-md px-2 py-1`}
             >
               {row.original.paymentEvidencePath ? "ReUpload Image" : "Upload Image"}
@@ -275,6 +293,13 @@ const DonationList = () => {
         <ImageViewerModal
           imageUrl={imageToView}
           onClose={handleCloseImageViewer}
+        />
+      )}
+
+      {isReceiptModalOpen && (
+        <PDFViewerModal
+          fileUrl={receiptFileUrl}
+          onClose={() => setIsReceiptModalOpen(false)}
         />
       )}
     </div>
