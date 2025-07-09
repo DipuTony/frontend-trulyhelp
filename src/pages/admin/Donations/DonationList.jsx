@@ -199,7 +199,7 @@ const DonationList = () => {
               row.original.receiptPath ? (
                 <button
                   onClick={() => {
-                    setReceiptFileUrl(`${import.meta.env.VITE_API_URL}/${row.original.receiptPath}`);
+                    setReceiptFileUrl(row.original.receiptPath);
                     setIsReceiptModalOpen(true);
                   }}
                   className="inline-flex items-center text-white bg-green-600 border border-green-500 rounded-md px-2 py-1 hover:bg-green-700"
