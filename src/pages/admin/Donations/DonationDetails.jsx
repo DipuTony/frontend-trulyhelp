@@ -13,7 +13,8 @@ import {
     FiXCircle,
     FiMessageSquare,
     FiSmartphone,
-    FiAtSign
+    FiAtSign,
+    FiEdit
 } from 'react-icons/fi';
 import DonationHistory from './DonationHistory';
 import { formatDateDMY, formatRelativeTime } from '../../../components/common/DateFormatFunctions';
@@ -22,6 +23,7 @@ import PDFViewerModal from './PDFViewerModal';
 import axiosInstance from '../../../utils/axiosInterceptor';
 import { setMessage } from '../../../store/slices/notificationSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import UpdateDonorModal from './UpdateDonorModal';
 
 const DonationDetails = ({ donationData, goBack }) => {
 
@@ -30,6 +32,8 @@ const DonationDetails = ({ donationData, goBack }) => {
     const [showVolunteerDetails, setShowVolunteerDetails] = useState(false);
     const [showReceiptModal, setShowReceiptModal] = useState(false);
     const [sendingReceipt, setSendingReceipt] = useState(false);
+    const [showUpdateDonorModal, setShowUpdateDonorModal] = useState(false);
+    const [generatingReceiptId, setGeneratingReceiptId] = useState(null);
     const dispatch = useDispatch();
 
     const { isAuthenticated, user } = useSelector((state) => state.auth)
@@ -80,6 +84,51 @@ const DonationDetails = ({ donationData, goBack }) => {
         }
     };
 
+    const handleGenerateReceipt = async (donationId) => {
+        setGeneratingReceiptId(donationId);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axiosInstance.get(`/donations/receipt/${donationId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            if (res.data.status && res.data.filePath) {
+                setDonation((prev) => ({ ...prev, receiptPath: res.data.filePath }));
+                setShowReceiptModal(true);
+                dispatch(setMessage('Receipt generated successfully.'));
+            } else {
+                dispatch(setMessage(res.data.message || 'Failed to generate receipt'));
+            }
+        } catch (err) {
+            dispatch(setMessage('Error generating receipt'));
+        }
+        setGeneratingReceiptId(null);
+    };
+
+    const handleUpdateDonorInformation = () => {
+        setShowUpdateDonorModal(true);
+    }
+
+    const handleSaveDonorInfo = async (updatedDonor) => {
+        try {
+            const res = await axiosInstance.post('/donations/update-donation-donor', {
+                donationId: donation.donationId,
+                ...updatedDonor
+            });
+            if (res.data.status) {
+                setDonation((prev) => ({ ...prev, ...res.data.data }));
+                setShowUpdateDonorModal(false);
+                dispatch(setMessage('Donor information updated successfully.'));
+            } else {
+                dispatch(setMessage(res.data.message || 'Failed to update donor information.'));
+            }
+        } catch (error) {
+            const errMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to update donor information.';
+            dispatch(setMessage(errMsg));
+        }
+    };
+
     return (
         <div className=" bg-gray-50">
             <div className=" mx-auto bg-white rounded-lg shadow-md overflow-hidden">
@@ -118,9 +167,20 @@ const DonationDetails = ({ donationData, goBack }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Donor Information */}
                         <div className="border rounded-lg p-4">
-                            <h3 className="text-lg font-semibold mb-4 flex items-center">
-                                <FiUser className="mr-2 text-blue-600" /> Donor Information
-                            </h3>
+                            <div className='flex justify-between'>
+                                <h3 className="text-lg font-semibold mb-4 flex items-center">
+                                    <FiUser className="mr-2 text-blue-600" /> Donor Information
+                                </h3>
+                                <div>
+                                    <button
+                                        onClick={handleUpdateDonorInformation}
+                                        className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors duration-200 shadow"
+                                    >
+                                        <FiEdit className="mr-2" size={16} />
+                                        Update
+                                    </button>
+                                </div>
+                            </div>
 
                             <div className="space-y-3">
                                 <div>
@@ -245,17 +305,37 @@ const DonationDetails = ({ donationData, goBack }) => {
                                             <span className="text-xs mt-1">SMS</span>
                                         </a>
                                     </div>
-                                    {isAdmin &&
-
-                                        <button
-                                            onClick={() => donation?.receiptPath && setShowReceiptModal(true)}
-                                            className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white shadow transition ${donation?.receiptPath ? 'hover:bg-blue-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}`}
-                                            disabled={!donation?.receiptPath}
-                                        >
-                                            <FiFileText className="mr-2" size={16} />
-                                            View Receipt
-                                        </button>
-                                    }
+                                    {/* Admin Receipt Actions */}
+                                    {isAdmin && (
+                                        donation?.receiptPath ? (
+                                            <button
+                                                onClick={() => setShowReceiptModal(true)}
+                                                className="inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-blue-600 text-white shadow hover:bg-blue-700"
+                                            >
+                                                <FiFileText className="mr-2" size={16} />
+                                                View Receipt
+                                            </button>
+                                        ) : (
+                                            donation?.paymentStatus === 'COMPLETED' ? (
+                                                <button
+                                                    onClick={() => handleGenerateReceipt(donation?.donationId)}
+                                                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-yellow-600 text-white shadow hover:bg-yellow-700"
+                                                    disabled={generatingReceiptId === donation?.donationId}
+                                                >
+                                                    <FiFileText className="mr-2" size={16} />
+                                                    {generatingReceiptId === donation?.donationId ? 'Generating...' : 'Generate Receipt'}
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="inline-flex items-center px-4 py-2 text-sm font-medium rounded bg-gray-300 text-gray-500 cursor-not-allowed"
+                                                    disabled
+                                                >
+                                                    <FiFileText className="mr-2" size={16} />
+                                                    No Receipt
+                                                </button>
+                                            )
+                                        )
+                                    )}
                                 </div>
                                 {sendingReceipt && (
                                     <div className="mt-2 text-center text-sm text-blue-500 font-medium animate-pulse">Sending...</div>
@@ -457,10 +537,17 @@ const DonationDetails = ({ donationData, goBack }) => {
             {/* Modal for viewing receipt */}
             {showReceiptModal && (
                 <PDFViewerModal
-                    fileUrl={`${import.meta.env.VITE_API_URL}/${donation?.receiptPath}`}
+                    fileUrl={donation?.receiptPath}
                     onClose={() => setShowReceiptModal(false)}
                 />
             )}
+            {/* Modal for updating donor info */}
+            <UpdateDonorModal
+                isOpen={showUpdateDonorModal}
+                onClose={() => setShowUpdateDonorModal(false)}
+                donorData={donation}
+                onSave={handleSaveDonorInfo}
+            />
         </div>
     );
 };
