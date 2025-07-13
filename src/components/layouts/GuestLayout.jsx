@@ -52,33 +52,69 @@ const GuestLayout = () => {
             <div className="flex space-x-4">
               {isAuthenticated ?
                 <div className="flex items-center space-x-6 bg-white/70 px-4 py-2 rounded-xl shadow-sm border border-gray-100">
-                  {/* Avatar or Initials */}
-                  <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-lg shadow">
-                    {user?.name ? user.name[0] : user?.email[0]}
+                  {/* Desktop: Avatar, Greeting, Role, Actions */}
+                  <div className="hidden sm:flex items-center space-x-6 w-full">
+                    {/* Avatar or Initials */}
+                    <div className="w-10 h-10 flex items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 text-white font-bold text-lg shadow">
+                      {user?.name ? user.name[0] : user?.email[0]}
+                    </div>
+                    {/* Greeting and Role */}
+                    <div className="flex flex-col">
+                      <span className="text-gray-800 font-semibold">
+                        Hello, {user?.name || user?.email}
+                      </span>
+                      <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium shadow">
+                        {user?.role}
+                      </span>
+                    </div>
+                    {/* Actions */}
+                    <div className="flex space-x-2">
+                      <Link
+                        to={getProfilePath(user?.role)}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
+                      >
+                        <span className="mr-1">👤</span> Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
+                      >
+                        <span className="mr-1">🚪</span> Logout
+                      </button>
+                    </div>
                   </div>
-                  {/* Greeting and Role */}
-                  <div className="flex flex-col">
-                    <span className="text-gray-800 font-semibold">
-                      Hello, {user?.name || user?.email}
+                  {/* Mobile: Compact info */}
+                  <div className="flex sm:hidden flex-col w-full items-start">
+                    <span className="text-gray-800 font-semibold text-base">
+                      {user?.name
+                        ? user.name.length > 10
+                          ? user.name.slice(0, 10) + '...'
+                          : user.name
+                        : ''}
+                      <span className="ml-2 border bg-sky-200 rounded-lg px-2">
+                        {
+                          user?.role
+                            ? user.role.length > 5
+                              ? user.role.slice(0, 5) + '...'
+                              : user.role
+                            : ''
+                        }
+                      </span>
                     </span>
-                    <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-medium shadow">
-                      {user?.role}
-                    </span>
-                  </div>
-                  {/* Actions */}
-                  <div className="flex space-x-2">
-                    <Link
-                      to={getProfilePath(user?.role)}
-                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
-                    >
-                      <span className="mr-1">👤</span> Profile
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
-                    >
-                      <span className="mr-1">🚪</span> Logout
-                    </button>
+                    <div className="flex space-x-2 mt-2">
+                      <Link
+                        to={getProfilePath(user?.role)}
+                        className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
+                      >
+                        <span className="mr-1">👤</span> Profile
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
+                      >
+                        <span className="mr-1">🚪</span> Logout
+                      </button>
+                    </div>
                   </div>
                 </div>
                 :
@@ -162,7 +198,7 @@ const GuestLayout = () => {
               </p>
             </div>
           </div>
-          
+
           <div className="mt-8 pt-8 border-t border-gray-700 text-center">
             <p className="text-gray-400 text-sm">
               &copy; {new Date().getFullYear()} {organizationName} System. All rights reserved.
