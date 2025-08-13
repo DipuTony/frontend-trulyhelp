@@ -489,7 +489,7 @@ const
                             All donations are tax exempted under section 80G of income tax act.
                         </p>
                         <p>
-                            For any further query, contact: info@trulyhelp.org | Whatsapp: +91 9319393076
+                            For any further query, contact: info@trulyhelp.org | Landline no : +1204316733 | Whatsapp: +91 9319393076
                         </p>
                     </div>
                 </div>

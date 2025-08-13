@@ -58,7 +58,6 @@ const VolunteerManagement = () => {
           email: values.email,
           phone: values.phone,
           role: roleName,
-          status: values.status,
         }
 
         const updatePayload = {

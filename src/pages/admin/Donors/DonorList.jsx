@@ -86,6 +86,7 @@ const DonorList = () => {
         },
         {
             Header: 'Donor Name',
+            accessor: 'name',
             Cell: ({ row }) => (
                 <button
                     onClick={() => handleViewDonation(row.original.userId)}
