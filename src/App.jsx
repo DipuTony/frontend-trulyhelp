@@ -14,7 +14,6 @@ import DonationList from "./pages/admin/Donations/DonationList"
 import ExpenseManagement from "./pages/admin/ExpenseManagement"
 import PaymentVerification from "./pages/admin/PaymentVerification"
 import ReportGenerator from "./pages/admin/ReportGenerator"
-import NotificationPanel from "./pages/admin/NotificationPanel"
 
 // Volunteer Pages
 import VolunteerDashboard from "./pages/volunteer/Dashboard"
@@ -58,6 +57,9 @@ import EmailVerification from "./pages/auth/EmailVerification"
 import AdminManagement from "./pages/admin/AdminManagement"
 import VolunteerManagement from "./pages/admin/VolunteerManagement"
 import AdminSettings from "./pages/admin/Settings/AdminSettings"
+import NotificationList from "./pages/admin/Notification/NotificationList"
+import SelectRecipients from "./pages/admin/Notification/SelectRecipients"
+import NotificationCompose from "./pages/admin/Notification/NotificationCompose"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -123,7 +125,9 @@ function App() {
             {/* <Route path="expenses" element={<ExpenseManagement />} /> */}
             <Route path="payment-verification" element={<PaymentVerification />} />
             <Route path="reports" element={<ReportGenerator />} />
-            <Route path="notifications" element={<NotificationPanel />} />
+            <Route path="notifications" element={<NotificationList />} />
+            <Route path="notifications/select" element={<SelectRecipients />} />
+            <Route path="notifications/compose" element={<NotificationCompose />} />
             <Route path="profile" element={<Profile />} />
             <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
