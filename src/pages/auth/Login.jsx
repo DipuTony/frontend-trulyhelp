@@ -20,12 +20,14 @@ const Login = () => {
   useEffect(() => {
     dispatch(clearError())
     if (isAuthenticated) {
+      const role = (user?.role || '').toUpperCase()
       const roleRoutes = {
-        ADMIN: "/admin",
-        VOLUNTEER: "/volunteer",
-        DONOR: "/donor",
+        SUPER_ADMIN: "/admin/profile",
+        ADMIN: "/admin/profile",
+        VOLUNTEER: "/volunteer/profile",
+        DONOR: "/donor/profile",
       }
-      navigate(roleRoutes[user?.role] || "/")
+      navigate(roleRoutes[role] || "/")
     }
   }, [isAuthenticated, user, navigate, dispatch])
 

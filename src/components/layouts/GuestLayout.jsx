@@ -17,20 +17,37 @@ const GuestLayout = () => {
   // Determine profile path based on user role
   const getProfilePath = (role) => {
     switch ((role || '').toUpperCase()) {
+      case 'SUPER_ADMIN':
+        return '/admin/profile';
       case 'ADMIN':
-        return '/admin';
+        return '/admin/profile';
       case 'VOLUNTEER':
-        return '/volunteer';
+        return '/volunteer/profile';
       case 'DONOR':
-        return '/donor';
+        return '/donor/profile';
       default:
-        return '/profile';
+        return '/login';
     }
   };
 
   const handleLogout = () => {
     dispatch(logout())
     navigate("/login")
+  }
+
+  const handleProfileClick = () => {
+    const token = localStorage.getItem("token")
+    console.debug("[GuestLayout] Profile click:", {
+      tokenPresent: !!token,
+      role: user?.role,
+      target: getProfilePath(user?.role)
+    })
+    if (!token) {
+      dispatch(logout())
+      navigate("/login")
+      return
+    }
+    navigate(getProfilePath(user?.role))
   }
 
   return (
@@ -69,13 +86,15 @@ const GuestLayout = () => {
                     </div>
                     {/* Actions */}
                     <div className="flex space-x-2">
-                      <Link
-                        to={getProfilePath(user?.role)}
+                      <button
+                        type="button"
+                        onClick={handleProfileClick}
                         className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
                       >
                         Profile
-                      </Link>
+                      </button>
                       <button
+                        type="button"
                         onClick={handleLogout}
                         className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
                       >
@@ -86,13 +105,15 @@ const GuestLayout = () => {
                   {/* Mobile: Buttons only */}
                   <div className="flex sm:hidden w-full items-start">
                     <div className="flex space-x-2">
-                      <Link
-                        to={getProfilePath(user?.role)}
+                      <button
+                        type="button"
+                        onClick={handleProfileClick}
                         className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
                       >
                         Profile
-                      </Link>
+                      </button>
                       <button
+                        type="button"
                         onClick={handleLogout}
                         className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
                       >

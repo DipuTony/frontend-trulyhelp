@@ -3,8 +3,29 @@ import axios from 'axios';
 import { logout } from '../store/slices/authSlice';
 import { setMessage } from "../store/slices/notificationSlice"; // Import the setMessage action
 
+// Determine and validate baseURL to avoid "Invalid URL" errors
+const DEFAULT_API_BASE = "https://api.trulyhelp.org";
+let envBase = import.meta?.env?.VITE_API_URL;
+let resolvedBaseURL = DEFAULT_API_BASE;
+try {
+  const candidate = (envBase && typeof envBase === 'string' && envBase.trim().length > 0)
+    ? envBase.trim()
+    : DEFAULT_API_BASE;
+  // Ensure absolute URL; fall back if invalid
+  // new URL will throw if candidate is not a valid absolute URL
+  // eslint-disable-next-line no-new
+  new URL(candidate);
+  resolvedBaseURL = candidate;
+} catch (e) {
+  // eslint-disable-next-line no-console
+  console.warn('[axios] Invalid VITE_API_URL detected, falling back to default', { provided: envBase, error: e?.message });
+  resolvedBaseURL = DEFAULT_API_BASE;
+}
+// eslint-disable-next-line no-console
+console.debug('[axios] Using API baseURL', { baseURL: resolvedBaseURL });
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://api.trulyhelp.org",
+  baseURL: resolvedBaseURL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -31,6 +52,14 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[axios][req]', {
+        method: (config.method || 'get').toUpperCase(),
+        baseURL: config.baseURL,
+        url: config.url
+      });
+    } catch {}
     return config;
   },
   (error) => Promise.reject(error)
@@ -40,6 +69,15 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
+    try {
+      // eslint-disable-next-line no-console
+      console.debug('[axios][err]', {
+        status: error.response?.status,
+        message: error.message,
+        baseURL: error.config?.baseURL,
+        url: error.config?.url
+      });
+    } catch {}
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
