@@ -6,6 +6,7 @@ import { formatDateFull } from "../../components/common/DateFormatFunctions";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchICard } from "../../store/slices/volunteerSlice";
 import axiosInstance from '../../utils/axiosInterceptor';
+import Logo1 from '../../images/Logo1.png';
 
 export default function IDCard({ cardData, adminSelectedCard }) {
     const cardContainerRef = useRef(null);
@@ -139,7 +140,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     };
 
     // Use provided data or fallback to static data
-    const logo = 'https://trulyhelp.org/wp-content/uploads/2024/12/Logo7.png';
+    const logo = Logo1;
     const userImage = 'https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg';
     const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${displayData?.userId || 'default'}`;
     const orgName = "Truly Help Org"
