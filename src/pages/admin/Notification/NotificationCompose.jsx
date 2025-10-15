@@ -3,9 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { showSuccessToast, showErrorToast } from '../../../utils/toast'
 
 const CHANNELS = [
-  { key: 'email', label: 'Email' },
-  { key: 'whatsapp', label: 'WhatsApp' },
-  { key: 'sms', label: 'SMS' },
+  { key: 'email', label: 'Email', icon: '📧' },
+  { key: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+  { key: 'sms', label: 'SMS', icon: '📱' },
 ]
 
 const NotificationCompose = () => {
@@ -17,129 +17,195 @@ const NotificationCompose = () => {
   const [channel, setChannel] = useState('email')
   const [subject, setSubject] = useState('')
   const [message, setMessage] = useState('')
+  const [sendType, setSendType] = useState('now')
+  const [scheduledAt, setScheduledAt] = useState('')
 
   const smsChars = message.length
   const smsLimit = 160
 
   const isValid = useMemo(() => {
-    if (channel === 'email') return subject.trim().length > 0 && message.trim().length > 0
-    if (channel === 'sms') return message.trim().length > 0 && smsChars <= smsLimit
-    return message.trim().length > 0
-  }, [channel, subject, message, smsChars])
+    const baseValid = (() => {
+      if (channel === 'email') return subject.trim() && message.trim()
+      if (channel === 'sms') return message.trim() && smsChars <= smsLimit
+      return message.trim()
+    })()
+    const scheduleValid = sendType === 'now' || (scheduledAt && new Date(scheduledAt) > new Date())
+    return baseValid && scheduleValid
+  }, [channel, subject, message, smsChars, sendType, scheduledAt])
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!recipients || recipients.length === 0) {
-      showErrorToast('Please select at least one recipient.')
-      return
-    }
-    if (!isValid) {
-      showErrorToast('Please fill the required fields.')
-      return
-    }
-    // Placeholder: integrate API call later
-    // payload shape kept simple and consistent
+    if (!recipients.length) return showErrorToast('Please select recipients.')
+    if (!isValid) return showErrorToast('Please fill required fields.')
+
     const payload = {
       channel,
       subject: channel === 'email' ? subject.trim() : undefined,
       message: message.trim(),
       recipientIds: recipients.map((r) => r.id),
+      sendType,
+      scheduledAt: sendType === 'later' ? new Date(scheduledAt).toISOString() : undefined,
     }
-    // eslint-disable-next-line no-console
     console.log('compose submit', payload)
     showSuccessToast('Notification ready to send (stub).')
     navigate('/admin/notifications')
   }
 
   return (
-    <div>
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Compose Notification</h1>
-          <p className="mt-2 text-sm text-gray-700">Choose one channel and compose your message.</p>
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Compose Notification</h1>
+          <p className="mt-1 text-sm text-gray-500">Create and send notifications to your recipients</p>
         </div>
-        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <button
-            type="button"
-            onClick={() => navigate('/admin/notifications/select', { state: { preserve } })}
-            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-          >
-            Back
-          </button>
-        </div>
+        <button
+          onClick={() => navigate('/admin/notifications/select', { state: { preserve } })}
+          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+        >
+          ← Back
+        </button>
       </div>
 
-      <div className="mt-4 text-sm text-gray-600">
-        <span className="font-medium">Recipients:</span> {recipients.length}
-        {recipients.length > 0 && (
-          <span className="ml-2 text-gray-400">(showing first 3)</span>
-        )}
-        {recipients.length > 0 && (
-          <ul className="mt-1 list-disc list-inside text-gray-500">
-            {recipients.slice(0, 3).map((r) => (
-              <li key={r.id}>{r.name} — {r.email}</li>
-            ))}
-            {recipients.length > 3 && (
-              <li>+{recipients.length - 3} more</li>
+      {/* Recipients Card */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">👥</span>
+          <div>
+            <p className="text-sm font-semibold text-gray-900">{recipients.length} Recipients Selected</p>
+            {recipients.length > 0 && (
+              <p className="text-xs text-gray-600 mt-1">
+                {recipients.slice(0, 2).map(r => r.name).join(', ')}
+                {recipients.length > 2 && ` +${recipients.length - 2} more`}
+              </p>
             )}
-          </ul>
-        )}
+          </div>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-        <div className="sm:col-span-2">
-          <label className="block text-sm font-medium text-gray-700">Channel</label>
-          <div className="mt-2 flex space-x-4">
+      {/* Form Card */}
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
+        {/* Channel Selection */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-3">Select Channel</label>
+          <div className="grid grid-cols-3 gap-3">
             {CHANNELS.map((c) => (
-              <label key={c.key} className="inline-flex items-center space-x-2 text-sm text-gray-700">
-                <input
-                  type="radio"
-                  name="channel"
-                  value={c.key}
-                  checked={channel === c.key}
-                  onChange={() => setChannel(c.key)}
-                  className="h-4 w-4 text-indigo-600 border-gray-300"
-                />
-                <span>{c.label}</span>
-              </label>
+              <button
+                key={c.key}
+                type="button"
+                onClick={() => setChannel(c.key)}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  channel === c.key
+                    ? 'border-indigo-600 bg-indigo-50 shadow-sm'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="text-2xl mb-1">{c.icon}</div>
+                <div className={`text-sm font-medium ${channel === c.key ? 'text-indigo-700' : 'text-gray-700'}`}>
+                  {c.label}
+                </div>
+              </button>
             ))}
           </div>
         </div>
 
+        {/* Subject (Email only) */}
         {channel === 'email' && (
-          <div className="sm:col-span-4">
-            <label className="block text-sm font-medium text-gray-700">Subject</label>
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-2">Subject</label>
             <input
               type="text"
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              placeholder="Enter subject"
+              placeholder="Enter email subject"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow"
             />
           </div>
         )}
 
-        <div className={channel === 'email' ? 'sm:col-span-6' : 'sm:col-span-4'}>
-          <label className="block text-sm font-medium text-gray-700">Message</label>
+        {/* Message */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-2">Message</label>
           <textarea
-            rows={channel === 'sms' ? 3 : 5}
+            rows={channel === 'sms' ? 3 : 6}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            placeholder={channel === 'whatsapp' ? 'Write WhatsApp message' : channel === 'sms' ? 'Write SMS (max 160 chars)' : 'Write email content'}
+            placeholder={`Write your ${channel} message here...`}
+            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-shadow resize-none"
           />
           {channel === 'sms' && (
-            <div className="mt-1 text-xs text-gray-500">{smsChars}/{smsLimit} characters</div>
+            <p className={`text-xs mt-1 ${smsChars > smsLimit ? 'text-red-600' : 'text-gray-500'}`}>
+              {smsChars}/{smsLimit} characters
+            </p>
           )}
         </div>
 
-        <div className="sm:col-span-6">
+        {/* Delivery Options */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-3">Delivery Time</label>
+          <div className="space-y-3">
+            <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+              <input
+                type="radio"
+                name="sendType"
+                value="now"
+                checked={sendType === 'now'}
+                onChange={() => setSendType('now')}
+                className="w-4 h-4 text-indigo-600"
+              />
+              <div>
+                <div className="text-sm font-medium text-gray-900">Send Immediately</div>
+                <div className="text-xs text-gray-500">Notification will be sent right away</div>
+              </div>
+            </label>
+            <label className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+              <input
+                type="radio"
+                name="sendType"
+                value="later"
+                checked={sendType === 'later'}
+                onChange={() => setSendType('later')}
+                className="w-4 h-4 text-indigo-600"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-gray-900">Schedule for Later</div>
+                <div className="text-xs text-gray-500 mb-2">Choose a date and time</div>
+                {sendType === 'later' && (
+                  <input
+                    type="datetime-local"
+                    value={scheduledAt}
+                    onChange={(e) => setScheduledAt(e.target.value)}
+                    min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+                  />
+                )}
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex gap-3 pt-4 border-t">
           <button
             type="submit"
-            disabled={!isValid || recipients.length === 0}
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
+            disabled={!isValid || !recipients.length}
+            className="flex-1 px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Send
+            {sendType === 'now' ? '📤 Send Now' : '⏰ Schedule Notification'}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/notifications')}
+            className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate('/admin/notifications/select', { state: { preserve } })}
+            className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            Back
           </button>
         </div>
       </form>
