@@ -157,6 +157,15 @@ const SelectRecipients = () => {
           <h1 className="text-2xl font-semibold text-gray-900">Select Recipients</h1>
           <p className="mt-2 text-sm text-gray-700">Filter and choose recipients for your notification.</p>
         </div>
+        <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+          <button
+            type="button"
+            onClick={() => navigate('/admin/notifications')}
+            className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+          >
+            Back
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSearch} className="mt-6 grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-6">

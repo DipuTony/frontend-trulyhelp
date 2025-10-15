@@ -8,6 +8,17 @@ const CHANNELS = [
   { key: 'sms', label: 'SMS', icon: '📱' },
 ]
 
+const TEMPLATES = {
+  whatsapp: [
+    { key: 'thanks', label: 'Thank You', body: 'Dear {name}, thank you for your generous support to TrulyHelp.' },
+    { key: 'reminder', label: 'Payment Reminder', body: 'Hello {name}, this is a friendly reminder about your pending donation.' },
+  ],
+  sms: [
+    { key: 'thanks', label: 'Thank You', body: 'Thank you for supporting TrulyHelp!' },
+    { key: 'update', label: 'Project Update', body: 'TrulyHelp update: Your support is making a difference.' },
+  ],
+}
+
 const NotificationCompose = () => {
   const navigate = useNavigate()
   const { state } = useLocation()
@@ -19,6 +30,7 @@ const NotificationCompose = () => {
   const [message, setMessage] = useState('')
   const [sendType, setSendType] = useState('now')
   const [scheduledAt, setScheduledAt] = useState('')
+  const [templateKey, setTemplateKey] = useState('')
 
   const smsChars = message.length
   const smsLimit = 160
@@ -87,7 +99,8 @@ const NotificationCompose = () => {
       <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 space-y-6">
         {/* Channel Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-3">Select Channel</label>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Select Channel <span className="text-red-600">*</span></label>
+          <p className="text-xs text-gray-500 mb-3">Choose one channel to send this notification.</p>
           <div className="grid grid-cols-3 gap-3">
             {CHANNELS.map((c) => (
               <button
@@ -112,7 +125,8 @@ const NotificationCompose = () => {
         {/* Subject (Email only) */}
         {channel === 'email' && (
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">Subject</label>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">Subject <span className="text-red-600">*</span></label>
+            <p className="text-xs text-gray-500 mb-2">Required for email notifications.</p>
             <input
               type="text"
               value={subject}
@@ -123,9 +137,33 @@ const NotificationCompose = () => {
           </div>
         )}
 
+        {(channel === 'whatsapp' || channel === 'sms') && (
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-1">Template</label>
+            <p className="text-xs text-gray-500 mb-2">Optional: select a predefined template. You can edit the message after selecting.</p>
+            <select
+              value={templateKey}
+              onChange={(e) => {
+                const key = e.target.value
+                setTemplateKey(key)
+                const list = TEMPLATES[channel] || []
+                const selected = list.find((t) => t.key === key)
+                if (selected) setMessage(selected.body)
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+            >
+              <option value="">Select a template...</option>
+              {(TEMPLATES[channel] || []).map((t) => (
+                <option key={t.key} value={t.key}>{t.label}</option>
+              ))}
+            </select>
+          </div>
+        )}
+
         {/* Message */}
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">Message</label>
+          <label className="block text-sm font-semibold text-gray-900 mb-1">Message <span className="text-red-600">*</span></label>
+          <p className="text-xs text-gray-500 mb-2">Write the content that will be sent to recipients. Keep it concise and clear.</p>
           <textarea
             rows={channel === 'sms' ? 3 : 6}
             value={message}
