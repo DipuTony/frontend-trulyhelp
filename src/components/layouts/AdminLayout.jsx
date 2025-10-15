@@ -100,6 +100,12 @@ const AdminLayout = () => {
       icon: "user",
       description: "User Profile"
     },
+    { 
+      name: "Settings", 
+      href: "/admin/settings", 
+      icon: "user",
+      description: "Admin Settings"
+    },
   ]
 
   useEffect(() => {

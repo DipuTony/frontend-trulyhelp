@@ -4,7 +4,8 @@ import { logout } from '../store/slices/authSlice';
 import { setMessage } from "../store/slices/notificationSlice"; // Import the setMessage action
 
 // Determine and validate baseURL to avoid "Invalid URL" errors
-const DEFAULT_API_BASE = "https://api.trulyhelp.org";
+// const DEFAULT_API_BASE = "https://api.trulyhelp.org";
+const DEFAULT_API_BASE = "http://localhost:4004";
 let envBase = import.meta?.env?.VITE_API_URL;
 let resolvedBaseURL = DEFAULT_API_BASE;
 try {

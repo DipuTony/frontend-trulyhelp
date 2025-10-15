@@ -57,6 +57,7 @@ import SearchDonor from "./pages/volunteer/SearchDonor"
 import EmailVerification from "./pages/auth/EmailVerification"
 import AdminManagement from "./pages/admin/AdminManagement"
 import VolunteerManagement from "./pages/admin/VolunteerManagement"
+import AdminSettings from "./pages/admin/Settings/AdminSettings"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -127,6 +128,7 @@ function App() {
             <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
             <Route path="id-card" element={<IdCardList />} />
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
 
           {/* Volunteer Routes */}
