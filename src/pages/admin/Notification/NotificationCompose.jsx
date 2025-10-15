@@ -12,6 +12,7 @@ const NotificationCompose = () => {
   const navigate = useNavigate()
   const { state } = useLocation()
   const recipients = state?.recipients || []
+  const preserve = state?.preserve
 
   const [channel, setChannel] = useState('email')
   const [subject, setSubject] = useState('')
@@ -60,7 +61,7 @@ const NotificationCompose = () => {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/admin/notifications/select', { state: { preserve } })}
             className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
           >
             Back

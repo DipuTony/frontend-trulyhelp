@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from '../../../utils/axiosInterceptor'
+import DataTable from '../../../components/common/DataTable/DataTable'
+
 
 const ROLES = [
   { value: 'ALL', label: 'All' },
@@ -12,6 +14,7 @@ const ROLES = [
 
 const SelectRecipients = () => {
   const navigate = useNavigate()
+  const { state } = useLocation()
 
   const [role, setRole] = useState('ALL')
   const [query, setQuery] = useState('')
@@ -21,8 +24,17 @@ const SelectRecipients = () => {
   const [selectedIds, setSelectedIds] = useState(new Set())
 
   useEffect(() => {
-    // simulate initial empty state
+    // Restore preserved state if available (coming back from compose)
+    const preserve = state?.preserve
+    if (preserve) {
+      if (preserve.role) setRole(preserve.role)
+      if (typeof preserve.query === 'string') setQuery(preserve.query)
+      if (Array.isArray(preserve.results)) setResults(preserve.results)
+      if (Array.isArray(preserve.selectedIds)) setSelectedIds(new Set(preserve.selectedIds))
+      return
+    }
     setResults([])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const filterByQuery = (list) => {
@@ -96,8 +108,47 @@ const SelectRecipients = () => {
   const proceed = () => {
     const selected = results.filter((u) => selectedIds.has(u.id))
     // Pass selection via navigation state for now; can switch to store/query later
-    navigate('/admin/notifications/compose', { state: { recipients: selected } })
+    navigate('/admin/notifications/compose', {
+      state: {
+        recipients: selected,
+        preserve: {
+          role,
+          query,
+          results,
+          selectedIds: Array.from(selectedIds),
+        },
+      },
+    })
   }
+
+  const COLUMNS = useMemo(() => [
+    {
+      Header: '',
+      accessor: 'select',
+      disableSortBy: true,
+      Cell: ({ row }) => (
+        <input
+          type="checkbox"
+          checked={selectedIds.has(row.original.id)}
+          onChange={() => toggleOne(row.original.id)}
+          className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+        />
+      )
+    },
+    {
+      Header: 'Name',
+      accessor: 'name',
+      Cell: ({ row }) => (
+        <div>
+          <div className="text-sm font-medium text-gray-900">{row.original.name}</div>
+          <div className="text-xs text-gray-400">ID: {row.original.userId || row.original.id}</div>
+        </div>
+      )
+    },
+    { Header: 'Email', accessor: 'email' },
+    { Header: 'Phone', accessor: 'phone' },
+    { Header: 'Role', accessor: 'role' }
+  ], [selectedIds])
 
   return (
     <div>
@@ -171,36 +222,19 @@ const SelectRecipients = () => {
           </div>
         </div>
 
-        <ul className="divide-y divide-gray-200">
-          {loading ? (
-            <li className="px-4 py-6">
-              <p className="text-sm text-gray-500 italic">Loading...</p>
-            </li>
-          ) : results.length === 0 ? (
-            <li className="px-4 py-6">
-              <p className="text-sm text-gray-500 italic">No results. Adjust filters and search.</p>
-            </li>
-          ) : (
-            results.map((u) => (
-              <li key={u.id} className="px-4 py-3 sm:px-6 flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedIds.has(u.id)}
-                    onChange={() => toggleOne(u.id)}
-                    className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
-                  />
-                  <div className="ml-3">
-                    <p className="text-sm font-medium text-gray-900">{u.name}</p>
-                    <p className="text-xs text-gray-500">{u.email} · {u.role}</p>
-                    {u.phone && <p className="text-xs text-gray-500">{u.phone}</p>}
-                    <p className="text-xs text-gray-400">ID: {u.userId || u.id}</p>
-                  </div>
-                </div>
-              </li>
-            ))
-          )}
-        </ul>
+        {loading ? (
+          <div className="px-4 py-6">
+            <p className="text-sm text-gray-500 italic">Loading...</p>
+          </div>
+        ) : results.length === 0 ? (
+          <div className="px-4 py-6">
+            <p className="text-sm text-gray-500 italic">No results. Adjust filters and search.</p>
+          </div>
+        ) : (
+          <div className="p-4">
+            <DataTable data={results} columns={COLUMNS} />
+          </div>
+        )}
       </div>
     </div>
   )
