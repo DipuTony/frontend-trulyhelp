@@ -2,7 +2,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { logout } from "../../store/slices/authSlice";
 import organizationLogo from '../../images/Logo1.png';
-import qrCode from '../../images/qr_trulyhelp.png';
+
 
 const GuestLayout = () => {
 
@@ -38,18 +38,18 @@ const GuestLayout = () => {
       {/* Animated Header */}
       <header className="bg-white shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-20 items-center">
+          <div className="flex justify-between items-center h-16 sm:h-20">
             <div className="flex items-center space-x-2">
               <div className="flex-shrink-0">
                 <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
-                  <img className="h-12 w-auto" src={organizationLogo} alt={organizationName} />
+                  <img className="h-10 sm:h-12 w-auto" src={organizationLogo} alt={organizationName} />
                 </a>
               </div>
               {/* <h1 className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                 {organizationName}
               </h1> */}
             </div>
-            <div className="flex space-x-4">
+            <div className="flex items-center flex-wrap gap-2 sm:gap-4">
               {isAuthenticated ?
                 <div className="flex items-center space-x-6 bg-white/70 px-4 py-2 rounded-xl shadow-sm border border-gray-100">
                   {/* Desktop: Avatar, Greeting, Role, Actions */}
@@ -73,46 +73,30 @@ const GuestLayout = () => {
                         to={getProfilePath(user?.role)}
                         className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
                       >
-                        <span className="mr-1">👤</span> Profile
+                        Profile
                       </Link>
                       <button
                         onClick={handleLogout}
                         className="inline-flex items-center px-4 py-2 text-sm font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
                       >
-                        <span className="mr-1">🚪</span> Logout
+                        Logout
                       </button>
                     </div>
                   </div>
-                  {/* Mobile: Compact info */}
-                  <div className="flex sm:hidden flex-col w-full items-start">
-                    <span className="text-gray-800 font-semibold text-base">
-                      {user?.name
-                        ? user.name.length > 10
-                          ? user.name.slice(0, 10) + '...'
-                          : user.name
-                        : ''}
-                      <span className="ml-2 border bg-sky-200 rounded-lg px-2">
-                        {
-                          user?.role
-                            ? user.role.length > 5
-                              ? user.role.slice(0, 5) + '...'
-                              : user.role
-                            : ''
-                        }
-                      </span>
-                    </span>
-                    <div className="flex space-x-2 mt-2">
+                  {/* Mobile: Buttons only */}
+                  <div className="flex sm:hidden w-full items-start">
+                    <div className="flex space-x-2">
                       <Link
                         to={getProfilePath(user?.role)}
                         className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow transition-all"
                       >
-                        <span className="mr-1">👤</span> Profile
+                        Profile
                       </Link>
                       <button
                         onClick={handleLogout}
                         className="inline-flex items-center px-3 py-1 text-xs font-medium rounded-full text-white bg-red-500 hover:bg-red-400 shadow transition-all"
                       >
-                        <span className="mr-1">🚪</span> Logout
+                        Logout
                       </button>
                     </div>
                   </div>
@@ -123,13 +107,13 @@ const GuestLayout = () => {
                     to="/login"
                     className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
                   >
-                    <span className="mr-1">👋</span> Login
+                    Login
                   </Link>
                   <Link
                     to="/signup"
                     className="relative inline-flex items-center px-6 py-2.5 text-sm font-medium rounded-full text-indigo-600 bg-white border-2 border-indigo-200 hover:border-indigo-300 shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
                   >
-                    <span className="mr-1">✨</span> Sign Up
+                    Sign Up
                   </Link>
                 </>
               }
@@ -142,9 +126,9 @@ const GuestLayout = () => {
       {/* Main Content */}
       < main className="relative" >
         {/* Decorative elements */}
-        <div className="absolute top-0 left-0 w-full h-72 bg-gradient-to-r from-indigo-50 to-purple-50 opacity-30 -z-0" ></div >
+        <div className="absolute top-0 left-0 w-full h-40 sm:h-56 md:h-72 bg-gradient-to-r from-indigo-50 to-purple-50 opacity-30 -z-0" ></div >
 
-        <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl overflow-hidden">
             <Outlet />
           </div>
@@ -157,13 +141,13 @@ const GuestLayout = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 mb-4 md:mb-0">
               <a href="https://trulyhelp.org/" target="_blank" rel="noopener noreferrer">
-                <img src={organizationLogo} alt={organizationName} className="h-10 w-auto" />
+                <img src={organizationLogo} alt={organizationName} className="h-8 sm:h-10 w-auto" />
               </a>
               {/* <span className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                 {organizationName}
               </span> */}
             </div>
-            <div className="flex space-x-6">
+            <div className="flex flex-wrap gap-4 sm:gap-6 justify-center md:justify-end">
               <a href="https://trulyhelp.org/terms-conditions/" className="text-gray-300 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer">
                 Terms & Condition
               </a>
