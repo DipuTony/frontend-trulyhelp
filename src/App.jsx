@@ -56,10 +56,10 @@ import SearchDonor from "./pages/volunteer/SearchDonor"
 import EmailVerification from "./pages/auth/EmailVerification"
 import AdminManagement from "./pages/admin/AdminManagement"
 import VolunteerManagement from "./pages/admin/VolunteerManagement"
-import AdminSettings from "./pages/admin/Settings/AdminSettings"
 import NotificationList from "./pages/admin/Notification/NotificationList"
 import SelectRecipients from "./pages/admin/Notification/SelectRecipients"
 import NotificationCompose from "./pages/admin/Notification/NotificationCompose"
+import AdminSettingIndex from "./pages/admin/Settings/AdminSettingIndex"
 // import HomePage from "./pages/guest/HomePage"
 
 function App() {
@@ -132,7 +132,7 @@ function App() {
             <Route path="donation-setting" element={<DonationSettings />} />
             <Route path="add-donation" element={<AddDonation usedFor="admin" />} />
             <Route path="id-card" element={<IdCardList />} />
-            <Route path="settings" element={<AdminSettings />} />
+            <Route path="settings" element={<AdminSettingIndex />} />
           </Route>
 
           {/* Volunteer Routes */}

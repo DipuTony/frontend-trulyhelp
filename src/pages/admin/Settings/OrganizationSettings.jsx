@@ -3,7 +3,7 @@ import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import axiosInstance from '../../../utils/axiosInterceptor'
 
-const AdminSettings = () => {
+const OrganizationSettings = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -27,17 +27,7 @@ const AdminSettings = () => {
     donationReference: '',
     receiptFooterNote: '',
     supportEmail: '',
-    supportPhone: '',
-    bankName: '',
-    bankAccountName: '',
-    bankAccountNumber: '',
-    bankIfsc: '',
-    bankBranch: '',
-    qrUpiId: '',
-    socialFacebook: '',
-    socialInstagram: '',
-    socialTwitter: '',
-    socialYouTube: ''
+    supportPhone: ''
   })
 
   const validationSchema = Yup.object({
@@ -49,8 +39,6 @@ const AdminSettings = () => {
     supportEmail: Yup.string().email('Invalid support email').nullable(true),
     supportPhone: Yup.string().matches(/^[0-9+\-()\s]{6,20}$/,
       'Invalid support phone').nullable(true),
-    bankIfsc: Yup.string().matches(/^[A-Z]{4}0[A-Z0-9]{6}$/i,
-      { message: 'Invalid IFSC', excludeEmptyString: true })
   })
 
   const formik = useFormik({
@@ -190,28 +178,6 @@ const AdminSettings = () => {
           </div>
         </section>
 
-        <section className="bg-white rounded-xl shadow p-4">
-          <h2 className="text-lg font-medium mb-4">Bank (offline donations)</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Bank Name" name="bankName" help="Shown for offline/cheque donations." />
-            <Field label="Account Name" name="bankAccountName" help="Beneficiary name for bank transfers." />
-            <Field label="Account Number" name="bankAccountNumber" help="Displayed to donors opting bank transfer." />
-            <Field label="IFSC" name="bankIfsc" help="Required for NEFT/RTGS—shown with bank details." />
-            <Field label="Branch" name="bankBranch" help="Optional—displayed with bank details." />
-            <Field label="QR / UPI ID" name="qrUpiId" help="Used to render QR or UPI payment info." />
-          </div>
-        </section>
-
-        <section className="bg-white rounded-xl shadow p-4">
-          <h2 className="text-lg font-medium mb-4">Social</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Facebook" name="socialFacebook" help="Linked in footer and share components." />
-            <Field label="Instagram" name="socialInstagram" help="Linked in footer and share components." />
-            <Field label="Twitter / X" name="socialTwitter" help="Linked in footer and share components." />
-            <Field label="YouTube" name="socialYouTube" help="Linked in footer and share components." />
-          </div>
-        </section>
-
         <div className="flex justify-end">
           <button
             type="submit"
@@ -226,4 +192,4 @@ const AdminSettings = () => {
   )
 }
 
-export default AdminSettings
+export default OrganizationSettings
