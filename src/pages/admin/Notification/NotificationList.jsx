@@ -45,6 +45,9 @@ const NotificationList = () => {
         <div className="sm:flex-auto">
           <h1 className="text-2xl font-semibold text-gray-900">Notifications</h1>
           <p className="mt-2 text-sm text-gray-700">View past, current, and scheduled notifications.</p>
+          <div className="mt-4 bg-red-50 border-l-4 border-red-500 rounded-lg p-3 shadow-sm">
+            <p className="text-sm text-red-700">This feature coming soon</p>
+          </div>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button

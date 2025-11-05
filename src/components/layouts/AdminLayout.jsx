@@ -86,7 +86,8 @@ const AdminLayout = () => {
       name: "Notifications", 
       href: "/admin/notifications", 
       icon: "bell",
-      description: "Manage notifications"
+      description: "Manage notifications",
+      comingSoon: true
     },
     { 
       name: "Donation Settings", 
@@ -104,7 +105,8 @@ const AdminLayout = () => {
       name: "Settings", 
       href: "/admin/settings", 
       icon: "user",
-      description: "Admin Settings"
+      description: "Admin Settings",
+      comingSoon: true
     },
   ]
 
@@ -250,7 +252,12 @@ const AdminLayout = () => {
                         <span className={`mr-4 h-6 w-6 ${getIconClasses(item.href)}`}>
                           <i className={`fas fa-${item.icon}`}></i>
                         </span>
-                        {item.name}
+                        <span className="flex-1">{item.name}</span>
+                        {item.comingSoon && (
+                          <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                            Coming Soon
+                          </span>
+                        )}
                       </Link>
                     )}
                   </div>
@@ -359,7 +366,12 @@ const AdminLayout = () => {
                       <span className={`mr-3 h-6 w-6 ${getIconClasses(item.href)}`}>
                         <i className={`fas fa-${item.icon}`}></i>
                       </span>
-                      {item.name}
+                      <span className="flex-1">{item.name}</span>
+                      {item.comingSoon && (
+                        <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-red-100 text-red-700 rounded-full">
+                          Coming Soon
+                        </span>
+                      )}
                     </Link>
                   )}
                 </div>
