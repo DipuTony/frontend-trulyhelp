@@ -58,7 +58,11 @@ function ForgotPassword() {
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm text-red-700">{error || message}</p>
+                <p className="text-sm text-red-700">
+                  {typeof error === 'object' && error !== null 
+                    ? (error.message || JSON.stringify(error))
+                    : (error || message)}
+                </p>
               </div>
             </div>
           </div>

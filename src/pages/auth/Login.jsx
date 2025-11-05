@@ -9,8 +9,8 @@ import LoaderType1 from "../../components/common/LoaderType1"
 import 'animate.css';
 
 const Login = () => {
-  const [email, setEmail] = useState()
-  const [password, setPassword] = useState()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const { loading, error, isAuthenticated, user } = useSelector((state) => state.auth)
   const [resendLoading, setResendLoading] = useState(false)
