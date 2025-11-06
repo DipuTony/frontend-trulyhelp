@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import PaymentGatewaySetting from './PaymentGatewaySetting'
 import OrganizationSettings from './OrganizationSettings'
 import BankSettings from './BankSettings'
@@ -6,15 +6,30 @@ import SocialSettings from './SocialSettings'
 
 const AdminSettingIndex = () => {
   const [activeTab, setActiveTab] = useState('organization')
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 500)
+    return () => clearTimeout(timer)
+  }, [])
 
   const TabButton = ({ id, label }) => (
     <button
       type="button"
-      onClick={() => setActiveTab(id)}
+      onClick={() => {
+        if (isLoading) return
+        setActiveTab(id)
+        setIsLoading(true)
+        const t = setTimeout(() => setIsLoading(false), 400)
+        // best-effort cleanup; button unmounts on tab switch but safe
+        return () => clearTimeout(t)
+      }}
+      disabled={isLoading}
       className={`px-4 py-2 text-sm font-medium rounded-t-lg border-b-2 focus:outline-none transition-colors
         ${activeTab === id
           ? 'border-indigo-600 text-indigo-700'
-          : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'}`}
+          : 'border-transparent text-gray-600 hover:text-gray-800 hover:border-gray-300'}
+        ${isLoading ? ' opacity-60 cursor-not-allowed' : ''}`}
     >
       {label}
     </button>
@@ -41,7 +56,7 @@ const AdminSettingIndex = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow">
+      <div className="bg-white rounded-xl shadow relative">
         <div className="px-4 pt-4">
           <div className="flex gap-2 border-b">
             <TabButton id="organization" label="Organization" />
@@ -51,7 +66,15 @@ const AdminSettingIndex = () => {
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-4 min-h-[200px]">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-xl">
+              <div className="flex items-center gap-3 text-gray-600">
+                <span className="inline-block h-5 w-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm">Loading...</span>
+              </div>
+            </div>
+          )}
           {activeTab === 'organization' && (
             <OrganizationSettings />
           )}
