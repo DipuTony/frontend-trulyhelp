@@ -140,15 +140,16 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     };
 
     // Use provided data or fallback to static data
-    const logo = Logo1;
-    const userImage = 'https://img.freepik.com/free-photo/young-bearded-man-with-striped-shirt_273609-5677.jpg';
+    const logo = displayData?.organization?.logoUrl || Logo1;
     const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${displayData?.userId || 'default'}`;
-    const orgName = "Truly Help Org"
-    const webSite = "trulyhelp.org"
-    const orgRegNo = "MH/2021/XXXXX"
-    const orgPhone = "xxxx989652"
-    const orgEmail = "info@trulyhelp.org"
-    const orgAddress = "noida, UP"
+    const orgName = displayData?.organization?.legalName || "Truly Help Org";
+    const webSite = displayData?.organization?.website || "trulyhelp.org";
+    const orgRegNo = displayData?.organization?.registrationNumber || "N/A";
+    const orgPhone = displayData?.organization?.phone || "N/A";
+    const orgEmail = displayData?.organization?.email || "info@trulyhelp.org";
+    const orgAddress = displayData?.organization?.formattedAddress || displayData?.organization?.address || "Noida, UP";
+    const directorName = displayData?.organization?.directorName || "N/A";
+    const directorTitle = displayData?.organization?.directorTitle || "(President / Director)";
 
     return (
         <div className="relative">
@@ -194,8 +195,8 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                             <p><strong>City:</strong> {displayData?.city || 'N/A'}</p>
                         </div>
                         <div className="mt-4 text-left">
-                            <p className="text-xs">Rajkumar Maurya Maurya</p>
-                            <p className="text-xs font-semibold">(President / Founder)</p>
+                            <p className="text-xs">{directorName}</p>
+                            <p className="text-xs font-semibold">{directorTitle}</p>
                         </div>
                     </div>
                     <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
