@@ -58,55 +58,161 @@ export default function IDCard({ cardData, adminSelectedCard }) {
         try {
             const loadingToast = toast.loading('Preparing ID Card for download...');
 
-            // Function to preload an image
-            const preloadImage = (src) => {
-                return new Promise((resolve, reject) => {
+            // Function to convert image to data URL
+            const imageToDataURL = (src) => {
+                return new Promise((resolve) => {
+                    // If already a data URL, return as is
+                    if (src.startsWith('data:')) {
+                        resolve(src);
+                        return;
+                    }
+
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
-                    img.onload = () => resolve(img);
-                    img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+                    
+                    img.onload = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.naturalWidth || img.width;
+                            canvas.height = img.naturalHeight || img.height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0);
+                            const dataURL = canvas.toDataURL('image/png');
+                            resolve(dataURL);
+                        } catch (err) {
+                            console.warn('Canvas conversion failed:', err);
+                            // If conversion fails, try to use original src
+                            resolve(src);
+                        }
+                    };
+                    
+                    img.onerror = () => {
+                        console.warn('Failed to load image:', src);
+                        resolve(src); // Fallback to original src
+                    };
+                    
                     img.src = src;
                 });
             };
 
-            // Preload all images first
+            // Get all images and convert them to data URLs
             const images = cardContainerRef.current.getElementsByTagName('img');
-            const imagePromises = Array.from(images).map(img => {
-                if (img.complete && img.naturalHeight !== 0) {
-                    return Promise.resolve();
+            const imageMap = new Map();
+            
+            // Convert all images to data URLs
+            const conversionPromises = Array.from(images).map(async (img, index) => {
+                if (!img.src && !img.currentSrc) return;
+                
+                // Get both src attribute and currentSrc for better matching
+                const srcAttr = img.getAttribute('src') || img.src;
+                const originalSrc = img.currentSrc || img.src;
+                
+                console.log(`Processing image ${index}:`, { srcAttr, originalSrc });
+                
+                // Wait for image to load if not already loaded
+                if (!img.complete || img.naturalHeight === 0) {
+                    await new Promise((resolve) => {
+                        if (img.complete && img.naturalHeight > 0) {
+                            resolve();
+                        } else {
+                            const timeout = setTimeout(resolve, 5000);
+                            img.onload = () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            };
+                            img.onerror = () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            };
+                        }
+                    });
                 }
-                return preloadImage(img.src);
+                
+                // Only convert if image loaded successfully
+                if (img.complete && img.naturalHeight > 0) {
+                    // Convert to data URL
+                    const dataURL = await imageToDataURL(originalSrc);
+                    // Store both src attribute and currentSrc for matching
+                    imageMap.set(originalSrc, dataURL);
+                    if (srcAttr && srcAttr !== originalSrc) {
+                        imageMap.set(srcAttr, dataURL);
+                    }
+                    console.log(`Converted image ${index}:`, originalSrc, 'to data URL');
+                } else {
+                    console.warn(`Image ${index} not loaded:`, originalSrc);
+                    imageMap.set(originalSrc, originalSrc); // Keep original
+                    if (srcAttr && srcAttr !== originalSrc) {
+                        imageMap.set(srcAttr, originalSrc);
+                    }
+                }
             });
 
-            // Wait for all images to load
-            await Promise.all(imagePromises);
+            await Promise.all(conversionPromises);
+            
+            console.log('Image conversion complete. Total images:', imageMap.size);
+            
+            // Wait a bit more to ensure everything is ready
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Create a temporary container
+            // Create a clone of the container
+            const clonedContainer = cardContainerRef.current.cloneNode(true);
+            
+            // Replace all image sources with data URLs in the clone
+            const clonedImages = clonedContainer.getElementsByTagName('img');
+            Array.from(clonedImages).forEach(img => {
+                const originalSrc = img.currentSrc || img.src;
+                if (imageMap.has(originalSrc)) {
+                    const dataURL = imageMap.get(originalSrc);
+                    img.src = dataURL;
+                    img.crossOrigin = 'anonymous';
+                    img.style.display = 'block';
+                    img.style.opacity = '1';
+                    img.style.visibility = 'visible';
+                    console.log('Replaced image src:', originalSrc, 'with data URL');
+                } else {
+                    // Try to find by src attribute if currentSrc doesn't match
+                    const srcAttr = img.getAttribute('src');
+                    if (srcAttr && imageMap.has(srcAttr)) {
+                        img.src = imageMap.get(srcAttr);
+                        img.crossOrigin = 'anonymous';
+                        img.style.display = 'block';
+                        img.style.opacity = '1';
+                        img.style.visibility = 'visible';
+                        console.log('Replaced image src by attribute:', srcAttr);
+                    }
+                }
+            });
+
+            // Create temporary container
             const tempContainer = document.createElement('div');
             tempContainer.style.position = 'absolute';
             tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '-9999px';
-            tempContainer.style.backgroundColor = '#f3f4f6'; // Match the background color
-            tempContainer.appendChild(cardContainerRef.current.cloneNode(true));
+            tempContainer.style.top = '0px';
+            tempContainer.style.width = cardContainerRef.current.offsetWidth + 'px';
+            tempContainer.style.backgroundColor = '#f3f4f6';
+            tempContainer.style.padding = '24px';
+            tempContainer.appendChild(clonedContainer);
             document.body.appendChild(tempContainer);
 
-            // Capture the card
-            const canvas = await html2canvas(tempContainer.firstChild, {
+            // Wait for clone to render
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Capture the cloned container
+            const canvas = await html2canvas(clonedContainer, {
                 scale: 2,
                 backgroundColor: '#f3f4f6',
                 logging: false,
                 useCORS: true,
-                allowTaint: true,
-                foreignObjectRendering: false,
-                imageTimeout: 15000,
+                allowTaint: false, // Use false since we're using data URLs
+                imageTimeout: 30000,
                 onclone: (clonedDoc) => {
-                    const clonedImages = clonedDoc.getElementsByTagName('img');
-                    Array.from(clonedImages).forEach(img => {
-                        if (img.src) {
-                            img.crossOrigin = 'anonymous';
-                            img.style.display = 'block';
-                            img.style.opacity = '1';
-                        }
+                    // Ensure all images are visible
+                    const finalImages = clonedDoc.getElementsByTagName('img');
+                    Array.from(finalImages).forEach(img => {
+                        img.style.display = 'block';
+                        img.style.opacity = '1';
+                        img.style.visibility = 'visible';
+                        img.crossOrigin = 'anonymous';
                     });
                 }
             });
@@ -117,6 +223,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
             // Convert canvas to blob
             canvas.toBlob((blob) => {
                 if (!blob) {
+                    toast.dismiss(loadingToast);
                     toast.error('Failed to generate image. Please try again.');
                     return;
                 }
