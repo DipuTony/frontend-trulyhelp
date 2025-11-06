@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { FiDownload } from 'react-icons/fi';
+import { FiLoader } from 'react-icons/fi';
 import html2canvas from 'html2canvas';
 import { toast } from 'sonner';
 import { formatDateFull } from "../../components/common/DateFormatFunctions";
@@ -13,6 +14,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     const [fetchedData, setFetchedData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [downloading, setDownloading] = useState(false);
 
     const userId = adminSelectedCard?.userId;
 
@@ -53,9 +55,10 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     if (!displayData) return null;
 
     const handleDownload = async () => {
-        if (!cardContainerRef.current) return;
+        if (!cardContainerRef.current || downloading) return;
 
         try {
+            setDownloading(true);
             const loadingToast = toast.loading('Preparing ID Card for download...');
 
             // Function to convert image to data URL
@@ -225,6 +228,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                 if (!blob) {
                     toast.dismiss(loadingToast);
                     toast.error('Failed to generate image. Please try again.');
+                    setDownloading(false);
                     return;
                 }
 
@@ -239,10 +243,12 @@ export default function IDCard({ cardData, adminSelectedCard }) {
 
                 toast.dismiss(loadingToast);
                 toast.success('ID Card downloaded successfully!');
+                setDownloading(false);
             }, 'image/png', 1.0);
         } catch (error) {
             console.error('Error downloading ID card:', error);
             toast.error(error.message || 'Failed to download ID Card. Please try again.');
+            setDownloading(false);
         }
     };
 
@@ -376,10 +382,24 @@ export default function IDCard({ cardData, adminSelectedCard }) {
             <div className="flex justify-center mt-6">
                 <button
                     onClick={handleDownload}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                    disabled={downloading}
+                    className={`inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
+                        downloading 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'hover:bg-blue-700'
+                    }`}
                 >
-                    <FiDownload className="w-5 h-5 mr-2" />
-                    Download ID Card
+                    {downloading ? (
+                        <>
+                            <FiLoader className="w-5 h-5 mr-2 animate-spin" />
+                            Downloading...
+                        </>
+                    ) : (
+                        <>
+                            <FiDownload className="w-5 h-5 mr-2" />
+                            Download ID Card
+                        </>
+                    )}
                 </button>
             </div>
         </div>
