@@ -137,7 +137,7 @@ const OrganizationSettings = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Field formik={formik} label="Legal Name" name="legalName" required help="Shown on receipts, legal docs and public pages." />
             <Field formik={formik} label="Website" name="website" help="Linked from headers/footers and emails." />
-            <Field formik={formik} label="Logo URL" name="logoUrl" help="Displayed in navbar, ID cards and receipts." />
+            {/* <Field formik={formik} label="Logo URL" name="logoUrl" help="Displayed in navbar, ID cards and receipts." /> */}
             <Field formik={formik} label="Email" name="email" help="Primary contact email shown on site and receipts." />
             <Field formik={formik} label="Phone" name="phone" help="Primary contact number shown on site and receipts." />
             <Field formik={formik} label="Director Name" name="directorName" help="Used in signatures on receipts/ID cards." />

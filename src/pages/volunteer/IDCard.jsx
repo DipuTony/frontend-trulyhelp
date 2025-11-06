@@ -140,7 +140,8 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     };
 
     // Use provided data or fallback to static data
-    const logo = displayData?.organization?.logoUrl || Logo1;
+    // const logo = displayData?.organization?.logoUrl || Logo1;
+    const logo = Logo1;
     const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${displayData?.userId || 'default'}`;
     const orgName = displayData?.organization?.legalName || "Truly Help Org";
     const webSite = displayData?.organization?.website || "trulyhelp.org";
@@ -206,9 +207,9 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                         <div>
                             <p>✉ {orgEmail}</p>
                         </div>
-                        <div>
+                        {/* <div>
                             <p>📍 {orgAddress}</p>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
 
@@ -251,12 +252,12 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                         </div>
                     </div>
                     <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
-                        <div>
+                        {/* <div>
                             <p>📞 {orgPhone}</p>
                         </div>
                         <div>
                             <p>✉ {orgEmail}</p>
-                        </div>
+                        </div> */}
                         <div>
                             <p>📍 {orgAddress}</p>
                         </div>
