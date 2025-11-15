@@ -18,7 +18,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
 
     const userId = adminSelectedCard?.userId;
 
-    console.log("cardData, userId",cardData, userId)
+    console.log("cardData, userId", cardData, userId)
 
     useEffect(() => {
         // Only fetch if cardData is not provided
@@ -72,7 +72,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
 
                     const img = new Image();
                     img.crossOrigin = 'anonymous';
-                    
+
                     img.onload = () => {
                         try {
                             const canvas = document.createElement('canvas');
@@ -88,12 +88,12 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                             resolve(src);
                         }
                     };
-                    
+
                     img.onerror = () => {
                         console.warn('Failed to load image:', src);
                         resolve(src); // Fallback to original src
                     };
-                    
+
                     img.src = src;
                 });
             };
@@ -101,17 +101,17 @@ export default function IDCard({ cardData, adminSelectedCard }) {
             // Get all images and convert them to data URLs
             const images = cardContainerRef.current.getElementsByTagName('img');
             const imageMap = new Map();
-            
+
             // Convert all images to data URLs
             const conversionPromises = Array.from(images).map(async (img, index) => {
                 if (!img.src && !img.currentSrc) return;
-                
+
                 // Get both src attribute and currentSrc for better matching
                 const srcAttr = img.getAttribute('src') || img.src;
                 const originalSrc = img.currentSrc || img.src;
-                
+
                 console.log(`Processing image ${index}:`, { srcAttr, originalSrc });
-                
+
                 // Wait for image to load if not already loaded
                 if (!img.complete || img.naturalHeight === 0) {
                     await new Promise((resolve) => {
@@ -130,7 +130,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                         }
                     });
                 }
-                
+
                 // Only convert if image loaded successfully
                 if (img.complete && img.naturalHeight > 0) {
                     // Convert to data URL
@@ -151,15 +151,15 @@ export default function IDCard({ cardData, adminSelectedCard }) {
             });
 
             await Promise.all(conversionPromises);
-            
+
             console.log('Image conversion complete. Total images:', imageMap.size);
-            
+
             // Wait a bit more to ensure everything is ready
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // Create a clone of the container
             const clonedContainer = cardContainerRef.current.cloneNode(true);
-            
+
             // Replace all image sources with data URLs in the clone
             const clonedImages = clonedContainer.getElementsByTagName('img');
             Array.from(clonedImages).forEach(img => {
@@ -256,8 +256,10 @@ export default function IDCard({ cardData, adminSelectedCard }) {
     // const logo = displayData?.organization?.logoUrl || Logo1;
     const logo = Logo1;
     const qrImage = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${displayData?.userId || 'default'}`;
-    const orgName = displayData?.organization?.legalName || "Truly Help Org";
-    const webSite = displayData?.organization?.website || "trulyhelp.org";
+    const webSiteRaw = displayData?.organization?.website || "trulyhelp.org";
+    // Remove protocol (http://, https://) and ensure www. prefix
+    let webSite = webSiteRaw.replace(/^https?:\/\//, '').replace(/^www\./, '');
+    webSite = webSite ? `www.${webSite}` : 'www.trulyhelp.org';
     const orgRegNo = displayData?.organization?.registrationNumber || "N/A";
     const orgPhone = displayData?.organization?.phone || "N/A";
     const orgEmail = displayData?.organization?.email || "info@trulyhelp.org";
@@ -279,15 +281,6 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                             alt="Logo"
                             className="mx-auto h-12 mb-2"
                         />
-                        <h2 className="text-xl font-bold text-gray-800">
-                            {orgName}
-                        </h2>
-                        <a
-                            href={webSite}
-                            className="text-sm text-blue-600"
-                        >
-                            {webSite}
-                        </a>
                         <div className="flex justify-center items-center mt-4 gap-4">
                             <img
                                 src={displayData?.profileImageUrl}
@@ -313,16 +306,19 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                             <p className="text-xs font-semibold">{directorTitle}</p>
                         </div>
                     </div>
-                    <div className="bg-gray-800 text-white flex justify-around py-2 text-xs">
-                        <div>
-                            <p>📞 {orgPhone}</p>
+                    <div className="bg-gray-800 mt-6 text-white flex flex-col py-2 text-xs space-y-1">
+                        <div className="flex justify-around">
+                            <div>
+                                <p>📞 {orgPhone}</p>
+                            </div>
+                            <div>
+                                <p>✉ {orgEmail}</p>
+                            </div>
+                            <div>
+                                <p>🌐 {webSite}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p>✉ {orgEmail}</p>
-                        </div>
-                        {/* <div>
-                            <p>📍 {orgAddress}</p>
-                        </div> */}
+
                     </div>
                 </div>
 
@@ -337,9 +333,7 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                             alt="Logo"
                             className="mx-auto h-12 mb-2"
                         />
-                        <h2 className="text-xl font-bold text-gray-800 mb-4">
-                            {orgName}
-                        </h2>
+
                         <div className="flex justify-center items-center mt-4 gap-4">
 
                             <img
@@ -383,11 +377,10 @@ export default function IDCard({ cardData, adminSelectedCard }) {
                 <button
                     onClick={handleDownload}
                     disabled={downloading}
-                    className={`inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${
-                        downloading 
-                            ? 'opacity-50 cursor-not-allowed' 
+                    className={`inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors ${downloading
+                            ? 'opacity-50 cursor-not-allowed'
                             : 'hover:bg-blue-700'
-                    }`}
+                        }`}
                 >
                     {downloading ? (
                         <>
