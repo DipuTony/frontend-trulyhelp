@@ -47,6 +47,7 @@ const AdminManagement = () => {
       phone: '',
       password: '',
       role: '',
+      status: 'ACTIVE',
       isEditing: false
     },
     validationSchema,
@@ -57,6 +58,7 @@ const AdminManagement = () => {
           email: values.email,
           phone: values.phone,
           role: roleName,
+          status: 'ACTIVE', // New admins are always active
         }
 
         const updatePayload = {
@@ -64,6 +66,7 @@ const AdminManagement = () => {
           name: values.name,
           phone: values.phone,
           role: roleName,
+          status: values.status,
         }
 
         if (isEditing && currentAdmin) {
@@ -74,7 +77,7 @@ const AdminManagement = () => {
           showSuccessToast("Admin added successfully");
         }
 
-        fetchAdmins();
+        await fetchAdmins();
         setStatus(null);
         setSubmitting(false);
         resetForm();
@@ -114,6 +117,7 @@ const AdminManagement = () => {
         phone: admin.phone || "",
         password: "",
         role: roleName,
+        status: admin.status || 'ACTIVE',
         isEditing: true
       })
     } else {
@@ -125,6 +129,7 @@ const AdminManagement = () => {
         phone: "",
         password: "",
         role: roleName,
+        status: 'ACTIVE',
         isEditing: false
       })
     }
@@ -168,7 +173,7 @@ const AdminManagement = () => {
       Cell: ({ row }) => (
         <button
           onClick={() => handleViewAdmin(row.original.userId)}
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
+          className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline font-medium"
         >
           {row.original.name}
         </button>
@@ -187,6 +192,22 @@ const AdminManagement = () => {
       accessor:'role',  
     },
     {
+      Header: 'Status',
+      accessor: 'status',
+      Cell: ({ value }) => {
+        const statusColors = {
+          ACTIVE: 'bg-green-100 text-green-800',
+          INACTIVE: 'bg-red-100 text-red-800',
+          DELETED: 'bg-gray-100 text-gray-800'
+        }
+        return (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${statusColors[value] || 'bg-gray-100 text-gray-800'}`}>
+            {value || 'ACTIVE'}
+          </span>
+        )
+      }
+    },
+    {
       Header: 'Created At',
       accessor:'createdAt',
       Cell: ({ value }) => formatDateShort(value)
@@ -196,8 +217,11 @@ const AdminManagement = () => {
       Cell: ({ row }) => (
         <button
           onClick={() => handleOpenModal(row.original)}
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-900"
+          className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200"
         >
+          <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
           Edit
         </button>
       )
@@ -281,6 +305,35 @@ const AdminManagement = () => {
                             <p className="mt-1 text-sm text-red-600">{formik.errors.phone}</p>
                           )}
                         </div>
+                        {isEditing && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <div className="flex items-center space-x-4">
+                              <label className="inline-flex items-center">
+                                <input
+                                  type="radio"
+                                  name="status"
+                                  value="ACTIVE"
+                                  checked={formik.values.status === 'ACTIVE'}
+                                  onChange={formik.handleChange}
+                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                />
+                                <span className="ml-2 text-sm text-gray-700">Active</span>
+                              </label>
+                              <label className="inline-flex items-center">
+                                <input
+                                  type="radio"
+                                  name="status"
+                                  value="INACTIVE"
+                                  checked={formik.values.status === 'INACTIVE'}
+                                  onChange={formik.handleChange}
+                                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                                />
+                                <span className="ml-2 text-sm text-gray-700">Inactive</span>
+                              </label>
+                            </div>
+                          </div>
+                        )}
                         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                           <button
                             type="submit"

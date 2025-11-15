@@ -33,8 +33,19 @@ const Login = () => {
   }, [isAuthenticated, user, navigate, dispatch])
 
   useEffect(() => {
-    if (error && typeof error === 'object' && error.status === 403 && error.emailVerifyStatus === false) {
-      showErrorToast(error.message || "Please verify your email before logging in")
+    if (error && typeof error === 'object') {
+      if (error.status === 403) {
+        if (error.emailVerifyStatus === false) {
+          showErrorToast(error.message || "Please verify your email before logging in")
+        } else {
+          // Handle inactive/disabled user status
+          showErrorToast(error.message || "Your account is not active. Please contact support.")
+        }
+      } else if (error.message) {
+        showErrorToast(error.message)
+      }
+    } else if (error && typeof error === 'string') {
+      showErrorToast(error)
     }
   }, [error])
 
