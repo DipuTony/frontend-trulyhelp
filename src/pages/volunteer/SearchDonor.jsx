@@ -13,8 +13,8 @@ const SearchDonor = () => {
 
     const handleSearch = async (e) => {
         e.preventDefault();
-        if (searchQuery.length < 5) {
-            toast.error('Please enter at least 5 characters to search');
+        if (searchQuery.length < 3) {
+            toast.error('Please enter at least 3 characters to search');
             return;
         }
 
@@ -64,14 +64,14 @@ const SearchDonor = () => {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search by name, email, phone, or user ID (min. 5 characters)"
+                                    placeholder="Search by name, email, phone, or user ID (min. 3 characters)"
                                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                                    minLength={5}
+                                    minLength={3}
                                 />
                             </div>
                             <button
                                 type="submit"
-                                disabled={loading || searchQuery.length < 5}
+                                disabled={loading || searchQuery.length < 3}
                                 className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:transform-none"
                             >
                                 {loading ? (
@@ -87,9 +87,9 @@ const SearchDonor = () => {
                                 )}
                             </button>
                         </div>
-                        {searchQuery.length > 0 && searchQuery.length < 5 && (
+                        {searchQuery.length > 0 && searchQuery.length < 3 && (
                             <p className="mt-2 text-sm text-red-600">
-                                Please enter at least 5 characters to search
+                                Please enter at least 3 characters to search
                             </p>
                         )}
                     </form>
