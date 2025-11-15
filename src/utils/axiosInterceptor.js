@@ -66,7 +66,7 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor (handles 401 errors)
+// Response interceptor (handles 401 and 403 errors for disabled accounts)
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -79,6 +79,8 @@ axiosInstance.interceptors.response.use(
         url: error.config?.url
       });
     } catch {}
+    
+    // Handle 401 (Unauthorized) - Invalid/expired token
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -94,6 +96,28 @@ axiosInstance.interceptors.response.use(
         window.location.href = "/login"; // Fallback (reloads)
       }
     }
+    
+    // Handle 403 (Forbidden) - Account disabled or access denied
+    // Check if it's an account disabled message
+    if (error.response?.status === 403) {
+      const errorMessage = error.response?.data?.message || '';
+      if (errorMessage.includes('disabled') || errorMessage.includes('not active')) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        // Dispatch the logout action and show message
+        if (dispatchRef) {
+          dispatchRef(logout());
+          dispatchRef(setMessage(errorMessage || "Your account has been disabled. Please contact support."));
+        }
+
+        if (navigateRef) {
+          navigateRef('/login'); // Use React Router navigation (no reload)
+        } else {
+          window.location.href = "/login"; // Fallback (reloads)
+        }
+      }
+    }
+    
     return Promise.reject(error);
   }
 );
