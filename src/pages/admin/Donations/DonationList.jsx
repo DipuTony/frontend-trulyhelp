@@ -123,12 +123,18 @@ const DonationList = () => {
     {
       Header: 'Donor Name',
       Cell: ({ row }) => (
-        <button
-          onClick={() => handleViewDonation(row.original.donorUserId)}
-          className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
-        >
-          {row.original.donorName}
-        </button>
+        isAdmin ? (
+          <button
+            onClick={() => handleViewDonation(row.original.donorUserId)}
+            className="inline-flex items-center text-indigo-600 hover:text-indigo-900 hover:underline"
+          >
+            {row.original.donorName}
+          </button>
+        ) : (
+          <span className="inline-flex items-center text-gray-900">
+            {row.original.donorName}
+          </span>
+        )
       )
     },
     // {
