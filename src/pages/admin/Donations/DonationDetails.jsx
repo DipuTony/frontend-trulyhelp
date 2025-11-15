@@ -458,58 +458,62 @@ const DonationDetails = ({ donationData, goBack }) => {
                         </div>
                     </div>
 
-                    {/* Timeline */}
-                    <div className="mt-8">
-                        <h3 className="text-lg font-semibold mb-4">Donation Timeline</h3>
-                        <div className="border-l-2 border-gray-200 pl-6 space-y-6">
-                            <div className="relative">
-                                <div className="absolute -left-7 top-0 w-4 h-4 rounded-full bg-blue-600 border-4 border-white"></div>
-                                <div className="flex items-start">
-                                    <div className="flex-1">
-                                        <p className="font-medium">Donation Received</p>
-                                        <p className="text-sm text-gray-500">{formatDate(donation?.createdAt) || "N/A"}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {donation.receiptGeneratedAt && (
+                    {/* Timeline - Admin only */}
+                    {isAdmin && (
+                        <div className="mt-8">
+                            <h3 className="text-lg font-semibold mb-4">Donation Timeline</h3>
+                            <div className="border-l-2 border-gray-200 pl-6 space-y-6">
                                 <div className="relative">
-                                    <div className="absolute -left-7 top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white"></div>
+                                    <div className="absolute -left-7 top-0 w-4 h-4 rounded-full bg-blue-600 border-4 border-white"></div>
                                     <div className="flex items-start">
                                         <div className="flex-1">
-                                            <p className="font-medium">Receipt Generated</p>
-                                            <p className="text-sm text-gray-500">{formatDate(donation?.receiptGeneratedAt) || "N/A"}</p>
+                                            <p className="font-medium">Donation Received</p>
+                                            <p className="text-sm text-gray-500">{formatDate(donation?.createdAt) || "N/A"}</p>
                                         </div>
                                     </div>
                                 </div>
-                            )}
+
+                                {donation.receiptGeneratedAt && (
+                                    <div className="relative">
+                                        <div className="absolute -left-7 top-0 w-4 h-4 rounded-full bg-green-500 border-4 border-white"></div>
+                                        <div className="flex items-start">
+                                            <div className="flex-1">
+                                                <p className="font-medium">Receipt Generated</p>
+                                                <p className="text-sm text-gray-500">{formatDate(donation?.receiptGeneratedAt) || "N/A"}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* Footer Actions */}
                 <div className='flex justify-between'>
-                    <div className="px-6 py-4 flex justify-start space-x-3">
-                        <button
-                            onClick={() => {
-                                setShowOldDonations(!showOldDonations);
-                                setTimeout(() => { // Wait for state update and DOM render
-                                    if (!showOldDonations) {
-                                        // Scroll to bottom of donations container
-                                        const container = document.querySelector('.donations-container');
-                                        if (container) {
-                                            container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                    {isAdmin && (
+                        <div className="px-6 py-4 flex justify-start space-x-3">
+                            <button
+                                onClick={() => {
+                                    setShowOldDonations(!showOldDonations);
+                                    setTimeout(() => { // Wait for state update and DOM render
+                                        if (!showOldDonations) {
+                                            // Scroll to bottom of donations container
+                                            const container = document.querySelector('.donations-container');
+                                            if (container) {
+                                                container.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                                            }
+                                        } else {
+                                            window.scrollTo({ top: 0, behavior: 'smooth' });
                                         }
-                                    } else {
-                                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                                    }
-                                }, 0);
-                            }}
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-                        >
-                            {showOldDonations ? 'Hide' : 'Show'} Previous Donations
-                        </button>
-                    </div>
+                                    }, 0);
+                                }}
+                                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                            >
+                                {showOldDonations ? 'Hide' : 'Show'} Previous Donations
+                            </button>
+                        </div>
+                    )}
                     <div className="px-6 py-4 flex justify-end space-x-3">
                         {/* <button className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100">
                             Edit Details
