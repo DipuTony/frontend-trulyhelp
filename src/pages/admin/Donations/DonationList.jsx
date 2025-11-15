@@ -171,6 +171,11 @@ const DonationList = () => {
       accessor: 'paymentStatus',
     },
     {
+      Header: 'Donor Type',
+      accessor: 'donationType',
+      Cell: ({ value }) => value || 'N/A'
+    },
+    {
       Header: 'Date',
       accessor: 'createdAt',
       Cell: ({ value }) => formatDateShort(value)
