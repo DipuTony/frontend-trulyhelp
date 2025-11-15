@@ -23,10 +23,10 @@ const Login = () => {
     if (isAuthenticated) {
       const role = (user?.role || '').toUpperCase()
       const roleRoutes = {
-        SUPER_ADMIN: "/admin/profile",
-        ADMIN: "/admin/profile",
-        VOLUNTEER: "/volunteer/profile",
-        DONOR: "/donor/profile",
+        SUPER_ADMIN: "/admin",
+        ADMIN: "/admin",
+        VOLUNTEER: "/volunteer",
+        DONOR: "/donor",
       }
       navigate(roleRoutes[role] || "/")
     }
