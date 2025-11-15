@@ -106,7 +106,7 @@ const AdminLayout = () => {
       href: "/admin/settings", 
       icon: "user",
       description: "Admin Settings",
-      comingSoon: true
+      comingSoon: false
     },
   ]
 

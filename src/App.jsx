@@ -40,6 +40,7 @@ import Profile from "./pages/donor/Profile"
 import ForgotPassword from "./pages/auth/ForgotPassword"
 import ResetPassword from "./pages/auth/ResetPassword"
 import ToastNotification from "./components/common/ToastNotification"
+import TestPaymentNotification from "./components/common/TestPaymentNotification"
 import { useEffect } from "react"
 import { setAxiosNavigate, setAxiosDispatch } from "./utils/axiosInterceptor"
 
@@ -75,6 +76,7 @@ function App() {
   return (
     <>
       <ToastNotification />
+      <TestPaymentNotification />
       <ErrorBoundary
         FallbackComponent={({ error, resetErrorBoundary }) => (
           <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} showNavigation={true} />
